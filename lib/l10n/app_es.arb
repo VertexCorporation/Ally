@@ -1,0 +1,821 @@
+{
+  "@@locale": "es",
+  "appTitle": "Ally",
+  "welcomeTitle": "Ally",
+  "welcomeDescription": "El aliado más cercano de tu salud.",
+  "letsStart": "¡Empecemos!",
+  "loginTitle": "Iniciar sesión",
+  "continueAnonymously": "Continuar anónimamente",
+  "loginDescription": "Inicia sesión para continuar",
+  "dailyReflection": "Reflexión diaria",
+  "helloAnonymous": "¡Hola, anónimo!",
+  "healthScore": "Puntuación de salud",
+  "today": "Hoy",
+  "of100": "de 100",
+  "exercises": "Ejercicios",
+  "dayStreak": "{count} días seguidos",
+  "nutrition": "Nutrición",
+  "calories": "{count} cal",
+  "sleep": "Sueño",
+  "hours": "{hours}h",
+  "water": "Agua",
+  "waterGlasses": "{current} / {goal} vasos",
+  "weight": "Peso",
+  "weightKg": "{weight} kg",
+  "heartbeat": "Latidos",
+  "bpm": "{bpm} lpm",
+  "pedometer": "Pasos",
+  "steps": "{current} / {goal} pasos",
+  "home": "Inicio",
+  "activity": "Actividad",
+  "achievements": "Logros",
+  "account": "Cuenta",
+  "settings": "Configuración",
+  "friendsActivity": "Actividad de amigos",
+  "myActivity": "Mi actividad",
+  "yourAchievements": "Tus logros",
+  "totalPoints": "Puntos totales",
+  "completedChallenges": "Desafíos completados",
+  "currentStreak": "Racha actual",
+  "days": "días",
+  "notifications": "Notificaciones",
+  "pushNotifications": "Notificaciones push",
+  "pushNotificationsDesc": "Recibe notificaciones de tus actividades",
+  "emailNotifications": "Notificaciones por correo",
+  "emailNotificationsDesc": "Recibe actualizaciones por correo electrónico",
+  "privacySecurity": "Privacidad y seguridad",
+  "privacySettings": "Configuración de privacidad",
+  "privacySettingsDesc": "Administra tus preferencias de privacidad",
+  "dataStorage": "Datos y almacenamiento",
+  "dataStorageDesc": "Administra tus datos y almacenamiento",
+  "appSettings": "Configuración de la aplicación",
+  "language": "Idioma",
+  "theme": "Tema",
+  "units": "Unidades",
+  "about": "Acerca de",
+  "helpSupport": "Ayuda y soporte",
+  "helpSupportDesc": "Obtén ayuda y contacta con soporte",
+  "termsConditions": "Términos y condiciones",
+  "termsConditionsDesc": "Lee nuestros términos y condiciones",
+  "aboutAlly": "Acerca de Ally",
+  "version": "Versión 1.0.0",
+  "selectLanguage": "Seleccionar idioma",
+  "selectTheme": "Seleccionar tema",
+  "selectUnits": "Seleccionar unidades",
+  "systemDefault": "Predeterminado del sistema",
+  "lightMode": "Modo claro",
+  "darkMode": "Modo oscuro",
+  "metric": "Métrico",
+  "imperial": "Imperial",
+  "personalInfo": "Información personal",
+  "fullName": "Nombre completo",
+  "anonymousUser": "Usuario anónimo",
+  "country": "País",
+  "unitedStates": "Estados Unidos",
+  "dateOfBirth": "Fecha de nacimiento",
+  "january1": "1 de enero de 1990",
+  "healthInfo": "Información de salud",
+  "currentWeight": "Peso actual",
+  "waterGoal": "Objetivo de agua",
+  "glassesPerDay": "{count} vasos/día",
+  "calorieGoal": "Objetivo de calorías",
+  "kcalPerDay": "{count} kcal/día",
+  "exerciseStreak": "Racha de ejercicio",
+  "daysCount": "{count} días",
+  "dangerZone": "Zona de peligro",
+  "deleteAccount": "Eliminar cuenta",
+  "deleteAccountDesc": "Elimina permanentemente tu cuenta y datos",
+  "noFriendsYet": "Aún no hay amigos",
+  "addFriendsToSee": "Agrega amigos para ver su actividad",
+  "noActivityYet": "Aún no hay actividad",
+  "startTrackingToSee": "Comienza a rastrear para ver tu actividad",
+  "badges": "Insignias",
+  "dayStreakLabel": "Racha de días",
+  "availableAchievements": "Logros disponibles",
+  "hydrationHero": "Héroe de la hidratación",
+  "drink8Glasses": "Bebe 8 vasos de agua diariamente",
+  "points": "puntos",
+  "workoutWarrior": "Guerrero del ejercicio",
+  "complete7Days": "Completa 7 días de ejercicio",
+  "sleepChampion": "Campeón del sueño",
+  "get8Hours": "Duerme 8 horas durante 7 días",
+  "nutritionMaster": "Maestro de nutrición",
+  "trackMeals": "Registra comidas durante 30 días",
+  "heartHealth": "Salud del corazón",
+  "maintain60to100": "Mantén 60-100 lpm durante una semana",
+  "waterIntake": "Consumo de agua",
+  "mealLogged": "Comida registrada",
+  "sleepLogged": "Sueño registrado",
+  "weightUpdated": "Peso actualizado",
+  "justNow": "Justo ahora",
+  "minutesAgo": "Hace {minutes}m",
+  "@minutesAgo": {"placeholders": {"minutes": {"type": "int"}}},
+  "hoursAgo": "Hace {hours}h",
+  "@hoursAgo": {"placeholders": {"hours": {"type": "int"}}},
+  "lastNight": "Anoche",
+  "thisWeek": "Esta semana",
+  "sleepDuration": "Duración del sueño",
+  "heartRate": "Frecuencia cardíaca",
+  "scoreBreakdown": "Desglose de puntuación",
+  "loseWeight": "Perder peso",
+  "reduceCalories": "Reducir calorías",
+  "maintainWeight": "Mantener peso",
+  "balancedCalories": "Calorías equilibradas",
+  "gainWeight": "Ganar peso",
+  "increaseCalories": "Aumentar calorías",
+  "activityLevel": "Nivel de actividad",
+  "sedentary": "Sedentario",
+  "littleExercise": "Poco o ningún ejercicio",
+  "lightlyActive": "Ligeramente activo",
+  "lightExercise": "Ejercicio ligero 1-3 días/semana",
+  "moderatelyActive": "Moderadamente activo",
+  "moderateExercise": "Ejercicio moderado 3-5 días/semana",
+  "veryActive": "Muy activo",
+  "intenseTraining": "Entrenamiento intenso diario",
+  "yourHealthScore": "Tu Puntuación de Salud",
+  "outOf100": "de 100",
+  "workoutStreakDesc": "Racha de ejercicio y actividad diaria",
+  "sleepQualityDesc": "Duración y calidad del sueño",
+  "hydrationGoalDesc": "Objetivo de hidratación diaria",
+  "weightProgressDesc": "Progreso hacia el peso objetivo",
+  "calorieBalanceDesc": "Balance de ingesta calórica",
+  "restingHeartRateDesc": "Frecuencia cardíaca en reposo",
+  "todaysIntake": "Ingesta de Hoy",
+  "todaysMeals": "Comidas de Hoy",
+  "noMealsLogged": "No hay comidas registradas aún",
+  "tapToAddMeal": "Toca + para añadir tu primera comida",
+  "todaysPrograms": "Programas de Hoy",
+  "noWorkoutsLogged": "No hay entrenamientos registrados aún",
+  "startFitnessJourney": "¡Comienza tu viaje fitness hoy!",
+  "noSleepData": "No hay datos de sueño registrados",
+  "trackSleepPatterns": "Registra tu sueño para ver patrones",
+  "progress": "Progreso",
+  "noWeightHistory": "No hay historial de peso aún",
+  "trackWeightProgress": "Registra tu peso para ver el progreso",
+  "currentHeartRate": "Frecuencia Cardíaca Actual",
+  "todaysReadings": "Lecturas de Hoy",
+  "noReadingsYet": "No hay lecturas aún",
+  "requiresMonitor": "Requiere dispositivo monitor de frecuencia cardíaca",
+  "percentWeight": "% peso",
+  "tipMaintainStreak": "Concéntrate en mantener tu racha de ejercicio",
+  "tipDrinkWater": "Intenta beber 2 vasos más de agua hoy",
+  "tipBedtimeEarlier": "Intenta dormir 30 minutos más temprano",
+  "weightGoalAchieved": "Objetivo de Peso Alcanzado",
+  "reachTargetWeight": "Alcanza tu peso objetivo",
+  "welcomeToAlly": "Bienvenido a Ally",
+  "personalHealthCompanion": "Tu compañero personal de salud",
+  "trackWellnessJourney": "Rastrea tu viaje de bienestar con objetivos y perspectivas personalizadas",
+  "drankGlasses": "Bebió {count} vasos de agua",
+  "caloriesConsumed": "{count} calorías consumidas",
+  "dayStreakMaintained": "Racha de {count} días mantenida",
+  "hoursOfSleep": "{hours} horas de sueño",
+  "todaysOverview": "Resumen de Hoy",
+  "quickStats": "Estadísticas Rápidas",
+  "totalActivity": "Actividad Total",
+  "badgesEarned": "Insignias Ganadas",
+  "setYourGoals": "Establece Tus Objetivos",
+  "manageYourProfile": "Administra Tu Perfil",
+  "firstSteps": "Primeros Pasos",
+  "firstStepsDesc": "Completa la configuración de tu perfil",
+  "earlyBird": "Madrugador",
+  "earlyBirdDesc": "Registra 7 días consecutivos",
+  "hydrationHero": "Héroe de Hidratación",
+  "hydrationHeroDesc": "Bebe 8 vasos al día durante 7 días",
+  "calorieCounter": "Contador de Calorías",
+  "calorieCounterDesc": "Rastrea comidas durante 30 días",
+  "weekWarrior": "Guerrero Semanal",
+  "weekWarriorDesc": "Haz ejercicio 5 veces a la semana",
+  "mileMaster": "Maestro de Millas",
+  "mileMasterDesc": "Corre un total de 100 millas",
+  "sleepChampion": "Campeón del Sueño",
+  "sleepChampionDesc": "Duerme 8 horas durante 7 días",
+  "calculateCalorieNeeds": "Esto nos ayuda a calcular tus necesidades calóricas diarias",
+  "personalizeHealthGoals": "Usaremos esto para personalizar tus objetivos de salud",
+  "tellUsAboutYourself": "Cuéntanos más sobre ti",
+  "determinesCalorieTarget": "Esto determina tu objetivo de calorías",
+  "loseWeight": "Perder Peso",
+  "maintainWeight": "Mantener Peso",
+  "balancedCalories": "Calorías equilibradas",
+  "gainWeight": "Ganar Peso",
+  "activityLevel": "Nivel de Actividad",
+  "howActiveAreYou": "¿Qué tan activo eres en un día típico?",
+  "sedentary": "Sedentario",
+  "littleToNoExercise": "Poco o ningún ejercicio",
+  "veryActive": "Muy Activo",
+  "intenseDailyTraining": "Entrenamiento intenso diario",
+  "light": "Ligero",
+  "lightActivity": "1-3 días/semana",
+  "moderate": "Moderado",
+  "moderateActivity": "3-5 días/semana",
+  "active": "Activo",
+  "activeActivity": "6-7 días/semana",
+  "addExercise": "Agregar Ejercicio",
+  "cardio": "Cardio",
+  "strength": "Fuerza",
+  "flexibility": "Flexibilidad",
+  "sports": "Deportes",
+  "addNutrition": "Agregar Nutrición",
+  "automatic": "Automático",
+  "manual": "Manual",
+  "scanWithCamera": "Escanear con Cámara",
+  "selectPlateType": "Seleccionar Tipo de Plato",
+  "plate": "Plato",
+  "bowl": "Tazón",
+  "smallPlate": "Plato Pequeño",
+  "mediumPlate": "Plato Mediano",
+  "largePlate": "Plato Grande",
+  "smallBowl": "Tazón Pequeño",
+  "mediumBowl": "Tazón Mediano",
+  "largeBowl": "Tazón Grande",
+  "fillLevel": "Nivel de Llenado",
+  "quarter": "1/4 Lleno",
+  "half": "1/2 Lleno",
+  "threeQuarters": "3/4 Lleno",
+  "full": "Lleno",
+  "selectFood": "Seleccionar Comida",
+  "breakfast": "Desayuno",
+  "lunch": "Almuerzo",
+  "dinner": "Cena",
+  "snacks": "Bocadillos",
+  "egg": "Huevo",
+  "milk": "Leche",
+  "yogurt": "Yogur",
+  "whiteRice": "Arroz Blanco",
+  "plainPasta": "Pasta Simple",
+  "chickenBreast": "Pechuga de Pollo",
+  "grilledSalmon": "Salmón a la Parrilla",
+  "boiledPotato": "Patata Hervida",
+  "mixedVegetables": "Verduras Mixtas",
+  "couscous": "Cuscús",
+  "quinoa": "Quinoa",
+  "bulgur": "Bulgur",
+  "corn": "Maíz",
+  "peas": "Guisantes",
+  "broccoli": "Brócoli",
+  "mushroom": "Champiñón",
+  "stirFryVegetables": "Verduras Salteadas",
+  "sweetPotato": "Batata",
+  "baldoRice": "Arroz Baldo",
+  "chickenCurry": "Curry de Pollo",
+  "beefCurry": "Curry de Carne",
+  "spaghettiPuttanesca": "Espagueti Puttanesca",
+  "ravioli": "Ravioli",
+  "gnocchi": "Gnocchi",
+  "kidneyBeans": "Frijoles Rojos",
+  "chickpeas": "Garbanzos",
+  "lentils": "Lentejas",
+  "whiteBeans": "Frijoles Blancos",
+  "tuna": "Atún",
+  "mussels": "Mejillones",
+  "shrimp": "Camarón",
+  "caesarSalad": "Ensalada César",
+  "tofu": "Tofu",
+  "salad": "Ensalada",
+  "soup": "Sopa",
+  "fruit": "Fruta",
+  "vegetables": "Verduras",
+  "mealLog": "Registro de Comidas",
+  "todaysMeals": "Comidas de Hoy",
+  "noMealsYet": "Aún no se han agregado comidas",
+  "premium": "Premium",
+  "upgradeYourPlan": "Mejora tu Plan",
+  "unlockMore": "Desbloquea Más.",
+  "goPremium": "Hazte Premium",
+  "upgradeForExclusive": "Mejora para obtener ventajas exclusivas y una experiencia\nmás fluida y rápida.",
+  "individual": "Individual",
+  "family": "Familia",
+  "familyPlan": "Plan Familiar",
+  "allyIndividual": "Ally Individual",
+  "month": "mes",
+  "allIndividualFeatures": "Todas las funciones Individual más\ncompartir en familia hasta 4 miembros.",
+  "getAllyPlan": "Obtener Plan Ally",
+  "getFamilyPlan": "Obtener Plan Familiar",
+  "friendRequestSent": "Solicitud de Amistad Enviada",
+  "requestSentTo": "¡Solicitud enviada a {username} con éxito!",
+  "@requestSentTo": {
+    "placeholders": {
+      "username": {
+        "type": "String"
+      }
+    }
+  },
+  "selectExercise": "Seleccionar Ejercicio",
+  "all": "Todos",
+  "addExercisesToStart": "Agregar ejercicios para comenzar",
+  "tapPlusButton": "Toca el botón + a continuación",
+  "reps": "Repeticiones",
+  "weight": "Peso",
+  "rest": "Descanso (s)",
+  "addSet": "Agregar Serie",
+  "addExercise": "Agregar Ejercicio",
+  "save": "Guardar",
+  "workoutName": "Nombre del Entrenamiento",
+  "enterWorkoutName": "Ingresa nombre del entrenamiento",
+  "createWorkout": "Crear Entrenamiento",
+  "editWorkout": "Editar Entrenamiento",
+  "deleteWorkout": "Eliminar Entrenamiento",
+  "areYouSureDelete": "¿Estás seguro de que deseas eliminar este entrenamiento?",
+  "delete": "Eliminar",
+  "completedAt": "Completado a las {time}",
+  "@completedAt": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "set": "Serie",
+  "quickExerciseLog": "Registro Rápido de Ejercicio",
+  "logYourExercise": "Registra tu ejercicio",
+  "exerciseName": "Nombre del Ejercicio",
+  "enterExerciseName": "Ingresa nombre del ejercicio",
+  "sets": "Series",
+  "duration": "Duración",
+  "minutes": "minutos",
+  "logExercise": "Registrar Ejercicio",
+  "close": "Cerrar",
+  "customProgram": "Programa Personalizado",
+  "buildYourOwnWorkout": "Crea tu propio entrenamiento",
+  "quickLog": "Registro Rápido",
+  "logASingleExercise": "Registrar un solo ejercicio",
+  "noStreakYet": "Aún no hay racha",
+  "day": "día",
+  "keepGoing": "¡Sigue así!",
+  "quickPrograms": "Programas Rápidos",
+  "createProgramToQuicklyStart": "Crea un programa para comenzar rápidamente",
+  "min": "min",
+  "ex": "ej",
+  "editProgram": "Editar Programa",
+  "deleteProgram": "Eliminar Programa",
+  "deleteProgramQuestion": "¿Eliminar Programa?",
+  "areYouSureDeleteProgram": "¿Estás seguro de que deseas eliminar \"{name}\"?",
+  "@areYouSureDeleteProgram": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "logged": "registrado",
+  "kg": "kg",
+  "editSetNumber": "Editar Serie {number}",
+  "@editSetNumber": {
+    "placeholders": {
+      "number": {
+        "type": "int"
+      }
+    }
+  },
+  "reps": "Repeticiones",
+  "weightWithUnit": "Peso ({unit})",
+  "@weightWithUnit": {
+    "placeholders": {
+      "unit": {
+        "type": "String"
+      }
+    }
+  },
+  "exerciseNotFound": "Ejercicio no encontrado",
+  "exitWorkout": "¿Salir del Entrenamiento?",
+  "progressNotSaved": "Tu progreso no se guardará.",
+  "exit": "Salir",
+  "finish": "Finalizar",
+  "exerciseProgress": "Ejercicio {current}/{total}",
+  "@exerciseProgress": {
+    "placeholders": {
+      "current": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "percentComplete": "{percent}% Completo",
+  "@percentComplete": {
+    "placeholders": {
+      "percent": {
+        "type": "int"
+      }
+    }
+  },
+  "restTime": "Tiempo de Descanso",
+  "skip": "Saltar",
+  "sets": "Series",
+  "repsLowercase": "repeticiones",
+  "kgUnit": "kg",
+  "workoutNotComplete": "Entrenamiento No Completado",
+  "workoutNotCompleteMessage": "No has terminado todas las series. ¿Quieres guardar tu progreso y terminar de todos modos?",
+  "finishAnyway": "Terminar de Todos Modos",
+  "previous": "Anterior",
+  "next": "Siguiente",
+  "workoutCompleted": "¡Entrenamiento Completado!",
+  "enableStepTracking": "Habilitar Seguimiento de Pasos",
+  "stepPermissionMessage": "Necesitamos permiso de reconocimiento de actividad para contar tus pasos en segundo plano.",
+  "later": "Más tarde",
+  "allow": "Permitir",
+  "stepTrackingEnabled": "¡Seguimiento de pasos habilitado!",
+  "permissionDenied": "Permiso denegado",
+  "profile": "Perfil",
+  "yourProfile": "Tu Perfil",
+  "support": "Soporte",
+  "legal": "Legal",
+  "healthClosestAlly": "El aliado más cercano de tu salud.",
+  "openingWebsite": "Abriendo sitio web...",
+  "visitWebsite": "Visitar Sitio Web",
+  "licensedApache": "Licenciado bajo Apache License 2.0",
+  "licensedApache2": "Licenciado bajo Apache 2.0",
+  "copyright": "© 2025 Vertex Corporation",
+  "readPolicies": "Lee nuestras políticas y términos",
+  "openingPrivacyPolicy": "Abriendo Política de Privacidad...",
+  "privacyPolicy": "Política de Privacidad",
+  "openingTerms": "Abriendo Términos de Servicio...",
+  "termsOfService": "Términos de Servicio",
+  "editWaterGoal": "Editar Objetivo de Agua",
+  "glasses": "vasos",
+  "editCalorieGoal": "Editar Objetivo de Calorías",
+  "kcal": "kcal",
+  "goalWeight": "Peso Objetivo",
+  "editHeight": "Editar Altura",
+  "height": "Altura",
+  "cm": "cm",
+  "feet": "Pies",
+  "inches": "Pulgadas",
+  "bodyMassIndex": "Índice de Masa Corporal (IMC)",
+  "notCalculated": "No calculado",
+  "addHeightWeight": "Agregar altura y peso",
+  "noAchievementsYet": "Aún No Hay Logros",
+  "startTrackingForAchievements": "¡Comienza a rastrear tu salud para desbloquear logros!",
+  "authFailed": "Autenticación fallida. Continuando sin iniciar sesión.",
+  "firebaseNotConfigured": "Firebase no configurado. Usar inicio de sesión anónimo.",
+  "googleSignInFailed": "El inicio de sesión de Google falló. Usa inicio de sesión anónimo en su lugar.",
+  "emailSignInFailed": "Inicio de sesión por correo falló: {error}",
+  "@emailSignInFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "signIn": "Iniciar sesión",
+  "chooseSignInMethod": "Elige tu método de inicio de sesión",
+  "continueWithGoogle": "Continuar con Google",
+  "continueWithEmail": "Continuar con Correo",
+  "continueAsAnonymous": "Continuar como Anónimo",
+  "dontHaveAccount": "¿No tienes una cuenta? ",
+  "signUp": "Registrarse",
+  "legalAgreement": "Al iniciar sesión/registrarte, aceptas nuestra Política de Privacidad y Términos de Servicio",
+  "signInWithEmail": "Iniciar sesión con correo",
+  "enterEmailAddress": "Ingresa tu dirección de correo",
+  "email": "Correo",
+  "enterPassword": "Ingresa tu contraseña",
+  "password": "Contraseña",
+  "firebaseNotConfiguredSignup": "Firebase no configurado. Continuando sin registro.",
+  "signUpFailed": "Registro fallido: {error}",
+  "@signUpFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "chooseUsername": "Elige tu nombre de usuario",
+  "username": "Nombre de Usuario",
+  "createPassword": "Crea una contraseña",
+  "back": "Atrás",
+  "startJourney": "Comenzar Viaje",
+  "continueAlly": "Continuar",
+  "chooseUnits": "Elige tus unidades",
+  "selectSystemPrefer": "Selecciona el sistema que prefieras",
+  "kgCm": "kg, cm",
+  "lbsIn": "lbs, in",
+  "whatsYourWeight": "¿Cuál es tu peso?",
+  "personalizeJourney": "Ayúdanos a personalizar tu viaje",
+  "whatsYourHeight": "¿Cuál es tu altura?",
+  "calculateIdealMetrics": "Calcularemos tus métricas ideales",
+  "whatsYourAge": "¿Cuál es tu edad?",
+  "createPerfectPlan": "Creemos tu plan de salud perfecto",
+  "years": "años",
+  "dailyStepGoal": "Objetivo de pasos diarios",
+  "weightPercent": "{weight}% peso",
+  "@weightPercent": {
+    "placeholders": {
+      "weight": {
+        "type": "int"
+      }
+    }
+  },
+  "ally": "Ally",
+  "yourHealths": "El aliado más\n",
+  "closest": "cercano ",
+  "getStarted": "Comenzar",
+  "service": "Servicio",
+  "automaticSleepTracking": "Seguimiento Automático del Sueño",
+  "noSmartwatchNeeded": "¡No se necesita reloj inteligente! Rastrea tu sueño automáticamente.",
+  "whenDoYouSleep": "¿Cuándo sueles dormir?",
+  "sleepTime": "Hora de Dormir",
+  "wakeTime": "Hora de Despertar",
+  "sleepTrackingTitle": "Seguimiento del Sueño",
+  "automaticTrackingEnabled": "Seguimiento automático habilitado",
+  "startTracking": "Comenzar Seguimiento",
+  "sleepSegments": "Segmentos de Sueño",
+  "sleepCycles": "Ciclos de Sueño",
+  "wakeUps": "Despertares",
+  "noSleepDataYet": "Aún no hay datos de sueño",
+  "sleepTrackingStartTonight": "El seguimiento del sueño comenzará esta noche",
+  "currentlySleeping": "Durmiendo Actualmente",
+  "sleepSegmentNumber": "Segmento de Sueño {number}",
+  "@sleepSegmentNumber": {
+    "placeholders": {
+      "number": {
+        "type": "int"
+      }
+    }
+  },
+  "setWaterGoal": "Establece Tu Objetivo de Agua",
+  "howMuchWater": "¿Cuánta agua quieres beber diariamente?",
+  "goalUpdated": "Objetivo Actualizado",
+
+  "editGoal": "Editar Objetivo",
+  "quickAdd": "Agregar Rápido",
+  "updateWeight": "Actualizar Peso",
+  "enterWeight": "Ingresa peso ({unit})",
+  "@enterWeight": {
+    "placeholders": {
+      "unit": {
+        "type": "String"
+      }
+    }
+  },
+  "weightHistory": "Historial de Peso",
+  "startTrackingWeight": "Comienza a rastrear tu progreso de peso",
+  "setCalorieGoal": "Establece Tu Objetivo de Calorías",
+  "howManyCalories": "¿Cuántas calorías quieres consumir diariamente?",
+  "goalSet": "Objetivo Establecido",
+  "calorieGoalSet": "Tu objetivo diario de calorías ahora es {calories} kcal",
+  "@calorieGoalSet": {
+    "placeholders": {
+      "calories": {
+        "type": "int"
+      }
+    }
+  },
+  "stepTrackingEnabled": "✅ ¡Seguimiento de pasos activado!",
+  "permissionDenied": "⚠️ Permiso denegado",
+  "openingWebsite": "Abriendo sitio web...",
+  "licensedApache": "Licenciado bajo Apache License 2.0",
+  "openingPrivacyPolicy": "Abriendo Política de Privacidad...",
+  "openingTerms": "Abriendo Términos de Servicio...",
+  "firebaseNotConfiguredSignup": "Firebase no configurado. Continuando sin registro.",
+  "signUpFailed": "Registro fallido: {error}",
+  "@signUpFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "authFailed": "Autenticación fallida. Continuando sin iniciar sesión.",
+  "firebaseNotConfigured": "Firebase no configurado. Use inicio de sesión anónimo.",
+  "googleSignInFailed": "Inicio de sesión con Google fallido. Use inicio de sesión anónimo en su lugar.",
+  "emailSignInFailed": "Inicio de sesión con correo electrónico fallido: {error}",
+  "@emailSignInFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "addFriend": "Agregar Amigo",
+  "welcomeText1": "Tu salud",
+  "welcomeText2": "más cercana",
+  "welcomeText3": "aliado",
+  "getStarted": "Comenzar",
+  "serviceControls": "Controles de Servicio",
+  "startService": "Iniciar Servicio",
+  "restartService": "Reiniciar Servicio",
+  "stopService": "Detener Servicio",
+  "setYourGoal": "Establece Tu Objetivo",
+  "howManySteps": "Cuántos pasos quieres lograr hoy?",
+  "steps": "pasos",
+  "cancel": "Cancelar",
+  "goalSet": "Objetivo Establecido",
+  "save": "Guardar",
+  "serviceStarted": "Servicio Iniciado",
+  "serviceStartedDesc": "El servicio de contador de pasos ahora está funcionando",
+  "serviceRestarted": "Servicio Reiniciado",
+  "serviceRestartedDesc": "El servicio de contador de pasos ha sido reiniciado",
+  "serviceStopped": "Servicio Detenido",
+  "serviceStoppedDesc": "El servicio de contador de pasos ha sido detenido",
+  "dailyGoalSet": "Tu objetivo diario ahora es {goal} pasos",
+  "stepsLabel": "pasos",
+  "ageHint": "5",
+  "heightFeetHint": "9",
+  "weightLbsHint": "170",
+  "calorieGoalHint": "25",
+  "defaultStepGoal": "6000",
+  "programNameHint": "Nombre del programa (ej: Día Push)",
+  "usernameHint": "Nombre de usuario",
+  "emailHint": "Correo electrónico",
+  "passwordHint": "Contraseña",
+  "dailyCalorieHint": "2000",
+  "usernameAtHint": "@nombredeusuario",
+  "programUpdated": "¡Programa \"{name}\" actualizado!",
+  "@programUpdated": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "programSaved": "¡Programa \"{name}\" guardado!",
+  "@programSaved": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "valueOfTarget": "{value} de {target}",
+  "@valueOfTarget": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      },
+      "target": {
+        "type": "String"
+      }
+    }
+  },
+  "valueSlashTarget": "{value}/{target}",
+  "@valueSlashTarget": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      },
+      "target": {
+        "type": "String"
+      }
+    }
+  },
+  "hoursMinutes": "{hours}h {minutes}m",
+  "@hoursMinutes": {
+    "placeholders": {
+      "hours": {
+        "type": "int"
+      },
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "ofValueUnit": "de {value}{unit}",
+  "@ofValueUnit": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      },
+      "unit": {
+        "type": "String"
+      }
+    }
+  },
+  "bmiValue": "IMC: {value}",
+  "@bmiValue": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "gramsAmount": "~{grams}g",
+  "@gramsAmount": {
+    "placeholders": {
+      "grams": {
+        "type": "String"
+      }
+    }
+  },
+  "caloriesAmount": "~{calories} cal",
+  "@caloriesAmount": {
+    "placeholders": {
+      "calories": {
+        "type": "String"
+      }
+    }
+  },
+  "caloriesPer100g": "({calories}/100g)",
+  "@caloriesPer100g": {
+    "placeholders": {
+      "calories": {
+        "type": "String"
+      }
+    }
+  },
+  "licensedApache2Short": "Licenciado bajo Apache 2.0",
+  "waterGoalLabel": "Objetivo de Agua",
+  "calorieGoalLabel": "Objetivo de Calorías",
+  "enterWeightLbs": "Ingrese peso (lbs)",
+  "enterWeightKg": "Ingrese peso (kg)",
+  "bmiLabel": "IMC: {value}",
+  "@bmiLabel": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "currentSlashTarget": "{current} / {target}",
+  "@currentSlashTarget": {
+    "placeholders": {
+      "current": {
+        "type": "String"
+      },
+      "target": {
+        "type": "String"
+      }
+    }
+  },
+  "scoreSlashWeight": "{score}/{weight}",
+  "@scoreSlashWeight": {
+    "placeholders": {
+      "score": {
+        "type": "String"
+      },
+      "weight": {
+        "type": "String"
+      }
+    }
+  },
+  "bpmUnit": "LPM",
+  "ofHoursGoal": "de {hours}h",
+  "@ofHoursGoal": {
+    "placeholders": {
+      "hours": {
+        "type": "String"
+      }
+    }
+  },
+  "nowLabel": "Ahora",
+  "dailyGoalSetTo": "Objetivo diario establecido en {value}{unit}",
+  "@dailyGoalSetTo": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      },
+      "unit": {
+        "type": "String"
+      }
+    }
+  },
+  "noWeightHistory": "Sin historial de peso",
+  "foodSelectionSubtitle": "{plateType} - {fillTitle} (~{grams}g)",
+  "@foodSelectionSubtitle": {
+    "placeholders": {
+      "plateType": {
+        "type": "String"
+      },
+      "fillTitle": {
+        "type": "String"
+      },
+      "grams": {
+        "type": "String"
+      }
+    }
+  },
+  "enterFriendUsername": "Ingrese el nombre de usuario de su amigo para seguir su actividad",
+  "sendRequest": "Enviar Solicitud",
+  "subscribeToPlan": "Suscribirse al plan {title}",
+  "@subscribeToPlan": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "restSeconds": "{seconds}s",
+  "@restSeconds": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "editGoal": "Editar Objetivo",
+  "cancel": "Cancelar",
+  "setYourCalorieGoal": "Establece Tu Objetivo de Calorías",
+  "howManyCalories": "¿Cuántas calorías quieres consumir diariamente?",
+  "workoutBuilder": "Constructor de Entrenamiento",
+  "editProgram": "Editar Programa",
+  "weightHistory": "Historial de Peso",
+  "automaticSleepTracking": "Seguimiento Automático del Sueño",
+  "noSmartwatchNeeded": "¡No se necesita reloj inteligente! Rastrea tu sueño automáticamente.",
+  "whenDoYouUsuallySleep": "¿Cuándo sueles dormir?",
+  "startTracking": "Iniciar Seguimiento",
+  "sleepSegments": "Segmentos de Sueño",
+  "sleepCycles": "Ciclos de Sueño",
+  "wakeUps": "Despertares",
+  "noSleepDataYet": "Aún no hay datos de sueño",
+  "sleepTrackingWillStartTonight": "El seguimiento del sueño comenzará esta noche",
+  "quickAdd": "Agregar Rápido"
+}

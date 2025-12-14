@@ -1,0 +1,679 @@
+{
+  "@@locale": "zh",
+  "appTitle": "Ally",
+  "welcomeTitle": "Ally",
+  "welcomeDescription": "您健康最亲密的盟友。",
+  "letsStart": "让我们开始吧！",
+  "loginTitle": "登录",
+  "continueAnonymously": "匿名继续",
+  "loginDescription": "登录以继续",
+  "dailyReflection": "每日反思",
+  "helloAnonymous": "你好，匿名用户！",
+  "healthScore": "健康评分",
+  "today": "今天",
+  "of100": "/ 100",
+  "exercises": "锻炼",
+  "dayStreak": "{count} 天连续",
+  "nutrition": "营养",
+  "calories": "{count} 卡",
+  "sleep": "睡眠",
+  "hours": "{hours}小时",
+  "water": "水",
+  "waterGlasses": "{current} / {goal} 杯",
+  "weight": "体重",
+  "weightKg": "{weight} 公斤",
+  "heartbeat": "心跳",
+  "bpm": "{bpm} bpm",
+  "pedometer": "步数",
+  "steps": "{current} / {goal} 步",
+  "home": "主页",
+  "activity": "活动",
+  "achievements": "成就",
+  "account": "账户",
+  "settings": "设置",
+  "friendsActivity": "好友活动",
+  "myActivity": "我的活动",
+  "yourAchievements": "您的成就",
+  "totalPoints": "总积分",
+  "completedChallenges": "已完成挑战",
+  "currentStreak": "当前连续",
+  "days": "天",
+  "notifications": "通知",
+  "pushNotifications": "推送通知",
+  "pushNotificationsDesc": "接收活动通知",
+  "emailNotifications": "电子邮件通知",
+  "emailNotificationsDesc": "通过电子邮件获取更新",
+  "privacySecurity": "隐私与安全",
+  "privacySettings": "隐私设置",
+  "privacySettingsDesc": "管理您的隐私偏好",
+  "dataStorage": "数据与存储",
+  "dataStorageDesc": "管理您的数据和存储",
+  "appSettings": "应用设置",
+  "language": "语言",
+  "theme": "主题",
+  "units": "单位",
+  "about": "关于",
+  "helpSupport": "帮助与支持",
+  "helpSupportDesc": "获取帮助并联系支持",
+  "termsConditions": "条款和条件",
+  "termsConditionsDesc": "阅读我们的条款和条件",
+  "aboutAlly": "关于 Ally",
+  "version": "版本 1.0.0",
+  "selectLanguage": "选择语言",
+  "selectTheme": "选择主题",
+  "selectUnits": "选择单位",
+  "systemDefault": "系统默认",
+  "lightMode": "浅色模式",
+  "darkMode": "深色模式",
+  "metric": "公制",
+  "imperial": "英制",
+  "personalInfo": "个人信息",
+  "fullName": "全名",
+  "anonymousUser": "匿名用户",
+  "country": "国家",
+  "unitedStates": "美国",
+  "dateOfBirth": "出生日期",
+  "january1": "1990年1月1日",
+  "healthInfo": "健康信息",
+  "currentWeight": "当前体重",
+  "waterGoal": "饮水目标",
+  "glassesPerDay": "{count} 杯/天",
+  "calorieGoal": "卡路里目标",
+  "kcalPerDay": "{count} 千卡/天",
+  "exerciseStreak": "锻炼连续",
+  "daysCount": "{count} 天",
+  "dangerZone": "危险区域",
+  "deleteAccount": "删除账户",
+  "deleteAccountDesc": "永久删除您的账户和数据",
+  "noFriendsYet": "还没有朋友",
+  "addFriendsToSee": "添加朋友查看他们的活动",
+  "noActivityYet": "还没有活动",
+  "startTrackingToSee": "开始追踪以查看您的活动",
+  "badges": "徽章",
+  "dayStreakLabel": "连续天数",
+  "availableAchievements": "可用成就",
+  "hydrationHero": "水分英雄",
+  "drink8Glasses": "每天喝8杯水",
+  "points": "积分",
+  "workoutWarrior": "锻炼战士",
+  "complete7Days": "完成7天锻炼",
+  "sleepChampion": "睡眠冠军",
+  "get8Hours": "连续7天睡8小时",
+  "nutritionMaster": "营养大师",
+  "trackMeals": "追踪30天饮食",
+  "heartHealth": "心脏健康",
+  "maintain60to100": "一周保持60-100 bpm",
+  "waterIntake": "水摄入量",
+  "mealLogged": "已记录饮食",
+  "sleepLogged": "已记录睡眠",
+  "weightUpdated": "体重已更新",
+  "justNow": "刚刚",
+  "minutesAgo": "{minutes}分钟前",
+  "@minutesAgo": {"placeholders": {"minutes": {"type": "int"}}},
+  "hoursAgo": "{hours}小时前",
+  "@hoursAgo": {"placeholders": {"hours": {"type": "int"}}},
+  "lastNight": "昨晚",
+  "thisWeek": "本周",
+  "sleepDuration": "睡眠时长",
+  "heartRate": "心率",
+  "scoreBreakdown": "分数明细",
+  "loseWeight": "减重",
+  "reduceCalories": "减少卡路里",
+  "maintainWeight": "保持体重",
+  "balancedCalories": "均衡卡路里",
+  "gainWeight": "增重",
+  "increaseCalories": "增加卡路里",
+  "activityLevel": "活动水平",
+  "sedentary": "久坐",
+  "littleExercise": "很少或不运动",
+  "lightlyActive": "轻度活跃",
+  "lightExercise": "每周轻度运动1-3天",
+  "moderatelyActive": "中度活跃",
+  "moderateExercise": "每周中度运动3-5天",
+  "veryActive": "非常活跃",
+  "intenseTraining": "每日高强度训练",
+  "yourHealthScore": "您的健康评分",
+  "outOf100": "/ 100",
+  "workoutStreakDesc": "锻炼连续天数和每日活动",
+  "sleepQualityDesc": "睡眠时长和质量",
+  "hydrationGoalDesc": "每日水分目标",
+  "weightProgressDesc": "达成目标体重的进度",
+  "calorieBalanceDesc": "卡路里摄入平衡",
+  "restingHeartRateDesc": "静息心率",
+  "todaysIntake": "今日摄入",
+  "todaysMeals": "今日餐食",
+  "noMealsLogged": "尚未记录餐食",
+  "tapToAddMeal": "点击 + 添加您的第一餐",
+  "todaysPrograms": "今日计划",
+  "noWorkoutsLogged": "尚未记录锻炼",
+  "startFitnessJourney": "今天开始您的健身之旅！",
+  "noSleepData": "尚未记录睡眠数据",
+  "trackSleepPatterns": "跟踪您的睡眠以查看模式",
+  "progress": "进度",
+  "noWeightHistory": "尚无体重历史",
+  "trackWeightProgress": "跟踪您的体重以查看进度",
+  "currentHeartRate": "当前心率",
+  "todaysReadings": "今日读数",
+  "noReadingsYet": "尚无读数",
+  "requiresMonitor": "需要心率监测设备",
+  "percentWeight": "% 权重",
+  "tipMaintainStreak": "专注于保持您的锻炼连续天数",
+  "tipDrinkWater": "尝试今天多喝2杯水",
+  "tipBedtimeEarlier": "争取提前30分钟就寝",
+  "weightGoalAchieved": "体重目标已达成",
+  "reachTargetWeight": "达到您的目标体重",
+  "welcomeToAlly": "欢迎使用 Ally",
+  "personalHealthCompanion": "您的个人健康伙伴",
+  "trackWellnessJourney": "通过个性化目标和见解追踪您的健康之旅",
+  "drankGlasses": "喝了{count}杯水",
+  "caloriesConsumed": "消耗了{count}卡路里",
+  "dayStreakMaintained": "保持了{count}天的连续记录",
+  "hoursOfSleep": "{hours}小时睡眠",
+  "todaysOverview": "今日概览",
+  "quickStats": "快速统计",
+  "totalActivity": "总活动量",
+  "badgesEarned": "获得的徽章",
+  "setYourGoals": "设定您的目标",
+  "manageYourProfile": "管理您的个人资料",
+  "firstSteps": "第一步",
+  "firstStepsDesc": "完成您的个人资料设置",
+  "earlyBird": "早起鸟儿",
+  "earlyBirdDesc": "连续记录7天",
+  "hydrationHero": "水分英雄",
+  "hydrationHeroDesc": "连续7天每天喝8杯水",
+  "calorieCounter": "卡路里计数器",
+  "calorieCounterDesc": "追踪30天的饮食",
+  "weekWarrior": "每周战士",
+  "weekWarriorDesc": "每周锻炼5次",
+  "mileMaster": "里程大师",
+  "mileMasterDesc": "总共跑100英里",
+  "sleepChampion": "睡眠冠军",
+  "sleepChampionDesc": "连续7天睡8小时",
+  "calculateCalorieNeeds": "这有助于我们计算您的每日卡路里需求",
+  "personalizeHealthGoals": "我们将使用此信息来个性化您的健康目标",
+  "tellUsAboutYourself": "告诉我们更多关于您的信息",
+  "determinesCalorieTarget": "这决定了您的卡路里目标",
+  "loseWeight": "减重",
+  "maintainWeight": "保持体重",
+  "balancedCalories": "均衡卡路里",
+  "gainWeight": "增重",
+  "activityLevel": "活动水平",
+  "howActiveAreYou": "您在典型的一天中有多活跃?",
+  "sedentary": "久坐",
+  "littleToNoExercise": "很少或不运动",
+  "veryActive": "非常活跃",
+  "intenseDailyTraining": "每日高强度训练",
+  "light": "轻度",
+  "lightActivity": "每周1-3天",
+  "moderate": "中等",
+  "moderateActivity": "每周 3-5 天",
+  "active": "活跃",
+  "activeActivity": "每周 6-7 天",
+  "addExercise": "添加锻炼",
+  "cardio": "有氧运动",
+  "strength": "力量训练",
+  "flexibility": "柔韧性",
+  "sports": "运动",
+  "addNutrition": "添加营养",
+  "automatic": "自动",
+  "manual": "手动",
+  "scanWithCamera": "相机扫描",
+  "selectPlateType": "选择盘子类型",
+  "plate": "盘子",
+  "bowl": "碗",
+  "smallPlate": "小盘",
+  "mediumPlate": "中盘",
+  "largePlate": "大盘",
+  "smallBowl": "小碗",
+  "mediumBowl": "中碗",
+  "largeBowl": "大碗",
+  "fillLevel": "填充程度",
+  "quarter": "1/4 满",
+  "half": "1/2 满",
+  "threeQuarters": "3/4 满",
+  "full": "满",
+  "selectFood": "选择食物",
+  "breakfast": "早餐",
+  "lunch": "午餐",
+  "dinner": "晚餐",
+  "snacks": "零食",
+  "egg": "鸡蛋",
+  "milk": "牛奶",
+  "yogurt": "酸奶",
+  "whiteRice": "白米饭",
+  "plainPasta": "清淡意面",
+  "chickenBreast": "鸡胸肉",
+  "grilledSalmon": "烤三文鱼",
+  "boiledPotato": "煮土豆",
+  "mixedVegetables": "混合蔬菜",
+  "couscous": "古斯米",
+  "quinoa": "藜麦",
+  "bulgur": "碾碎干小麦",
+  "corn": "玉米",
+  "peas": "豌豆",
+  "broccoli": "西兰花",
+  "mushroom": "蘑菇",
+  "stirFryVegetables": "炒蔬菜",
+  "sweetPotato": "红薯",
+  "baldoRice": "巴尔多米",
+  "chickenCurry": "咖喱鸡",
+  "beefCurry": "咖喱牛肉",
+  "spaghettiPuttanesca": "普塔内斯卡意面",
+  "ravioli": "意式饺子",
+  "gnocchi": "意式土豆团",
+  "kidneyBeans": "红腰豆",
+  "chickpeas": "鹰嘴豆",
+  "lentils": "扁豆",
+  "whiteBeans": "白豆",
+  "tuna": "金枪鱼",
+  "mussels": "贻贝",
+  "shrimp": "虾",
+  "caesarSalad": "凯撒沙拉",
+  "tofu": "豆腐",
+  "salad": "沙拉",
+  "soup": "汤",
+  "fruit": "水果",
+  "vegetables": "蔬菜",
+  "mealLog": "餐食记录",
+  "todaysMeals": "今日餐食",
+  "noMealsYet": "尚未添加餐食",
+  "premium": "高级版",
+  "upgradeYourPlan": "升级您的计划",
+  "unlockMore": "解锁更多。",
+  "goPremium": "升级高级版",
+  "upgradeForExclusive": "升级以获得专属特权，\n享受更流畅、更快速的体验。",
+  "individual": "个人",
+  "family": "家庭",
+  "familyPlan": "家庭计划",
+  "allyIndividual": "Ally 个人",
+  "month": "月",
+  "allIndividualFeatures": "所有个人功能，外加\n最多4位成员的家庭共享。",
+  "getAllyPlan": "获取 Ally 计划",
+  "getFamilyPlan": "获取家庭计划",
+  "friendRequestSent": "好友请求已发送",
+  "requestSentTo": "已成功向 {username} 发送请求！",
+  "@requestSentTo": {
+    "placeholders": {
+      "username": {
+        "type": "String"
+      }
+    }
+  },
+  "selectExercise": "选择锻炼",
+  "all": "全部",
+  "addExercisesToStart": "添加锻炼以开始",
+  "tapPlusButton": "点击下面的 + 按钮",
+  "reps": "组数",
+  "weight": "重量",
+  "rest": "休息 (秒)",
+  "addSet": "添加组",
+  "addExercise": "添加锻炼",
+  "save": "保存",
+  "workoutName": "锻炼名称",
+  "enterWorkoutName": "输入锻炼名称",
+  "createWorkout": "创建锻炼",
+  "editWorkout": "编辑锻炼",
+  "deleteWorkout": "删除锻炼",
+  "areYouSureDelete": "您确定要删除此锻炼吗？",
+  "delete": "删除",
+  "completedAt": "在 {time} 完成",
+  "@completedAt": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "set": "组",
+  "quickExerciseLog": "快速锻炼日志",
+  "logYourExercise": "记录您的锻炼",
+  "exerciseName": "锻炼名称",
+  "enterExerciseName": "输入锻炼名称",
+  "sets": "组",
+  "duration": "时长",
+  "minutes": "分钟",
+  "logExercise": "记录锻炼",
+  "close": "关闭",
+  "customProgram": "自定义计划",
+  "buildYourOwnWorkout": "创建您自己的锻炼",
+  "quickLog": "快速记录",
+  "logASingleExercise": "记录单个锻炼",
+  "noStreakYet": "尚无连续记录",
+  "day": "天",
+  "keepGoing": "继续加油！",
+  "quickPrograms": "快速计划",
+  "createProgramToQuicklyStart": "创建计划以快速开始",
+  "min": "分钟",
+  "ex": "锻炼",
+  "editProgram": "编辑计划",
+  "deleteProgram": "删除计划",
+  "deleteProgramQuestion": "删除计划？",
+  "areYouSureDeleteProgram": "您确定要删除 \"{name}\" 吗？",
+  "@areYouSureDeleteProgram": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "logged": "已记录",
+  "kg": "公斤",
+  "editSetNumber": "编辑第 {number} 组",
+  "@editSetNumber": {
+    "placeholders": {
+      "number": {
+        "type": "int"
+      }
+    }
+  },
+  "reps": "次数",
+  "weightWithUnit": "重量 ({unit})",
+  "@weightWithUnit": {
+    "placeholders": {
+      "unit": {
+        "type": "String"
+      }
+    }
+  },
+  "exerciseNotFound": "未找到锻炼",
+  "exitWorkout": "退出锻炼？",
+  "progressNotSaved": "您的进度将不会被保存。",
+  "exit": "退出",
+  "finish": "完成",
+  "exerciseProgress": "锻炼 {current}/{total}",
+  "@exerciseProgress": {
+    "placeholders": {
+      "current": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "percentComplete": "{percent}% 完成",
+  "@percentComplete": {
+    "placeholders": {
+      "percent": {
+        "type": "int"
+      }
+    }
+  },
+  "restTime": "休息时间",
+  "skip": "跳过",
+  "sets": "组",
+  "repsLowercase": "次",
+  "kgUnit": "公斤",
+  "workoutNotComplete": "锻炼未完成",
+  "workoutNotCompleteMessage": "您还没有完成所有组。您想保存进度并仍然完成吗？",
+  "finishAnyway": "仍然完成",
+  "previous": "上一个",
+  "next": "下一个",
+  "workoutCompleted": "锻炼已完成！",
+  "calorieGoalSet": "您每日卡路里目标现在是 {calories} 卡路里",
+  "@calorieGoalSet": {
+    "placeholders": {
+      "calories": {
+        "type": "int"
+      }
+    }
+  },
+  "stepTrackingEnabled": "✅ 步数跟踪已启用！",
+  "permissionDenied": "⚠️ 权限被拒绝",
+  "openingWebsite": "正在打开网站...",
+  "licensedApache": "根据 Apache License 2.0 授权",
+  "openingPrivacyPolicy": "正在打开隐私政策...",
+  "openingTerms": "正在打开服务条款...",
+  "firebaseNotConfiguredSignup": "Firebase 未配置。继续而不注册。",
+  "signUpFailed": "注册失败：{error}",
+  "@signUpFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "authFailed": "身份验证失败。继续而不登录。",
+  "firebaseNotConfigured": "Firebase 未配置。请使用匿名登录。",
+  "googleSignInFailed": "Google 登录失败。请改用匿名登录。",
+  "emailSignInFailed": "电子邮件登录失败：{error}",
+  "@emailSignInFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "addFriend": "添加好友",
+  "welcomeText1": "您健康的",
+  "welcomeText2": "最亲密",
+  "welcomeText3": "盟友",
+  "getStarted": "开始使用",
+  "serviceControls": "服务控制",
+  "startService": "启动服务",
+  "restartService": "重启服务",
+  "stopService": "停止服务",
+  "setYourGoal": "设置您的目标",
+  "howManySteps": "您今天想达到多少步？",
+  "steps": "步",
+  "cancel": "取消",
+  "goalSet": "目标已设置",
+  "save": "保存",
+  "serviceStarted": "服务已启动",
+  "serviceStartedDesc": "步数计数器服务正在运行",
+  "serviceRestarted": "服务已重启",
+  "serviceRestartedDesc": "步数计数器服务已重启",
+  "serviceStopped": "服务已停止",
+  "serviceStoppedDesc": "步数计数器服务已停止",
+  "dailyGoalSet": "您的每日目标现在是 {goal} 步",
+  "stepsLabel": "步",
+  "ageHint": "5",
+  "heightFeetHint": "9",
+  "weightLbsHint": "170",
+  "calorieGoalHint": "25",
+  "defaultStepGoal": "6000",
+  "programNameHint": "程序名称（例如：推举日）",
+  "usernameHint": "用户名",
+  "emailHint": "邮箱",
+  "passwordHint": "密码",
+  "dailyCalorieHint": "2000",
+  "usernameAtHint": "@用户名",
+  "programUpdated": "程序 \"{name}\" 已更新！",
+  "@programUpdated": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "programSaved": "程序 \"{name}\" 已保存！",
+  "@programSaved": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "valueOfTarget": "{value} / {target}",
+  "@valueOfTarget": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      },
+      "target": {
+        "type": "String"
+      }
+    }
+  },
+  "valueSlashTarget": "{value}/{target}",
+  "@valueSlashTarget": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      },
+      "target": {
+        "type": "String"
+      }
+    }
+  },
+  "hoursMinutes": "{hours}小时 {minutes}分钟",
+  "@hoursMinutes": {
+    "placeholders": {
+      "hours": {
+        "type": "int"
+      },
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "ofValueUnit": "{value}{unit}的",
+  "@ofValueUnit": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      },
+      "unit": {
+        "type": "String"
+      }
+    }
+  },
+  "bmiValue": "BMI: {value}",
+  "@bmiValue": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "gramsAmount": "~{grams}克",
+  "@gramsAmount": {
+    "placeholders": {
+      "grams": {
+        "type": "String"
+      }
+    }
+  },
+  "caloriesAmount": "~{calories} 卡",
+  "@caloriesAmount": {
+    "placeholders": {
+      "calories": {
+        "type": "String"
+      }
+    }
+  },
+  "caloriesPer100g": "({calories}/100克)",
+  "@caloriesPer100g": {
+    "placeholders": {
+      "calories": {
+        "type": "String"
+      }
+    }
+  },
+  "licensedApache2Short": "根据 Apache 2.0 授权",
+  "waterGoalLabel": "饮水目标",
+  "calorieGoalLabel": "卡路里目标",
+  "enterWeightLbs": "输入体重 (磅)",
+  "enterWeightKg": "输入体重 (公斤)",
+  "bmiLabel": "BMI: {value}",
+  "@bmiLabel": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "currentSlashTarget": "{current} / {target}",
+  "@currentSlashTarget": {
+    "placeholders": {
+      "current": {
+        "type": "String"
+      },
+      "target": {
+        "type": "String"
+      }
+    }
+  },
+  "scoreSlashWeight": "{score}/{weight}",
+  "@scoreSlashWeight": {
+    "placeholders": {
+      "score": {
+        "type": "String"
+      },
+      "weight": {
+        "type": "String"
+      }
+    }
+  },
+  "bpmUnit": "BPM",
+  "ofHoursGoal": "{hours}小时的",
+  "@ofHoursGoal": {
+    "placeholders": {
+      "hours": {
+        "type": "String"
+      }
+    }
+  },
+  "nowLabel": "现在",
+  "dailyGoalSetTo": "每日目标设置为 {value}{unit}",
+  "@dailyGoalSetTo": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      },
+      "unit": {
+        "type": "String"
+      }
+    }
+  },
+  "noWeightHistory": "无体重历史",
+  "foodSelectionSubtitle": "{plateType} - {fillTitle} (~{grams}克)",
+  "@foodSelectionSubtitle": {
+    "placeholders": {
+      "plateType": {
+        "type": "String"
+      },
+      "fillTitle": {
+        "type": "String"
+      },
+      "grams": {
+        "type": "String"
+      }
+    }
+  },
+  "enterFriendUsername": "输入您朋友的用户名以关注他们的活动",
+  "sendRequest": "发送请求",
+  "subscribeToPlan": "订阅 {title} 计划",
+  "@subscribeToPlan": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "restSeconds": "{seconds}秒",
+  "@restSeconds": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "editGoal": "编辑目标",
+  "cancel": "取消",
+  "setYourCalorieGoal": "设置您的卡路里目标",
+  "howManyCalories": "您想每天摄入多少卡路里？",
+  "workoutBuilder": "训练构建器",
+  "editProgram": "编辑程序",
+  "weightHistory": "体重历史",
+  "automaticSleepTracking": "自动睡眠跟踪",
+  "noSmartwatchNeeded": "不需要智能手表！自动跟踪您的睡眠。",
+  "whenDoYouUsuallySleep": "您通常什么时候睡觉？",
+  "startTracking": "开始跟踪",
+  "sleepSegments": "睡眠段",
+  "sleepCycles": "睡眠周期",
+  "wakeUps": "醒来",
+  "noSleepDataYet": "还没有睡眠数据",
+  "sleepTrackingWillStartTonight": "睡眠跟踪将于今晚开始",
+  "quickAdd": "快速添加"
+}

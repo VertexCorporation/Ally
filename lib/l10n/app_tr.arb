@@ -1,0 +1,844 @@
+{
+  "@@locale": "tr",
+  "appTitle": "Ally",
+  "welcomeTitle": "Ally",
+  "welcomeDescription": "Sağlığınızın en yakın dostu.",
+  "letsStart": "Hadi başlayalım!",
+  "loginTitle": "Giriş",
+  "continueAnonymously": "Anonim Devam Et",
+  "loginDescription": "Devam etmek için giriş yapın",
+  "dailyReflection": "Günlük yansıma",
+  "helloAnonymous": "Merhaba, anonim!",
+  "healthScore": "Sağlık Skoru",
+  "today": "Bugün",
+  "of100": "/ 100",
+  "exercises": "Egzersizler",
+  "dayStreak": "{count} günlük seri",
+  "nutrition": "Beslenme",
+  "calories": "{count} kal",
+  "sleep": "Uyku",
+  "hours": "{hours}s",
+  "water": "Su",
+  "waterGlasses": "{current} / {goal} bardak",
+  "weight": "Kilo",
+  "weightKg": "{weight} kg",
+  "heartbeat": "Kalp Atışı",
+  "bpm": "{bpm} bpm",
+  "pedometer": "Adımlar",
+  "steps": "{current} / {goal} adım",
+  "home": "Ana Sayfa",
+  "activity": "Aktivite",
+  "achievements": "Başarılar",
+  "account": "Hesap",
+  "settings": "Ayarlar",
+  "friendsActivity": "Arkadaş Aktivitesi",
+  "myActivity": "Aktivitem",
+  "yourAchievements": "Başarılarınız",
+  "totalPoints": "Toplam Puan",
+  "completedChallenges": "Tamamlanan Görevler",
+  "currentStreak": "Mevcut Seri",
+  "days": "gün",
+  "daysCount": "{count} gün",
+  "completed": "tamamlandı",
+  "quickActions": "Hızlı İşlemler",
+  "add500Steps": "500 Adım Ekle",
+  "add1000Steps": "1000 Adım Ekle",
+  "setGoal": "Hedef Belirle",
+  "stepsGoal": "Adım Hedefi",
+  "cancel": "İptal",
+  "save": "Kaydet",
+  "addExercise": "Egzersiz Ekle",
+  "exerciseType": "Egzersiz Tipi",
+  "cardio": "Kardiyo",
+  "strength": "Kuvvet",
+  "flexibility": "Esneklik",
+  "sports": "Spor",
+  "addNutrition": "Beslenme Ekle",
+  "automatic": "Otomatik",
+  "manual": "Manuel",
+  "scanWithCamera": "Kamera ile Tara",
+  "selectPlateType": "Tabak Tipi Seç",
+  "plate": "Tabak",
+  "bowl": "Kase",
+  "smallPlate": "Küçük Tabak",
+  "mediumPlate": "Orta Tabak",
+  "largePlate": "Büyük Tabak",
+  "smallBowl": "Küçük Kase",
+  "mediumBowl": "Orta Kase",
+  "largeBowl": "Büyük Kase",
+  "fillLevel": "Doluluk Seviyesi",
+  "quarter": "1/4 Dolu",
+  "half": "1/2 Dolu",
+  "threeQuarters": "3/4 Dolu",
+  "full": "Dolu",
+  "selectFood": "Yemek Seç",
+  "breakfast": "Kahvaltı",
+  "lunch": "Öğle Yemeği",
+  "dinner": "Akşam Yemeği",
+  "snacks": "Atıştırmalık",
+  "egg": "Yumurta",
+  "milk": "Süt",
+  "yogurt": "Yoğurt",
+  "whiteRice": "Beyaz Pirinç",
+  "plainPasta": "Sade Makarna",
+  "chickenBreast": "Tavuk Göğsü",
+  "grilledSalmon": "Izgara Somon",
+  "boiledPotato": "Haşlanmış Patates",
+  "mixedVegetables": "Karışık Sebze",
+  "couscous": "Kuskus",
+  "quinoa": "Kinoa",
+  "bulgur": "Bulgur",
+  "corn": "Mısır",
+  "peas": "Bezelye",
+  "broccoli": "Brokoli",
+  "mushroom": "Mantar",
+  "stirFryVegetables": "Sebze Sote",
+  "sweetPotato": "Tatlı Patates",
+  "baldoRice": "Baldo Pirinç",
+  "chickenCurry": "Tavuklu Körili",
+  "beefCurry": "Etli Körili",
+  "spaghettiPuttanesca": "Spagetti",
+  "ravioli": "Mantı",
+  "gnocchi": "Gnocchi",
+  "kidneyBeans": "Barbunya",
+  "chickpeas": "Nohut",
+  "lentils": "Mercimek",
+  "whiteBeans": "Kuru Fasulye",
+  "tuna": "Ton Balığı",
+  "mussels": "Midye",
+  "shrimp": "Karides",
+  "caesarSalad": "Sezar Salata",
+  "tofu": "Tofu",
+  "salad": "Salata",
+  "soup": "Çorba",
+  "fruit": "Meyve",
+  "vegetables": "Sebzeler",
+  "mealLog": "Yemek Kaydı",
+  "todaysMeals": "Bugünkü Yemekler",
+  "noMealsYet": "Henüz yemek eklenmedi",
+  "notifications": "Bildirimler",
+  "pushNotifications": "Anlık Bildirimler",
+  "pushNotificationsDesc": "Aktiviteleriniz için bildirim alın",
+  "emailNotifications": "E-posta Bildirimleri",
+  "emailNotificationsDesc": "E-posta ile güncelleme alın",
+  "privacySecurity": "Gizlilik ve Güvenlik",
+  "privacySettings": "Gizlilik Ayarları",
+  "privacySettingsDesc": "Gizlilik tercihlerinizi yönetin",
+  "dataStorage": "Veri ve Depolama",
+  "dataStorageDesc": "Verilerinizi ve depolamanızı yönetin",
+  "appSettings": "Uygulama Ayarları",
+  "language": "Dil",
+  "theme": "Tema",
+  "units": "Birimler",
+  "about": "Hakkında",
+  "helpSupport": "Yardım ve Destek",
+  "helpSupportDesc": "Yardım alın ve destekle iletişime geçin",
+  "termsConditions": "Şartlar ve Koşullar",
+  "termsConditionsDesc": "Şartlarımızı ve koşullarımızı okuyun",
+  "aboutAlly": "Ally Hakkında",
+  "version": "Versiyon 1.0.0",
+  "selectLanguage": "Dil Seçin",
+  "selectTheme": "Tema Seçin",
+  "selectUnits": "Birim Seçin",
+  "systemDefault": "Sistem Varsayılanı",
+  "lightMode": "Açık Mod",
+  "darkMode": "Koyu Mod",
+  "metric": "Metrik",
+  "imperial": "İngiliz Birimi",
+  "personalInfo": "Kişisel Bilgiler",
+  "fullName": "Tam Ad",
+  "anonymousUser": "Anonim Kullanıcı",
+  "country": "Ülke",
+  "unitedStates": "Amerika Birleşik Devletleri",
+  "dateOfBirth": "Doğum Tarihi",
+  "january1": "1 Ocak 1990",
+  "healthInfo": "Sağlık Bilgileri",
+  "currentWeight": "Mevcut Kilo",
+  "waterGoal": "Su Hedefi",
+  "glassesPerDay": "{count} bardak/gün",
+  "calorieGoal": "Kalori Hedefi",
+  "kcalPerDay": "{count} kkal/gün",
+  "exerciseStreak": "Egzersiz Serisi",
+  "daysCount": "{count} gün",
+  "dangerZone": "Tehlike Bölgesi",
+  "deleteAccount": "Hesabı Sil",
+  "deleteAccountDesc": "Hesabınızı ve verilerinizi kalıcı olarak silin",
+  "noFriendsYet": "Henüz arkadaş yok",
+  "addFriendsToSee": "Aktivitelerini görmek için arkadaş ekleyin",
+  "noActivityYet": "Henüz aktivite yok",
+  "startTrackingToSee": "Aktivitelerinizi görmek için takip başlatın",
+  "badges": "Rozetler",
+  "dayStreakLabel": "Günlük Seri",
+  "availableAchievements": "Mevcut Başarımlar",
+  "hydrationHero": "Hidrasyon Kahramanı",
+  "drink8Glasses": "Günlük 8 bardak su için",
+  "points": "puan",
+  "workoutWarrior": "Egzersiz Savaşçısı",
+  "complete7Days": "7 günlük egzersiz tamamla",
+  "sleepChampion": "Uyku Şampiyonu",
+  "get8Hours": "7 gün boyunca 8 saat uyku",
+  "nutritionMaster": "Beslenme Ustası",
+  "trackMeals": "30 gün öğün takibi",
+  "heartHealth": "Kalp Sağlığı",
+  "maintain60to100": "Bir hafta 60-100 nabız koruyun",
+  "waterIntake": "Su Alımı",
+  "mealLogged": "Öğün Kaydedildi",
+  "sleepLogged": "Uyku Kaydedildi",
+  "weightUpdated": "Kilo Güncellendi",
+  "justNow": "Şimdi",
+  "minutesAgo": "{minutes}d önce",
+  "@minutesAgo": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "hoursAgo": "{hours}s önce",
+  "@hoursAgo": {
+    "placeholders": {
+      "hours": {
+        "type": "int"
+      }
+    }
+  },
+  "lastNight": "Dün gece",
+  "thisWeek": "Bu Hafta",
+  "sleepDuration": "Uyku Süresi",
+  "heartRate": "Kalp Atışı",
+  "scoreBreakdown": "Skor Dağılımı",
+  "loseWeight": "Kilo Ver",
+  "reduceCalories": "Kaloriyi azalt",
+  "maintainWeight": "Kilonu Koru",
+  "balancedCalories": "Dengeli kalori",
+  "gainWeight": "Kilo Al",
+  "increaseCalories": "Kaloriyi artır",
+  "activityLevel": "Aktivite Seviyesi",
+  "sedentary": "Hareketsiz",
+  "littleExercise": "Az veya hiç egzersiz yok",
+  "lightlyActive": "Hafif Aktif",
+  "lightExercise": "Haftada 1-3 gün hafif egzersiz",
+  "moderatelyActive": "Orta Aktif",
+  "moderateExercise": "Haftada 3-5 gün orta egzersiz",
+  "veryActive": "Çok Aktif",
+  "intenseTraining": "Günlük yoğun antrenman",
+  "yourHealthScore": "Sağlık Puanınız",
+  "outOf100": "/ 100",
+  "workoutStreakDesc": "Egzersiz serisi ve günlük aktivite",
+  "sleepQualityDesc": "Uyku süresi ve kalitesi",
+  "hydrationGoalDesc": "Günlük hidrasyon hedefi",
+  "weightProgressDesc": "Hedef kilosundaki ilerleme",
+  "calorieBalanceDesc": "Kalori alımı dengesi",
+  "restingHeartRateDesc": "Dinlenme kalp atış hızı",
+  "todaysIntake": "Bugünkü Alım",
+  "todaysMeals": "Bugünkü Öğünler",
+  "noMealsLogged": "Henüz öğün kaydedilmedi",
+  "tapToAddMeal": "İlk öğününüzü eklemek için + düğmesine dokunun",
+  "todaysPrograms": "Bugünkü Programlar",
+  "noWorkoutsLogged": "Henüz egzersiz kaydedilmedi",
+  "startFitnessJourney": "Fitness yolculuğunuza bugün başlayın!",
+  "noSleepData": "Uyku verisi kaydedilmedi",
+  "trackSleepPatterns": "Uyku düzenlerini görmek için takip edin",
+  "progress": "İlerleme",
+  "noWeightHistory": "Henüz kilo geçmişi yok",
+  "trackWeightProgress": "İlerlemeyi görmek için kilonuzu takip edin",
+  "currentHeartRate": "Mevcut Kalp Atış Hızı",
+  "todaysReadings": "Bugünkü Ölçümler",
+  "noReadingsYet": "Henüz ölçüm yok",
+  "requiresMonitor": "Kalp atış hızı monitörü cihazı gerektirir",
+  "percentWeight": "% ağırlık",
+  "tipMaintainStreak": "Egzersiz serinizi sürdürmeye odaklanın",
+  "tipDrinkWater": "Bugün 2 bardak daha su içmeye çalışın",
+  "tipBedtimeEarlier": "30 dakika daha erken yatmayı hedefleyin",
+  "weightGoalAchieved": "Kilo Hedefi Ulaşıldı",
+  "reachTargetWeight": "Hedef kilonuza ulaşın",
+  "welcomeToAlly": "Ally'ye Hoş Geldiniz",
+  "personalHealthCompanion": "Kişisel sağlık yardımcınız",
+  "trackWellnessJourney": "Kişiselleştirilmiş hedefler ve içgörülerle sağlık yolculuğunuzu takip edin",
+  "drankGlasses": "{count} bardak su içildi",
+  "caloriesConsumed": "{count} kalori tüketildi",
+  "dayStreakMaintained": "{count} günlük seri sürdürüldü",
+  "hoursOfSleep": "{hours} saat uyku",
+  "todaysOverview": "Bugünün Özeti",
+  "quickStats": "Hızlı İstatistikler",
+  "totalActivity": "Toplam Aktivite",
+  "badgesEarned": "Kazanılan Rozetler",
+  "setYourGoals": "Hedeflerinizi Belirleyin",
+  "manageYourProfile": "Profilinizi Yönetin",
+  "firstSteps": "İlk Adımlar",
+  "firstStepsDesc": "Profil kurulumunuzu tamamlayın",
+  "earlyBird": "Erken Kalkan",
+  "earlyBirdDesc": "7 ardışık gün kaydedin",
+  "hydrationHero": "Hidrasyon Kahramanı",
+  "hydrationHeroDesc": "7 gün boyunca günde 8 bardak su için",
+  "calorieCounter": "Kalori Sayacı",
+  "calorieCounterDesc": "30 gün boyunca öğün takibi yapın",
+  "weekWarrior": "Haftalık Savaşçı",
+  "weekWarriorDesc": "Haftada 5 kez egzersiz yapın",
+  "mileMaster": "Mil Ustası",
+  "mileMasterDesc": "Toplam 100 mil koşun",
+  "sleepChampion": "Uyku Şampiyonu",
+  "sleepChampionDesc": "7 gün boyunca 8 saat uyuyun",
+  "calculateCalorieNeeds": "Bu, günlük kalori ihtiyacınızı hesaplamamıza yardımcı olur",
+  "personalizeHealthGoals": "Sağlık hedeflerinizi kişiselleştirmek için bunu kullanacağız",
+  "tellUsAboutYourself": "Bize kendinizden bahsedin",
+  "determinesCalorieTarget": "Bu, kalori hedefinizi belirler",
+  "loseWeight": "Kilo Ver",
+  "maintainWeight": "Kiloyu Koru",
+  "balancedCalories": "Dengeli kaloriler",
+  "gainWeight": "Kilo Al",
+  "activityLevel": "Aktivite Seviyesi",
+  "howActiveAreYou": "Tipik bir günde ne kadar aktifsiniz?",
+  "sedentary": "Hareketsiz",
+  "littleToNoExercise": "Az veya hiç egzersiz yok",
+  "veryActive": "Çok Aktif",
+  "intenseDailyTraining": "Yoğun günlük antrenman",
+  "light": "Hafif",
+  "lightActivity": "Haftada 1-3 gün",
+  "moderate": "Orta",
+  "moderateActivity": "Haftada 3-5 gün",
+  "active": "Aktif",
+  "activeActivity": "Haftada 6-7 gün",
+  "editWeight": "Kiloyu Düzenle",
+  "premium": "Premium",
+  "upgradeYourPlan": "Planını Yükselt",
+  "unlockMore": "Daha Fazlasını Aç.",
+  "goPremium": "Premium'a Geç",
+  "upgradeForExclusive": "Özel avantajlar ve daha akıcı,\ndaha hızlı deneyim için yükselt.",
+  "individual": "Bireysel",
+  "family": "Aile",
+  "familyPlan": "Aile Planı",
+  "allyIndividual": "Ally Bireysel",
+  "month": "ay",
+  "allIndividualFeatures": "Tüm Bireysel özellikler artı\n4 kişiye kadar aile paylaşımı.",
+  "getAllyPlan": "Ally Planı Al",
+  "getFamilyPlan": "Aile Planı Al",
+  "friendRequestSent": "Arkadaşlık İsteği Gönderildi",
+  "requestSentTo": "{username} kullanıcısına istek başarıyla gönderildi!",
+  "@requestSentTo": {
+    "placeholders": {
+      "username": {
+        "type": "String"
+      }
+    }
+  },
+  "selectExercise": "Egzersiz Seç",
+  "all": "Tümü",
+  "addExercisesToStart": "Başlamak için egzersiz ekle",
+  "tapPlusButton": "Aşağıdaki + butonuna dokun",
+  "reps": "Tekrar",
+  "weight": "Ağırlık",
+  "rest": "Dinlenme (sn)",
+  "addSet": "Set Ekle",
+  "addExercise": "Egzersiz Ekle",
+  "save": "Kaydet",
+  "workoutName": "Antrenman Adı",
+  "enterWorkoutName": "Antrenman adı girin",
+  "createWorkout": "Antrenman Oluştur",
+  "editWorkout": "Antrenmanı Düzenle",
+  "deleteWorkout": "Antrenmanı Sil",
+  "areYouSureDelete": "Bu antrenmanı silmek istediğinizden emin misiniz?",
+  "delete": "Sil",
+  "completedAt": "{time} saatinde tamamlandı",
+  "@completedAt": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "set": "Set",
+  "quickExerciseLog": "Hızlı Egzersiz Kaydı",
+  "logYourExercise": "Egzersizini kaydet",
+  "exerciseName": "Egzersiz Adı",
+  "enterExerciseName": "Egzersiz adı girin",
+  "sets": "Setler",
+  "duration": "Süre",
+  "minutes": "dakika",
+  "logExercise": "Egzersiz Kaydet",
+  "close": "Kapat",
+  "customProgram": "Özel Program",
+  "buildYourOwnWorkout": "Kendi antrenmanınızı oluşturun",
+  "quickLog": "Hızlı Kayıt",
+  "logASingleExercise": "Tek bir egzersiz kaydet",
+  "noStreakYet": "Henüz seri yok",
+  "day": "gün",
+  "keepGoing": "Devam et!",
+  "quickPrograms": "Hızlı Programlar",
+  "createProgramToQuicklyStart": "Hızlıca başlamak için program oluştur",
+  "min": "dk",
+  "ex": "egz",
+  "editProgram": "Programı Düzenle",
+  "deleteProgram": "Programı Sil",
+  "deleteProgramQuestion": "Program Silinsin mi?",
+  "areYouSureDeleteProgram": "\"{name}\" programını silmek istediğinizden emin misiniz?",
+  "@areYouSureDeleteProgram": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "logged": "kaydedildi",
+  "kg": "kg",
+  "editSetNumber": "Set {number} Düzenle",
+  "@editSetNumber": {
+    "placeholders": {
+      "number": {
+        "type": "int"
+      }
+    }
+  },
+  "reps": "Tekrar",
+  "weightWithUnit": "Ağırlık ({unit})",
+  "@weightWithUnit": {
+    "placeholders": {
+      "unit": {
+        "type": "String"
+      }
+    }
+  },
+  "exerciseNotFound": "Egzersiz bulunamadı",
+  "exitWorkout": "Antrenman Çıkış?",
+  "progressNotSaved": "İlerlemeniz kaydedilmeyecek.",
+  "exit": "Çıkış",
+  "finish": "Bitir",
+  "exerciseProgress": "Egzersiz {current}/{total}",
+  "@exerciseProgress": {
+    "placeholders": {
+      "current": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "percentComplete": "%{percent} Tamamlandı",
+  "@percentComplete": {
+    "placeholders": {
+      "percent": {
+        "type": "int"
+      }
+    }
+  },
+  "restTime": "Dinlenme Süresi",
+  "skip": "Atla",
+  "sets": "Setler",
+  "repsLowercase": "tekrar",
+  "kgUnit": "kg",
+  "workoutNotComplete": "Antrenman Tamamlanmadı",
+  "workoutNotCompleteMessage": "Tüm setleri bitirmediniz. İlerlemenizi kaydetmek ve yine de bitirmek ister misiniz?",
+  "finishAnyway": "Yine de Bitir",
+  "previous": "Önceki",
+  "next": "Sonraki",
+  "workoutCompleted": "Antrenman Tamamlandı!",
+  "enableStepTracking": "Adım Takibini Etkinleştir",
+  "stepPermissionMessage": "Arka planda adımlarınızı saymak için aktivite tanıma iznine ihtiyacımız var.",
+  "later": "Sonra",
+  "allow": "İzin Ver",
+  "stepTrackingEnabled": "Adım takibi etkinleştirildi!",
+  "permissionDenied": "İzin reddedildi",
+  "profile": "Profil",
+  "yourProfile": "Profiliniz",
+  "support": "Destek",
+  "legal": "Yasal",
+  "healthClosestAlly": "Sağlığınızın en yakın dostu.",
+  "openingWebsite": "Web sitesi açılıyor...",
+  "visitWebsite": "Web Sitesini Ziyaret Et",
+  "licensedApache": "Apache License 2.0 altında lisanslanmıştır",
+  "licensedApache2": "Apache 2.0 altında lisanslanmıştır",
+  "copyright": "© 2025 Vertex Corporation",
+  "readPolicies": "Politikalarımızı ve koşullarımızı okuyun",
+  "openingPrivacyPolicy": "Gizlilik Politikası açılıyor...",
+  "privacyPolicy": "Gizlilik Politikası",
+  "openingTerms": "Hizmet Şartları açılıyor...",
+  "termsOfService": "Hizmet Şartları",
+  "editWaterGoal": "Su Hedefini Düzenle",
+  "glasses": "bardak",
+  "editCalorieGoal": "Kalori Hedefini Düzenle",
+  "kcal": "kkal",
+  "goalWeight": "Hedef Kilo",
+  "editHeight": "Boyunu Düzenle",
+  "height": "Boy",
+  "cm": "cm",
+  "feet": "Fit",
+  "inches": "İnç",
+  "bodyMassIndex": "Vücut Kitle İndeksi (VKİ)",
+  "notCalculated": "Hesaplanmadı",
+  "addHeightWeight": "Boy ve kilo ekle",
+  "noAchievementsYet": "Henüz Başarı Yok",
+  "startTrackingForAchievements": "Başarıların kilidini açmak için sağlığınızı takip etmeye başlayın!",
+  "authFailed": "Kimlik doğrulama başarısız oldu. Giriş yapmadan devam ediliyor.",
+  "firebaseNotConfigured": "Firebase yapılandırılmamış. Anonim giriş kullanın.",
+  "googleSignInFailed": "Google ile giriş başarısız oldu. Bunun yerine anonim giriş kullanın.",
+  "emailSignInFailed": "E-posta ile giriş başarısız oldu: {error}",
+  "@emailSignInFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "signIn": "Giriş Yap",
+  "chooseSignInMethod": "Giriş yönteminizi seçin",
+  "continueWithGoogle": "Google ile Devam Et",
+  "continueWithEmail": "E-posta ile Devam Et",
+  "continueAsAnonymous": "Anonim Olarak Devam Et",
+  "dontHaveAccount": "Hesabınız yok mu? ",
+  "signUp": "Kaydol",
+  "legalAgreement": "Giriş yaparak/kaydolarak Gizlilik Politikamızı ve Hizmet Şartlarımızı kabul etmiş olursunuz",
+  "signInWithEmail": "E-posta ile giriş yap",
+  "enterEmailAddress": "E-posta adresinizi girin",
+  "email": "E-posta",
+  "enterPassword": "Şifrenizi girin",
+  "password": "Şifre",
+  "firebaseNotConfiguredSignup": "Firebase yapılandırılmamış. Kayıt olmadan devam ediliyor.",
+  "signUpFailed": "Kayıt başarısız oldu: {error}",
+  "@signUpFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "chooseUsername": "Kullanıcı adınızı seçin",
+  "username": "Kullanıcı Adı",
+  "createPassword": "Bir şifre oluşturun",
+  "back": "Geri",
+  "startJourney": "Yolculuğa Başla",
+  "continueAlly": "Devam Et",
+  "chooseUnits": "Birimlerinizi seçin",
+  "selectSystemPrefer": "Tercih ettiğiniz sistemi seçin",
+  "kgCm": "kg, cm",
+  "lbsIn": "lbs, in",
+  "whatsYourWeight": "Kilonuz nedir?",
+  "personalizeJourney": "Yolculuğunuzu kişiselleştirmemize yardımcı olun",
+  "whatsYourHeight": "Boyunuz nedir?",
+  "calculateIdealMetrics": "İdeal metriklerinizi hesaplayacağız",
+  "whatsYourAge": "Yaşınız kaç?",
+  "createPerfectPlan": "Mükemmel sağlık planınızı oluşturalım",
+  "years": "yıl",
+  "dailyStepGoal": "Günlük adım hedefi",
+  "weightPercent": "%{weight} ağırlık",
+  "@weightPercent": {
+    "placeholders": {
+      "weight": {
+        "type": "int"
+      }
+    }
+  },
+  "ally": "Ally",
+  "yourHealths": "Sağlığınızın\n",
+  "closest": "en yakın ",
+  "getStarted": "Başlayın",
+  "service": "Servis",
+  "automaticSleepTracking": "Otomatik Uyku Takibi",
+  "noSmartwatchNeeded": "Akıllı saate gerek yok! Uykuyu otomatik olarak takip edin.",
+  "whenDoYouSleep": "Genellikle ne zaman uyursunuz?",
+  "sleepTime": "Uyku Saati",
+  "wakeTime": "Uyanma Saati",
+  "sleepTrackingTitle": "Uyku Takibi",
+  "automaticTrackingEnabled": "Otomatik takip etkin",
+  "startTracking": "Takibe Başla",
+  "sleepSegments": "Uyku Bölümleri",
+  "sleepCycles": "Uyku Döngüleri",
+  "wakeUps": "Uyanmalar",
+  "noSleepDataYet": "Henüz uyku verisi yok",
+  "sleepTrackingStartTonight": "Uyku takibi bu gece başlayacak",
+  "currentlySleeping": "Şu Anda Uyuyor",
+  "sleepSegmentNumber": "Uyku Bölümü {number}",
+  "@sleepSegmentNumber": {
+    "placeholders": {
+      "number": {
+        "type": "int"
+      }
+    }
+  },
+  "setWaterGoal": "Su Hedefinizi Belirleyin",
+  "howMuchWater": "Günlük ne kadar su içmek istiyorsunuz?",
+  "goalUpdated": "Hedef Güncellendi",
+
+  "editGoal": "Hedefi Düzenle",
+  "quickAdd": "Hızlı Ekle",
+  "updateWeight": "Kiloyu Güncelle",
+  "enterWeight": "Kilo girin ({unit})",
+  "@enterWeight": {
+    "placeholders": {
+      "unit": {
+        "type": "String"
+      }
+    }
+  },
+  "weightHistory": "Kilo Geçmişi",
+  "startTrackingWeight": "Kilo ilerlemenizi takip etmeye başlayın",
+  "setCalorieGoal": "Kalori Hedefinizi Belirleyin",
+  "howManyCalories": "Günlük kaç kalori tüketmek istiyorsunuz?",
+  "goalSet": "Hedef Belirlendi",
+  "calorieGoalSet": "Günlük kalori hedefiniz artık {calories} kkal",
+  "@calorieGoalSet": {
+    "placeholders": {
+      "calories": {
+        "type": "int"
+      }
+    }
+  },
+  "stepTrackingEnabled": "✅ Adım takibi etkinleştirildi!",
+  "permissionDenied": "⚠️ İzin reddedildi",
+  "openingWebsite": "Web sitesi açılıyor...",
+  "licensedApache": "Apache License 2.0 altında lisanslanmıştır",
+  "openingPrivacyPolicy": "Gizlilik Politikası açılıyor...",
+  "openingTerms": "Hizmet Şartları açılıyor...",
+  "firebaseNotConfiguredSignup": "Firebase yapılandırılmamış. Kayıt olmadan devam ediliyor.",
+  "signUpFailed": "Kayıt başarısız oldu: {error}",
+  "@signUpFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "authFailed": "Kimlik doğrulama başarısız oldu. Giriş yapmadan devam ediliyor.",
+  "firebaseNotConfigured": "Firebase yapılandırılmamış. Anonim giriş kullanın.",
+  "googleSignInFailed": "Google ile giriş başarısız oldu. Bunun yerine anonim giriş kullanın.",
+  "emailSignInFailed": "E-posta ile giriş başarısız oldu: {error}",
+  "@emailSignInFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "addFriend": "Arkadaş Ekle",
+  "welcomeText1": "Sağlığınızın",
+  "welcomeText2": "en yakın",
+  "welcomeText3": "dostu",
+  "getStarted": "Başla",
+  "serviceControls": "Servis Kontrolleri",
+  "startService": "Servisi Başlat",
+  "restartService": "Servisi Yeniden Başlat",
+  "stopService": "Servisi Durdur",
+  "setYourGoal": "Hedefini Belirle",
+  "howManySteps": "Bugün kaç adım hedeflemek istiyorsun?",
+  "steps": "adım",
+  "cancel": "İptal",
+  "goalSet": "Hedef Belirlendi",
+  "save": "Kaydet",
+  "serviceStarted": "Servis Başlatıldı",
+  "serviceStartedDesc": "Adım sayacı servisi şimdi çalışıyor",
+  "serviceRestarted": "Servis Yeniden Başlatıldı",
+  "serviceRestartedDesc": "Adım sayacı servisi yeniden başlatıldı",
+  "serviceStopped": "Servis Durduruldu",
+  "serviceStoppedDesc": "Adım sayacı servisi durduruldu",
+  "dailyGoalSet": "Günlük hedefiniz şimdi {goal} adım",
+  "stepsLabel": "adım",
+  "ageHint": "5",
+  "heightFeetHint": "9",
+  "weightLbsHint": "170",
+  "calorieGoalHint": "25",
+  "defaultStepGoal": "6000",
+  "programNameHint": "Program adı (örn. Push Day)",
+  "usernameHint": "Kullanıcı Adı",
+  "emailHint": "E-posta",
+  "passwordHint": "Şifre",
+  "dailyCalorieHint": "2000",
+  "usernameAtHint": "@kullaniciadi",
+  "programUpdated": "Program \"{name}\" güncellendi!",
+  "@programUpdated": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "programSaved": "Program \"{name}\" kaydedildi!",
+  "@programSaved": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "valueOfTarget": "{value} / {target}",
+  "@valueOfTarget": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      },
+      "target": {
+        "type": "String"
+      }
+    }
+  },
+  "valueSlashTarget": "{value}/{target}",
+  "@valueSlashTarget": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      },
+      "target": {
+        "type": "String"
+      }
+    }
+  },
+  "hoursMinutes": "{hours}s {minutes}d",
+  "@hoursMinutes": {
+    "placeholders": {
+      "hours": {
+        "type": "int"
+      },
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "ofValueUnit": "{value}{unit}'den",
+  "@ofValueUnit": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      },
+      "unit": {
+        "type": "String"
+      }
+    }
+  },
+  "bmiValue": "VKİ: {value}",
+  "@bmiValue": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "gramsAmount": "~{grams}g",
+  "@gramsAmount": {
+    "placeholders": {
+      "grams": {
+        "type": "String"
+      }
+    }
+  },
+  "caloriesAmount": "~{calories} kal",
+  "@caloriesAmount": {
+    "placeholders": {
+      "calories": {
+        "type": "String"
+      }
+    }
+  },
+  "caloriesPer100g": "({calories}/100g)",
+  "@caloriesPer100g": {
+    "placeholders": {
+      "calories": {
+        "type": "String"
+      }
+    }
+  },
+  "licensedApache2Short": "Apache 2.0 altında lisanslanmıştır",
+  "waterGoalLabel": "Su Hedefi",
+  "calorieGoalLabel": "Kalori Hedefi",
+  "enterWeightLbs": "Kilo girin (lbs)",
+  "enterWeightKg": "Kilo girin (kg)",
+  "bmiLabel": "VKİ: {value}",
+  "@bmiLabel": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "currentSlashTarget": "{current} / {target}",
+  "@currentSlashTarget": {
+    "placeholders": {
+      "current": {
+        "type": "String"
+      },
+      "target": {
+        "type": "String"
+      }
+    }
+  },
+  "scoreSlashWeight": "{score}/{weight}",
+  "@scoreSlashWeight": {
+    "placeholders": {
+      "score": {
+        "type": "String"
+      },
+      "weight": {
+        "type": "String"
+      }
+    }
+  },
+  "bpmUnit": "Nabız",
+  "ofHoursGoal": "{hours}s'den",
+  "@ofHoursGoal": {
+    "placeholders": {
+      "hours": {
+        "type": "String"
+      }
+    }
+  },
+  "nowLabel": "Şimdi",
+  "dailyGoalSetTo": "Günlük hedef {value}{unit} olarak ayarlandı",
+  "@dailyGoalSetTo": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      },
+      "unit": {
+        "type": "String"
+      }
+    }
+  },
+  "noWeightHistory": "Kilo geçmişi yok",
+  "foodSelectionSubtitle": "{plateType} - {fillTitle} (~{grams}g)",
+  "@foodSelectionSubtitle": {
+    "placeholders": {
+      "plateType": {
+        "type": "String"
+      },
+      "fillTitle": {
+        "type": "String"
+      },
+      "grams": {
+        "type": "String"
+      }
+    }
+  },
+  "enterFriendUsername": "Aktivitelerini takip etmek için arkadaşınızın kullanıcı adını girin",
+  "sendRequest": "İstek Gönder",
+  "subscribeToPlan": "{title} planına abone ol",
+  "@subscribeToPlan": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "restSeconds": "{seconds}sn",
+  "@restSeconds": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "editGoal": "Hedefi Düzenle",
+  "cancel": "İptal",
+  "setYourCalorieGoal": "Kalori Hedefini Belirle",
+  "howManyCalories": "Günlük kaç kalori tüketmek istiyorsun?",
+  "workoutBuilder": "Antrenman Oluşturucu",
+  "editProgram": "Programı Düzenle",
+  "weightHistory": "Kilo Geçmişi",
+  "automaticSleepTracking": "Otomatik Uyku Takibi",
+  "noSmartwatchNeeded": "Akıllı saat gerekmez! Uykunuzu otomatik olarak takip edin.",
+  "whenDoYouUsuallySleep": "Genellikle ne zaman uyursunuz?",
+  "startTracking": "Takibi Başlat",
+  "sleepSegments": "Uyku Bölümleri",
+  "sleepCycles": "Uyku Döngüleri",
+  "wakeUps": "Uyanmalar",
+  "noSleepDataYet": "Henüz uyku verisi yok",
+  "sleepTrackingWillStartTonight": "Uyku takibi bu gece başlayacak",
+  "quickAdd": "Hızlı Ekle"
+}
