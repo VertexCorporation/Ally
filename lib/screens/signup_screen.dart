@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import '../l10n/app_localizations.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'onboarding_screen.dart';
+import 'onboard.dart';
 import '../main.dart' show isFirebaseInitialized;
 
 class SignUpScreen extends StatefulWidget {
@@ -223,7 +222,7 @@ class _SignUpScreenState extends State<SignUpScreen> with TickerProviderStateMix
   Widget build(BuildContext context) {
     return PopScope(
       canPop: _currentStep == 'username',
-      onPopInvoked: (bool didPop) {
+      onPopInvokedWithResult: (bool didPop, dynamic) {
         if (didPop) return;
         
         if (_currentStep != 'username') {

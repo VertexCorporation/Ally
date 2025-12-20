@@ -1,0 +1,1 @@
+{"flutter":{"platforms":{"android":{"default":{"projectId":"vertex-ai-1618","appId":"1:561391430514:android:ea1d848d92b7289eb10beb","fileOutput":"android/app/google-services.json"}},"dart":{"lib/firebase_options.dart":{"projectId":"vertex-ai-1618","configurations":{"android":"1:561391430514:android:ea1d848d92b7289eb10beb","ios":"1:561391430514:ios:7bfd48ae073a5869b10beb"}}}}}}

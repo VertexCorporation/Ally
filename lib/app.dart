@@ -1,0 +1,111 @@
+// app.dart
+//
+// Root application widget and shared app-level utilities.
+//
+// - Cortex: wraps [MaterialApp] with theming, localization, and navigator key.
+// - InvertedColor: small color utility extension used across the app.
+// - kUnsupportedMaterialLocales: locales with incomplete Material translations.
+
+import 'package:ally/theme.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:provider/provider.dart';
+
+import 'l10n/app_localizations.dart';
+import 'language.dart';
+
+/// Root application widget. Wraps [MaterialApp] with localization, theming,
+/// and the global [navigatorKey].
+class Ally extends StatelessWidget {
+  const Ally ({
+    super.key,
+    required this.navigatorKey,
+    this.startupScreen,
+  });
+
+  final GlobalKey<NavigatorState> navigatorKey;
+  final Widget? startupScreen;
+
+  ThemeData _buildTheme(String currentTheme) {
+    final bool isDark = currentTheme == 'dark';
+    final ThemeData baseTheme = isDark ? ThemeData.dark() : ThemeData.light();
+
+    return baseTheme.copyWith(
+      primaryColor: AppColors.background,
+      scaffoldBackgroundColor: AppColors.background,
+      colorScheme: baseTheme.colorScheme.copyWith(
+        primary: AppColors.primaryColor.inverted,
+        onPrimary: AppColors.primaryColor,
+        secondary: AppColors.border,
+        onSecondary: AppColors.quaternaryColor,
+        surface: AppColors.background,
+        onSurface: AppColors.border,
+        error: AppColors.septenaryColor,
+      ),
+      textSelectionTheme: TextSelectionThemeData(
+        cursorColor: AppColors.primaryColor.inverted,
+        selectionColor: AppColors.quaternaryColor,
+      ),
+      inputDecorationTheme: InputDecorationTheme(
+        focusColor: AppColors.primaryColor.inverted,
+        hintStyle: TextStyle(color: AppColors.tertiaryColor),
+        labelStyle: TextStyle(color: AppColors.tertiaryColor),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final ThemeProvider themeProvider = Provider.of<ThemeProvider>(context);
+    final LocaleProvider localeProvider = Provider.of<LocaleProvider>(context);
+
+    return MaterialApp(
+      navigatorKey: navigatorKey,
+      theme: _buildTheme(themeProvider.currentTheme),
+      builder: (BuildContext context, Widget? child) {
+        try {
+          themeProvider.updateSystemUIOverlayStyle();
+        } catch (_) {}
+        return child!;
+      },
+      locale: localeProvider.locale,
+      supportedLocales: AppLocalizations.supportedLocales,
+      localizationsDelegates: const <LocalizationsDelegate<dynamic>>[
+        AppLocalizations.delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      localeResolutionCallback:
+          (Locale? locale, Iterable<Locale> supportedLocales) {
+        final Locale chosenLocale = localeProvider.locale;
+        if (kUnsupportedMaterialLocales.contains(chosenLocale.languageCode)) {
+          return const Locale('en');
+        }
+        return chosenLocale;
+      },
+      home: startupScreen,
+    );
+  }
+}
+
+/// Helper extension to make color inversion cleaner and reusable.
+extension InvertedColor on Color {
+  /// Returns the inverted version of this color.
+  Color get inverted {
+    final int a = (this.a * 255).round();
+    final int r = (this.r * 255).round();
+    final int g = (this.g * 255).round();
+    final int b = (this.b * 255).round();
+
+    return Color.fromARGB(
+      a,
+      255 - r,
+      255 - g,
+      255 - b,
+    );
+  }
+}
+
+// List of locales with incomplete Material translations.
+const List<String> kUnsupportedMaterialLocales = <String>['ku'];
