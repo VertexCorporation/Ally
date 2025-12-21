@@ -1,6 +1,6 @@
 # Ally
 
-Your health's closest Ally.
+Always your ally.
 
 ## Description
 
