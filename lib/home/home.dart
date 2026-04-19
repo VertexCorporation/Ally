@@ -331,9 +331,6 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   }
 
   Widget _buildHomeScreen() {
-    final healthProvider = Provider.of<HealthProvider>(context);
-    final healthData = healthProvider.healthData;
-    final healthScore = healthData.healthScore;
     
     return CustomScrollView(
                   physics: const BouncingScrollPhysics(),
@@ -409,87 +406,82 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                     SliverToBoxAdapter(
                       child: Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                        child: GestureDetector(
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(builder: (context) => const HealthScoreScreen()),
+                        child: Consumer<HealthProvider>(
+                          builder: (context, provider, _) {
+                            final healthScore = provider.healthData.healthScore;
+                            return GestureDetector(
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(builder: (context) => const HealthScoreScreen()),
+                                );
+                              },
+                              child: FadeTransition(
+                                opacity: _fadeController,
+                                child: Container(
+                                  padding: const EdgeInsets.all(24),
+                                  decoration: BoxDecoration(
+                                    color: const Color(0xFF64B5F6),
+                                    borderRadius: BorderRadius.circular(24),
+                                    boxShadow: [BoxShadow(color: const Color(0xFF64B5F6).withValues(alpha:0.3), blurRadius: 20, offset: const Offset(0, 10))],
+                                  ),
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Row(
+                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Text(AppLocalizations.of(context)!.healthScore, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white)),
+                                          Container(
+                                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                                            decoration: BoxDecoration(color: Colors.white.withValues(alpha:0.25), borderRadius: BorderRadius.circular(20)),
+                                            child: Text(AppLocalizations.of(context)!.today, style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w600)),
+                                          ),
+                                        ],
+                                      ),
+                                      const SizedBox(height: 20),
+                                      Row(
+                                        crossAxisAlignment: CrossAxisAlignment.end,
+                                        children: [
+                                          Text('${healthScore.toInt()}', style: const TextStyle(fontSize: 52, fontWeight: FontWeight.bold, color: Colors.white, height: 1)),
+                                          const SizedBox(width: 8),
+                                          Padding(
+                                            padding: const EdgeInsets.only(bottom: 8),
+                                            child: Text(AppLocalizations.of(context)!.of100, style: const TextStyle(fontSize: 16, color: Colors.white70, fontWeight: FontWeight.w500)),
+                                          ),
+                                        ],
+                                      ),
+                                      const SizedBox(height: 16),
+                                      ClipRRect(
+                                        borderRadius: BorderRadius.circular(12),
+                                        child: Stack(
+                                          children: [
+                                            Container(
+                                              height: 12,
+                                              decoration: BoxDecoration(
+                                                color: Colors.white.withValues(alpha:0.3),
+                                                borderRadius: BorderRadius.circular(12),
+                                              ),
+                                            ),
+                                            FractionallySizedBox(
+                                              widthFactor: (healthScore / 100),
+                                              child: Container(
+                                                height: 12,
+                                                decoration: BoxDecoration(
+                                                  color: Colors.white,
+                                                  borderRadius: BorderRadius.circular(12),
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
                             );
                           },
-                          child: TweenAnimationBuilder<double>(
-                            duration: const Duration(milliseconds: 1200),
-                            tween: Tween(begin: 0.0, end: 1.0),
-                            curve: Curves.easeOut,
-                            builder: (context, value, child) {
-                              return Hero(
-                                tag: 'health_score_card',
-                                child: Material(
-                                  color: Colors.transparent,
-                                  child: Container(
-                                    padding: const EdgeInsets.all(24),
-                                    decoration: BoxDecoration(
-                                      color: const Color(0xFF64B5F6),
-                                      borderRadius: BorderRadius.circular(24),
-                                      boxShadow: [BoxShadow(color: const Color(0xFF64B5F6).withValues(alpha:0.3), blurRadius: 20, offset: const Offset(0, 10))],
-                                    ),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Text(AppLocalizations.of(context)!.healthScore, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white)),
-                                      Container(
-                                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                                        decoration: BoxDecoration(color: Colors.white.withValues(alpha:0.25), borderRadius: BorderRadius.circular(20)),
-                                        child: Text(AppLocalizations.of(context)!.today, style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w600)),
-                                      ),
-                                    ],
-                                  ),
-                                  const SizedBox(height: 20),
-                                  Row(
-                                    crossAxisAlignment: CrossAxisAlignment.end,
-                                    children: [
-                                      Text('${(healthScore * value).toInt()}', style: const TextStyle(fontSize: 52, fontWeight: FontWeight.bold, color: Colors.white, height: 1)),
-                                      const SizedBox(width: 8),
-                                      Padding(
-                                        padding: const EdgeInsets.only(bottom: 8),
-                                        child: Text(AppLocalizations.of(context)!.of100, style: const TextStyle(fontSize: 16, color: Colors.white70, fontWeight: FontWeight.w500)),
-                                      ),
-                                    ],
-                                  ),
-                                  const SizedBox(height: 16),
-                                  ClipRRect(
-                                    borderRadius: BorderRadius.circular(12),
-                                    child: Stack(
-                                      children: [
-                                        Container(
-                                          height: 12,
-                                          decoration: BoxDecoration(
-                                            color: Colors.white.withValues(alpha:0.3),
-                                            borderRadius: BorderRadius.circular(12),
-                                          ),
-                                        ),
-                                        FractionallySizedBox(
-                                          widthFactor: (healthScore / 100) * value,
-                                          child: Container(
-                                            height: 12,
-                                            decoration: BoxDecoration(
-                                              color: Colors.white,
-                                              borderRadius: BorderRadius.circular(12),
-                                            ),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                          );
-                          },
-                        ),
                         ),
                       ),
                     ),
@@ -498,29 +490,32 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                     
                     SliverPadding(
                       padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                      sliver: SliverGrid(
-                        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 2,
-                          mainAxisSpacing: 12,
-                          crossAxisSpacing: 12,
-                          childAspectRatio: 1.1,
-                        ),
-                        delegate: SliverChildListDelegate([
-                          _buildMetricCard(AppLocalizations.of(context)!.exercises, AppLocalizations.of(context)!.daysCount(healthData.exerciseStreak), Icons.fitness_center_rounded, const Color(0xFFE57373), 0),
-                          _buildMetricCard(AppLocalizations.of(context)!.nutrition, AppLocalizations.of(context)!.calories(healthData.caloriesConsumed), Icons.restaurant_rounded, const Color(0xFFFFB74D), 100),
-                          _buildMetricCard(AppLocalizations.of(context)!.sleep, AppLocalizations.of(context)!.hours(healthData.sleepHours.toStringAsFixed(1)), Icons.bedtime_rounded, const Color(0xFFCE93D8), 200),
-                          Consumer<HealthProvider>(
-                            builder: (context, provider, _) => _buildMetricCard(
-                              AppLocalizations.of(context)!.water,
-                              UnitConverter.formatWater(healthData.waterGlasses, provider.units),
-                              Icons.water_drop_rounded,
-                              const Color(0xFF64B5F6),
-                              300,
+                      sliver: Consumer<HealthProvider>(
+                        builder: (context, provider, _) {
+                          final healthData = provider.healthData;
+                          return SliverGrid(
+                            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                              crossAxisCount: 2,
+                              mainAxisSpacing: 12,
+                              crossAxisSpacing: 12,
+                              childAspectRatio: 1.1,
                             ),
-                          ),
-                          _buildMetricCard(AppLocalizations.of(context)!.weight, UnitConverter.formatWeight(healthData.currentWeight, healthProvider.units), Icons.monitor_weight_rounded, const Color(0xFF81C784), 400),
-                          _buildMetricCard(AppLocalizations.of(context)!.pedometer, AppLocalizations.of(context)!.steps(healthData.currentSteps, healthData.stepsGoal), Icons.directions_walk_rounded, const Color(0xFF4BAADF), 500),
-                        ]),
+                            delegate: SliverChildListDelegate([
+                              _buildMetricCard(AppLocalizations.of(context)!.exercises, AppLocalizations.of(context)!.daysCount(healthData.exerciseStreak), Icons.fitness_center_rounded, const Color(0xFFE57373), 0),
+                              _buildMetricCard(AppLocalizations.of(context)!.nutrition, AppLocalizations.of(context)!.calories(healthData.caloriesConsumed), Icons.restaurant_rounded, const Color(0xFFFFB74D), 100),
+                              _buildMetricCard(AppLocalizations.of(context)!.sleep, AppLocalizations.of(context)!.hours(healthData.sleepHours.toStringAsFixed(1)), Icons.bedtime_rounded, const Color(0xFFCE93D8), 200),
+                              _buildMetricCard(
+                                AppLocalizations.of(context)!.water,
+                                UnitConverter.formatWater(healthData.waterGlasses, provider.units),
+                                Icons.water_drop_rounded,
+                                const Color(0xFF64B5F6),
+                                300,
+                              ),
+                              _buildMetricCard(AppLocalizations.of(context)!.weight, UnitConverter.formatWeight(healthData.currentWeight, provider.units), Icons.monitor_weight_rounded, const Color(0xFF81C784), 400),
+                              _buildMetricCard(AppLocalizations.of(context)!.pedometer, AppLocalizations.of(context)!.steps(healthData.currentSteps, healthData.stepsGoal), Icons.directions_walk_rounded, const Color(0xFF4BAADF), 500),
+                            ]),
+                          );
+                        }
                       ),
                     ),
                     
@@ -552,55 +547,40 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       return _buildSleepCard(value, color, delay, icon);
     }
     
-    return TweenAnimationBuilder<double>(
-      duration: Duration(milliseconds: 600 + delay),
-      tween: Tween(begin: 0.0, end: 1.0),
-      curve: Curves.easeOut,
-      builder: (context, animValue, child) {
-        return Transform.scale(
-          scale: 0.8 + (0.2 * animValue),
-          child: Opacity(
-            opacity: animValue,
-            child: GestureDetector(
-              onTap: () {
-                final l10n = AppLocalizations.of(context)!;
-                Widget? screen;
-                
-                if (title == l10n.exercises) {
-                  screen = const ExercisesScreen();
-                } else if (title == l10n.sleep) {
-                  screen = const SleepScreen();
-                } else if (title == l10n.weight) {
-                  screen = const WeightScreen();
-                } else if (title == l10n.heartbeat) {
-                  screen = const HeartbeatScreen();
-                } else if (title == l10n.pedometer) {
-                  screen = const PedometerScreen();
-                }
-                
-                if (screen != null) {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => screen!),
-                  );
-                }
-              },
-              child: Hero(
-                tag: title == AppLocalizations.of(context)!.exercises ? 'exercises_card' :
-                     title == AppLocalizations.of(context)!.sleep ? 'sleep_card' :
-                     title == AppLocalizations.of(context)!.weight ? 'weight_card' :
-                     title == AppLocalizations.of(context)!.heartbeat ? 'heartbeat_card' :
-                     title == AppLocalizations.of(context)!.pedometer ? 'pedometer_card' : 'default_card',
-                child: Material(
-                  color: Colors.transparent,
-                  child: Container(
-                    padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      color: color,
-                      borderRadius: BorderRadius.circular(20),
-                      boxShadow: [BoxShadow(color: color.withValues(alpha:0.3), blurRadius: 15, offset: const Offset(0, 8))],
-                    ),
-                    child: Column(
+    return FadeTransition(
+      opacity: _fadeController,
+      child: GestureDetector(
+        onTap: () {
+          final l10n = AppLocalizations.of(context)!;
+          Widget? screen;
+          
+          if (title == l10n.exercises) {
+            screen = const ExercisesScreen();
+          } else if (title == l10n.sleep) {
+            screen = const SleepScreen();
+          } else if (title == l10n.weight) {
+            screen = const WeightScreen();
+          } else if (title == l10n.heartbeat) {
+            screen = const HeartbeatScreen();
+          } else if (title == l10n.pedometer) {
+            screen = const PedometerScreen();
+          }
+          
+          if (screen != null) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => screen!),
+            );
+          }
+        },
+        child: Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: color,
+            borderRadius: BorderRadius.circular(20),
+            boxShadow: [BoxShadow(color: color.withValues(alpha:0.3), blurRadius: 15, offset: const Offset(0, 8))],
+          ),
+          child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
@@ -641,99 +621,87 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       builder: (context, healthProvider, child) {
         final progress = healthProvider.healthData.waterGlasses / healthProvider.healthData.waterGoal;
         
-        return TweenAnimationBuilder<double>(
-          duration: Duration(milliseconds: 600 + delay),
-          tween: Tween(begin: 0.0, end: 1.0),
-          curve: Curves.easeOut,
-          builder: (context, animValue, child) {
-            return Transform.scale(
-              scale: 0.8 + (0.2 * animValue),
-              child: Opacity(
-                opacity: animValue,
-                child: GestureDetector(
-                  onTap: () {
-                    Navigator.push(context, MaterialPageRoute(builder: (context) => const WaterScreen()));
-                  },
-                  child: Hero(
-                    tag: 'water_card',
-                    child: Material(
-                      color: Colors.transparent,
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(20),
-                        child: Container(
-                          decoration: BoxDecoration(
-                            boxShadow: [BoxShadow(color: color.withValues(alpha:0.3), blurRadius: 15, offset: const Offset(0, 8))],
+        return FadeTransition(
+          opacity: _fadeController,
+          child: GestureDetector(
+            onTap: () {
+              Navigator.push(context, MaterialPageRoute(builder: (context) => const WaterScreen()));
+            },
+            child: Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(20),
+                boxShadow: [BoxShadow(color: color.withValues(alpha:0.3), blurRadius: 15, offset: const Offset(0, 8))],
+              ),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(20),
+                child: Container(
+                  decoration: const BoxDecoration(),
+                  child: Stack(
+                    children: [
+                      // Background
+                      Container(color: color),
+                      // Wave animation only when not empty and not full
+                      if (progress > 0 && progress < 1)
+                        Positioned.fill(
+                          child: CustomPaint(
+                            painter: WavePainter(
+                              progress: progress,
+                              color: Colors.white70,
+                              animation: _waveController ?? _fadeController,
+                            ),
                           ),
-                          child: Stack(
-                            children: [
-                              // Background
-                              Container(color: color),
-                              // Wave animation only when not empty and not full
-                              if (progress > 0 && progress < 1)
-                                Positioned.fill(
-                                  child: CustomPaint(
-                                    painter: WavePainter(
-                                      progress: progress,
-                                      color: Colors.white70,
-                                      animation: _waveController ?? _fadeController,
-                                    ),
-                                  ),
+                        ),
+                      // Bubble animation ONLY when completely full
+                      if (progress >= 1.0)
+                        Positioned.fill(
+                          child: AnimatedBuilder(
+                            animation: _waveController ?? _fadeController,
+                            builder: (context, child) {
+                              return CustomPaint(
+                                painter: HomeBubblePainter(
+                                  animationValue: (_waveController ?? _fadeController).value,
                                 ),
-                              // Bubble animation ONLY when completely full
-                              if (progress >= 1.0)
-                                Positioned.fill(
-                                  child: AnimatedBuilder(
-                                    animation: _waveController ?? _fadeController,
-                                    builder: (context, child) {
-                                      return CustomPaint(
-                                        painter: HomeBubblePainter(
-                                          animationValue: (_waveController ?? _fadeController).value,
-                                        ),
-                                      );
-                                    },
-                                  ),
-                                ),
-                              // Content
-                              Padding(
-                                padding: const EdgeInsets.all(16),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    const Icon(Icons.water_drop_rounded, size: 32, color: Colors.white),
-                                    const Spacer(),
-                                    Text(
-                                      AppLocalizations.of(context)!.water,
-                                      style: const TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.white,
-                                        height: 1.2,
-                                      ),
-                                    ),
-                                    const SizedBox(height: 4),
-                                    Text(
-                                      value,
-                                      style: const TextStyle(
-                                        fontSize: 12,
-                                        color: Colors.white70,
-                                        height: 1.2,
-                                      ),
-                                    ),
-                                  ],
-                                ),
+                              );
+                            },
+                          ),
+                        ),
+                      // Content
+                      Padding(
+                        padding: const EdgeInsets.all(16),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            const Icon(Icons.water_drop_rounded, size: 32, color: Colors.white),
+                            const Spacer(),
+                            Text(
+                              AppLocalizations.of(context)!.water,
+                              style: const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                                height: 1.2,
                               ),
-                            ],
-                          ),
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              value,
+                              style: const TextStyle(
+                                fontSize: 12,
+                                color: Colors.white70,
+                                height: 1.2,
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
-                    ),
+                    ],
                   ),
                 ),
               ),
             ),
-          );
-        },
-      );
+          ),
+        );
       },
     );
   }
@@ -741,74 +709,62 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   Widget _buildNutritionCard(String value, Color color, int delay) {
     return Consumer<HealthProvider>(
       builder: (context, healthProvider, child) {
-        return TweenAnimationBuilder<double>(
-          duration: Duration(milliseconds: 600 + delay),
-          tween: Tween(begin: 0.0, end: 1.0),
-          curve: Curves.easeOut,
-          builder: (context, animValue, child) {
-            return Transform.scale(
-              scale: 0.8 + (0.2 * animValue),
-              child: Opacity(
-                opacity: animValue,
-                child: GestureDetector(
-                  onTap: () {
-                    Navigator.push(context, MaterialPageRoute(builder: (context) => const NutritionScreen()));
-                  },
-                  child: Hero(
-                    tag: 'nutrition_card',
-                    child: Material(
-                      color: Colors.transparent,
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(20),
-                        child: Container(
-                          decoration: BoxDecoration(
-                            boxShadow: [BoxShadow(color: color.withValues(alpha:0.3), blurRadius: 15, offset: const Offset(0, 8))],
-                          ),
-                          child: Stack(
-                            children: [
-                              // Background
-                              Container(color: color),
-                              // Content
-                              Padding(
-                                padding: const EdgeInsets.all(16),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    const Icon(Icons.restaurant_rounded, size: 32, color: Colors.white),
-                                    const Spacer(),
-                                    Text(
-                                      AppLocalizations.of(context)!.nutrition,
-                                      style: const TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.white,
-                                        height: 1.2,
-                                      ),
-                                    ),
-                                    const SizedBox(height: 4),
-                                    Text(
-                                      value,
-                                      style: const TextStyle(
-                                        fontSize: 12,
-                                        color: Colors.white70,
-                                        height: 1.2,
-                                      ),
-                                    ),
-                                  ],
-                                ),
+        return FadeTransition(
+          opacity: _fadeController,
+          child: GestureDetector(
+            onTap: () {
+              Navigator.push(context, MaterialPageRoute(builder: (context) => const NutritionScreen()));
+            },
+            child: Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(20),
+                boxShadow: [BoxShadow(color: color.withValues(alpha:0.3), blurRadius: 15, offset: const Offset(0, 8))],
+              ),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(20),
+                child: Container(
+                  decoration: const BoxDecoration(),
+                  child: Stack(
+                    children: [
+                      // Background
+                      Container(color: color),
+                      // Content
+                      Padding(
+                        padding: const EdgeInsets.all(16),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            const Icon(Icons.restaurant_rounded, size: 32, color: Colors.white),
+                            const Spacer(),
+                            Text(
+                              AppLocalizations.of(context)!.nutrition,
+                              style: const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                                height: 1.2,
                               ),
-                            ],
-                          ),
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              value,
+                              style: const TextStyle(
+                                fontSize: 12,
+                                color: Colors.white70,
+                                height: 1.2,
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
-                    ),
+                    ],
                   ),
                 ),
               ),
             ),
-          );
-        },
-      );
+          ),
+        );
       },
     );
   }

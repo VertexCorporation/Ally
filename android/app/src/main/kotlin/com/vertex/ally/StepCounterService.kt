@@ -77,31 +77,28 @@ class StepCounterService : Service(), SensorEventListener {
             anyRegistered = anyRegistered || registered
         }
         
-        stepDetectorSensor?.let {
-            val registered = sensorManager.registerListener(
-                this, 
-                it, 
-                SensorManager.SENSOR_DELAY_UI
-            )
-            android.util.Log.d("StepService", "Step Detector registered: $registered")
-            anyRegistered = anyRegistered || registered
+        if (!anyRegistered) {
+            stepDetectorSensor?.let {
+                val registered = sensorManager.registerListener(
+                    this, 
+                    it, 
+                    SensorManager.SENSOR_DELAY_UI
+                )
+                android.util.Log.d("StepService", "Step Detector registered: $registered")
+                anyRegistered = anyRegistered || registered
+            }
         }
         
         if (!anyRegistered) {
-            if (stepCounterSensor == null && stepDetectorSensor == null) {
-                android.util.Log.e("StepService", "❌ NO STEP SENSORS AVAILABLE ON THIS DEVICE!")
-            } else {
-                android.util.Log.e("StepService", "❌ SENSORS AVAILABLE BUT REGISTRATION FAILED!")
-                // Tekrar dene
-                android.os.Handler(android.os.Looper.getMainLooper()).postDelayed({
-                    stepCounterSensor?.let { sensor ->
-                        sensorManager.registerListener(this, sensor, SensorManager.SENSOR_DELAY_UI)
-                    }
-                    stepDetectorSensor?.let { sensor ->
-                        sensorManager.registerListener(this, sensor, SensorManager.SENSOR_DELAY_UI)
-                    }
-                }, 1000)
-            }
+            android.util.Log.e("StepService", "❌ SENSORS AVAILABLE BUT REGISTRATION FAILED OR NONE EXIST!")
+            // Tekrar dene
+            android.os.Handler(android.os.Looper.getMainLooper()).postDelayed({
+                stepCounterSensor?.let { sensor ->
+                    sensorManager.registerListener(this, sensor, SensorManager.SENSOR_DELAY_UI)
+                } ?: stepDetectorSensor?.let { sensor ->
+                    sensorManager.registerListener(this, sensor, SensorManager.SENSOR_DELAY_UI)
+                }
+            }, 1000)
         }
         
         // Foreground service olarak başlat (bildirimle)

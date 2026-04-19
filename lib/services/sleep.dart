@@ -92,6 +92,7 @@ class SleepForegroundHandler extends TaskHandler {
 
   void _checkInactivity() async {
     if (!_isInSleepWindow) return;
+    if (_lastActivityTime == null) return;
 
     // Check if phone is active
     final timeSinceActivity = DateTime.now().difference(_lastActivityTime!);
@@ -132,6 +133,7 @@ class SleepForegroundHandler extends TaskHandler {
 
   void _checkWakeUp() {
     if (_sleepStartTime == null) return;
+    if (_lastActivityTime == null) return;
 
     // Check if phone became active (screen on, app opened, etc.)
     final timeSinceActivity = DateTime.now().difference(_lastActivityTime!);

@@ -173,6 +173,13 @@ class UserProvider with ChangeNotifier {
     _userSubscription = null;
     _userData = null;
     await _clearCachedUserData();
+    
+    try {
+      await FirebaseAuth.instance.signOut();
+    } catch (e) {
+      debugPrint("[UserProvider] Error during Firebase signOut: $e");
+    }
+    
     notifyListeners();
     debugPrint("[UserProvider] All user data and listeners cleared.");
   }

@@ -79,8 +79,11 @@ class _SleepScreenState extends State<SleepScreen> {
       backgroundColor: Colors.transparent,
       isScrollControlled: true,
       isDismissible: false,
-      builder: (context) => PopScope(
-        canPop: false,
+      builder: (context) => StatefulBuilder(
+        builder: (context, setStateModal) {
+          bool _isLoading = false;
+          return PopScope(
+            canPop: false,
         child: Container(
           margin: EdgeInsets.all(sw * 0.04),
           padding: EdgeInsets.all(sw * 0.06),
@@ -194,7 +197,10 @@ class _SleepScreenState extends State<SleepScreen> {
                   SizedBox(width: sw * 0.03),
                   Expanded(
                     child: ElevatedButton(
-                      onPressed: () async {
+                      onPressed: _isLoading ? null : () async {
+                        setStateModal(() {
+                          _isLoading = true;
+                        });
                         // 1. Asenkron işlemler
                         await _sleepService.startTracking(_sleepStart, _sleepEnd);
                         final prefs = await SharedPreferences.getInstance();
@@ -218,14 +224,23 @@ class _SleepScreenState extends State<SleepScreen> {
                         ),
                         elevation: 0,
                       ),
-                      child: Text(
-                        AppLocalizations.of(context)!.startTracking,
-                        style: TextStyle(
-                          fontSize: sw * 0.04,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.white,
-                        ),
-                      ),
+                      child: _isLoading
+                          ? const SizedBox(
+                              height: 20,
+                              width: 20,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                              ),
+                            )
+                          : Text(
+                              AppLocalizations.of(context)!.startTracking,
+                              style: TextStyle(
+                                fontSize: sw * 0.04,
+                                fontWeight: FontWeight.w600,
+                                color: Colors.white,
+                              ),
+                            ),
                     ),
                   ),
                 ],
@@ -233,7 +248,8 @@ class _SleepScreenState extends State<SleepScreen> {
             ],
           ),
         ),
-      ),
+      );
+    }),
     );
   }
 

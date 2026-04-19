@@ -277,10 +277,11 @@ class _SignUpScreenState extends State<SignUpScreen> with TickerProviderStateMix
           alignment: Alignment(0, -0.6),
         ),
       ),
-      child: Padding(
-        padding: const EdgeInsets.all(32.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+      child: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(32.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const SizedBox(height: 20),
             
@@ -315,7 +316,7 @@ class _SignUpScreenState extends State<SignUpScreen> with TickerProviderStateMix
               ),
             ),
             
-            const Spacer(),
+            const SizedBox(height: 60),
             
             TextField(
               controller: _usernameController,
@@ -342,7 +343,12 @@ class _SignUpScreenState extends State<SignUpScreen> with TickerProviderStateMix
                 ),
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(30),
-                  borderSide: const BorderSide(color: Colors.black87, width: 1.5),
+                  borderSide: BorderSide(
+                    color: Theme.of(context).brightness == Brightness.dark
+                        ? Colors.white
+                        : Colors.black87,
+                    width: 1.5,
+                  ),
                 ),
                 contentPadding: const EdgeInsets.symmetric(
                   horizontal: 20,
@@ -359,7 +365,9 @@ class _SignUpScreenState extends State<SignUpScreen> with TickerProviderStateMix
                 width: double.infinity,
                 padding: const EdgeInsets.symmetric(vertical: 18),
                 decoration: BoxDecoration(
-                  color: Colors.black87,
+                  color: Theme.of(context).brightness == Brightness.dark
+                      ? const Color(0xFFE57373)
+                      : Colors.black87,
                   borderRadius: BorderRadius.circular(30),
                 ),
                 child: Text(
@@ -377,6 +385,7 @@ class _SignUpScreenState extends State<SignUpScreen> with TickerProviderStateMix
             
             const SizedBox(height: 20),
           ],
+          ),
         ),
       ),
     );
@@ -391,10 +400,11 @@ class _SignUpScreenState extends State<SignUpScreen> with TickerProviderStateMix
           alignment: Alignment(0, -0.6),
         ),
       ),
-      child: Padding(
-        padding: const EdgeInsets.all(32.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+      child: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(32.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const SizedBox(height: 20),
             
@@ -429,7 +439,7 @@ class _SignUpScreenState extends State<SignUpScreen> with TickerProviderStateMix
               ),
             ),
             
-            const Spacer(),
+            const SizedBox(height: 60),
             
             TextField(
               controller: _emailController,
@@ -473,7 +483,9 @@ class _SignUpScreenState extends State<SignUpScreen> with TickerProviderStateMix
                 width: double.infinity,
                 padding: const EdgeInsets.symmetric(vertical: 18),
                 decoration: BoxDecoration(
-                  color: Colors.black87,
+                  color: Theme.of(context).brightness == Brightness.dark
+                      ? const Color(0xFFE57373)
+                      : Colors.black87,
                   borderRadius: BorderRadius.circular(30),
                 ),
                 child: Text(
@@ -491,6 +503,7 @@ class _SignUpScreenState extends State<SignUpScreen> with TickerProviderStateMix
             
             const SizedBox(height: 20),
           ],
+          ),
         ),
       ),
     );
@@ -505,10 +518,11 @@ class _SignUpScreenState extends State<SignUpScreen> with TickerProviderStateMix
           alignment: Alignment(0, -0.6),
         ),
       ),
-      child: Padding(
-        padding: const EdgeInsets.all(32.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+      child: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(32.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const SizedBox(height: 20),
             
@@ -543,7 +557,7 @@ class _SignUpScreenState extends State<SignUpScreen> with TickerProviderStateMix
               ),
             ),
             
-            const Spacer(),
+            const SizedBox(height: 60),
             
             TextField(
               controller: _passwordController,
@@ -587,7 +601,9 @@ class _SignUpScreenState extends State<SignUpScreen> with TickerProviderStateMix
                 width: double.infinity,
                 padding: const EdgeInsets.symmetric(vertical: 18),
                 decoration: BoxDecoration(
-                  color: Colors.black87,
+                  color: Theme.of(context).brightness == Brightness.dark
+                      ? const Color(0xFFE57373)
+                      : Colors.black87,
                   borderRadius: BorderRadius.circular(30),
                 ),
                 child: _isLoading
@@ -619,6 +635,7 @@ class _SignUpScreenState extends State<SignUpScreen> with TickerProviderStateMix
             
             const SizedBox(height: 20),
           ],
+          ),
         ),
       ),
     );

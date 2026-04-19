@@ -36,10 +36,11 @@ android {
         applicationId = "com.vertex.ally"
         minSdk = 26
         targetSdk = 36
-        versionCode = flutter.versionCode.toInt()
-        versionName = flutter.versionName
+        versionCode = 10
+        versionName = "1.0.1"
     }
 
+    /*
     signingConfigs {
         create("release") {
             keyAlias = keystoreProperties["keyAlias"] as String
@@ -48,13 +49,14 @@ android {
             storeFile = file(keystoreProperties["storeFile"] as String)
         }
     }
+    */
 
     buildTypes {
         release {
             isMinifyEnabled = true
             isShrinkResources = true
 
-            signingConfig = signingConfigs.getByName("release")
+           // signingConfig = signingConfigs.getByName("release")
 
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),

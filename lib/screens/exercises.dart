@@ -555,7 +555,7 @@ class _ExercisesScreenState extends State<ExercisesScreen> {
 
                     if (programs.isEmpty) {
                       return Container(
-                        height: 140,
+                        height: 160,
                         padding: const EdgeInsets.all(24),
                         decoration: BoxDecoration(
                           color: Colors.transparent,
@@ -583,7 +583,7 @@ class _ExercisesScreenState extends State<ExercisesScreen> {
                     }
 
                     return SizedBox(
-                      height: 140,
+                      height: 160,
                       child: ListView.builder(
                         scrollDirection: Axis.horizontal,
                         itemCount: programs.length,
@@ -599,7 +599,7 @@ class _ExercisesScreenState extends State<ExercisesScreen> {
                           final color = colors[index % colors.length];
 
                           return Container(
-                            width: 180,
+                            width: 200,
                             margin: const EdgeInsets.only(right: 12),
                             child: Stack(
                               children: [
@@ -643,25 +643,31 @@ class _ExercisesScreenState extends State<ExercisesScreen> {
                                     const SizedBox(height: 4),
                                     Row(
                                       children: [
-                                        Icon(Icons.access_time, color: Colors.white),
+                                        Icon(Icons.access_time, color: Colors.white, size: 16),
                                         const SizedBox(width: 4),
-                                        Text(
-                                          '${program.estimatedDuration} ${AppLocalizations.of(context)!.min}',
-                                          style: const TextStyle(
-                                            fontSize: 12,
-                                            color: Colors.white70,
+                                        Expanded(
+                                          child: Text(
+                                            '${program.estimatedDuration} ${AppLocalizations.of(context)!.min}',
+                                            style: const TextStyle(
+                                              fontSize: 12,
+                                              color: Colors.white70,
+                                            ),
+                                            maxLines: 1,
+                                            overflow: TextOverflow.ellipsis,
                                           ),
                                         ),
-                                        const SizedBox(width: 12),
-                                        Icon(Icons.fitness_center, color: Colors.white),
+                                        const SizedBox(width: 8),
+                                        Icon(Icons.fitness_center, color: Colors.white, size: 16),
                                         const SizedBox(width: 4),
-                                        Flexible(
+                                        Expanded(
                                           child: Text(
                                             '${program.totalExercises}',
                                             style: const TextStyle(
                                               fontSize: 12,
                                               color: Colors.white70,
                                             ),
+                                            maxLines: 1,
+                                            overflow: TextOverflow.ellipsis,
                                           ),
                                         ),
                                       ],

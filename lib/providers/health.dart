@@ -8,6 +8,11 @@ class HealthProvider extends ChangeNotifier {
   HealthData _healthData = HealthData();
   Timer? _sleepUpdateTimer;
   Timer? _midnightResetTimer;
+  Timer? _stepUpdateTimer;
+
+  HealthProvider() {
+    loadData();
+  }
 
   HealthData get healthData => _healthData;
 
@@ -30,6 +35,7 @@ class HealthProvider extends ChangeNotifier {
     notifyListeners();
 
     _startPeriodicSleepUpdate();
+    _startPeriodicStepUpdate();
     _startMidnightResetTimer();
   }
 
@@ -63,6 +69,28 @@ class HealthProvider extends ChangeNotifier {
     });
   }
 
+  void _startPeriodicStepUpdate() {
+    _stepUpdateTimer?.cancel();
+    _stepUpdateTimer = Timer.periodic(const Duration(seconds: 3), (_) async {
+      await _loadStepsFromNative();
+    });
+  }
+
+  Future<void> _loadStepsFromNative() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.reload(); // IMPORTANT: fetch fresh data modified by Native Service
+    
+    final now = DateTime.now();
+    final key = 'steps_${now.day}/${now.month}/${now.year}';
+    final steps = prefs.getInt(key);
+    
+    if (steps != null && _healthData.currentSteps != steps) {
+      _healthData.currentSteps = steps;
+      notifyListeners();
+      _saveData();
+    }
+  }
+
   void _startMidnightResetTimer() {
     _midnightResetTimer?.cancel();
 
@@ -91,6 +119,7 @@ class HealthProvider extends ChangeNotifier {
   void dispose() {
     _sleepUpdateTimer?.cancel();
     _midnightResetTimer?.cancel();
+    _stepUpdateTimer?.cancel();
     super.dispose();
   }
   

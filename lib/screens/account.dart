@@ -48,7 +48,11 @@ class _AccountScreenState extends State<AccountScreen> with SingleTickerProvider
   }
 
   void _handleBack() {
-    _controller.reverse().then((_) => Navigator.pop(context));
+    _controller.reverse().then((_) {
+      if (mounted) {
+        Navigator.pop(context);
+      }
+    });
   }
 
   // --- Helper: Dynamic Modal ---

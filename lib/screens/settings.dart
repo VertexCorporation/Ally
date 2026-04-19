@@ -10,6 +10,8 @@ import '../l10n/app_localizations.dart';
 import '../providers/health.dart';
 import '../language.dart'; // LocaleProvider
 import '../theme.dart';    // ThemeProvider
+import '../server/user.dart';
+import '../login/screen.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -97,8 +99,24 @@ class _SettingsScreenState extends State<SettingsScreen> with SingleTickerProvid
     super.dispose();
   }
 
+  Future<void> _handleLogout(BuildContext context) async {
+    final userProvider = context.read<UserProvider>();
+    await userProvider.clearDataOnSignOut();
+    
+    if (mounted) {
+      Navigator.of(context).pushAndRemoveUntil(
+        MaterialPageRoute(builder: (_) => const LoginScreen()),
+        (route) => false,
+      );
+    }
+  }
+
   void _handleBack() {
-    _controller.reverse().then((_) => Navigator.pop(context));
+    _controller.reverse().then((_) {
+      if (mounted) {
+        Navigator.pop(context);
+      }
+    });
   }
 
   @override
@@ -214,6 +232,22 @@ class _SettingsScreenState extends State<SettingsScreen> with SingleTickerProvid
                                   _buildIconTile(AppLocalizations.of(context)!.support, Icons.help_rounded, rw, rs, onTap: () {}),
                                   _buildIconTile(AppLocalizations.of(context)!.legal, Icons.description_rounded, rw, rs, onTap: () => _showLegalDialog(rw, rs)),
                                   _buildIconTile(AppLocalizations.of(context)!.aboutAlly, Icons.info_rounded, rw, rs, onTap: () => _showAboutAllyDialog(rw, rs)),
+                                ],
+                                rw,
+                              ),
+
+                              SizedBox(height: rh(30)),
+
+                              _buildSectionTitle(AppLocalizations.of(context)!.account, rs),
+                              SizedBox(height: rh(12)),
+                              _buildGroupedTiles(
+                                [
+                                  _buildIconTile(
+                                    AppLocalizations.of(context)!.exit,
+                                    Icons.logout_rounded,
+                                    rw, rs,
+                                    onTap: () => _handleLogout(context),
+                                  ),
                                 ],
                                 rw,
                               ),

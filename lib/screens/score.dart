@@ -52,7 +52,7 @@ class _HealthScoreScreenState extends State<HealthScoreScreen> {
         'description': AppLocalizations.of(context)!.hydrationGoalDesc,
       },
       {
-        'name': AppLocalizations.of(context)!.steps,
+        'name': AppLocalizations.of(context)!.pedometer,
         'icon': Icons.directions_walk_rounded,
         'color': const Color(0xFF81C784),
         'weight': 25,

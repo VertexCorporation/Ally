@@ -162,37 +162,39 @@ class LoginController extends ChangeNotifier {
     _setLoading(true);
     _clearErrors();
 
-    final result = await _backendService.loginWithEmail(
-      context: context,
-      notificationService: _notificationService,
-      email: email,
-      password: password,
-      rememberMe: true,
-    );
+    try {
+      final result = await _backendService.loginWithEmail(
+        context: context,
+        notificationService: _notificationService,
+        email: email,
+        password: password,
+        rememberMe: true,
+      );
 
-    if (!context.mounted) return;
-    final l10n = AppLocalizations.of(context)!;
+      if (!context.mounted) return;
+      final l10n = AppLocalizations.of(context)!;
 
-    switch (result) {
-      case LoginSuccess():
-        _navigateAfterSuccess(context);
-        break;
-      case LoginInvalidCredentials():
-      // We shake the password field for invalid creds usually
-        _passwordError = l10n.invalidCredentials; // Ensure this key exists or use authFailed
-        passwordShakeController.forward(from: 0);
-        break;
-      case LoginUserDisabled():
-        _emailError = l10n.userDisabled; // Ensure this key exists
-        emailShakeController.forward(from: 0);
-        break;
-      case LoginNetworkError():
-      case LoginUnknownError():
-      // Notification is handled by backend
-        break;
+      switch (result) {
+        case LoginSuccess():
+          _navigateAfterSuccess(context);
+          break;
+        case LoginInvalidCredentials():
+        // We shake the password field for invalid creds usually
+          _passwordError = l10n.invalidCredentials; // Ensure this key exists or use authFailed
+          passwordShakeController.forward(from: 0);
+          break;
+        case LoginUserDisabled():
+          _emailError = l10n.userDisabled; // Ensure this key exists
+          emailShakeController.forward(from: 0);
+          break;
+        case LoginNetworkError():
+        case LoginUnknownError():
+        // Notification is handled by backend
+          break;
+      }
+    } finally {
+      _setLoading(false);
     }
-
-    _setLoading(false);
   }
 
   Future<void> signInWithGoogle(BuildContext context) async {
@@ -200,18 +202,21 @@ class LoginController extends ChangeNotifier {
 
     _setLoading(true);
 
-    final result = await _backendService.signInWithGoogle(
-      context: context,
-      notificationService: _notificationService,
-    );
+    try {
+      final result = await _backendService.signInWithGoogle(
+        context: context,
+        notificationService: _notificationService,
+      );
 
-    if (!context.mounted) return;
+      if (!context.mounted) return;
 
-    if (result is GoogleSignInSuccess) {
-      _navigateAfterSuccess(context);
+      if (result is GoogleSignInSuccess) {
+        _navigateAfterSuccess(context);
+      }
+      // Failures are handled via notifications in backend
+    } finally {
+      _setLoading(false);
     }
-    // Failures are handled via notifications in backend
-    _setLoading(false);
   }
 
   Future<void> signInWithApple(BuildContext context) async {
@@ -219,17 +224,20 @@ class LoginController extends ChangeNotifier {
 
     _setLoading(true);
 
-    final result = await _backendService.signInWithApple(
-      context: context,
-      notificationService: _notificationService,
-    );
+    try {
+      final result = await _backendService.signInWithApple(
+        context: context,
+        notificationService: _notificationService,
+      );
 
-    if (!context.mounted) return;
+      if (!context.mounted) return;
 
-    if (result is AppleSignInSuccess) {
-      _navigateAfterSuccess(context);
+      if (result is AppleSignInSuccess) {
+        _navigateAfterSuccess(context);
+      }
+    } finally {
+      _setLoading(false);
     }
-    _setLoading(false);
   }
 
   Future<void> signInAnonymously(BuildContext context) async {
@@ -237,17 +245,20 @@ class LoginController extends ChangeNotifier {
 
     _setLoading(true);
 
-    final result = await _backendService.signInAnonymously(
-      context: context,
-      notificationService: _notificationService,
-    );
+    try {
+      final result = await _backendService.signInAnonymously(
+        context: context,
+        notificationService: _notificationService,
+      );
 
-    if (!context.mounted) return;
+      if (!context.mounted) return;
 
-    if (result is AnonymousSignInSuccess) {
-      _navigateAfterSuccess(context);
+      if (result is AnonymousSignInSuccess) {
+        _navigateAfterSuccess(context);
+      }
+    } finally {
+      _setLoading(false);
     }
-    _setLoading(false);
   }
 
   // --- Private Helpers ---

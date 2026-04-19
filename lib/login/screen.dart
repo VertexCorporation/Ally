@@ -264,13 +264,14 @@ class _EmailInputView extends StatelessWidget {
       color: AppColors.background,
       child: SafeArea(
         child: Center(
-          child: SizedBox(
-            width: contentWidth,
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 32.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
+          child: SingleChildScrollView(
+            child: SizedBox(
+              width: contentWidth,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 32.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
                   const SizedBox(height: 20),
 
                   GestureDetector(
@@ -295,7 +296,7 @@ class _EmailInputView extends StatelessWidget {
                     style: TextStyle(fontSize: 16, color: AppColors.tertiaryColor.withValues(alpha: 0.7)),
                   ),
 
-                  const Spacer(),
+                  SizedBox(height: constraints.maxHeight * 0.1),
 
                   _ShakeableInput(
                     controller: controller.emailController,
@@ -309,23 +310,29 @@ class _EmailInputView extends StatelessWidget {
 
                   const SizedBox(height: 16),
 
-                  GestureDetector(
-                    onTap: controller.goToPasswordStep,
-                    child: Container(
-                      width: double.infinity,
-                      padding: const EdgeInsets.symmetric(vertical: 18),
-                      decoration: BoxDecoration(
-                        color: AppColors.senaryColor, // Tema vurgu rengi
+                  Container(
+                    width: double.infinity,
+                    decoration: BoxDecoration(
+                      color: AppColors.senaryColor, // Tema vurgu rengi
+                      borderRadius: BorderRadius.circular(30),
+                    ),
+                    child: Material(
+                      color: Colors.transparent,
+                      child: InkWell(
+                        onTap: controller.goToPasswordStep,
                         borderRadius: BorderRadius.circular(30),
-                      ),
-                      child: Text(
-                        l10n.next, // "Next"
-                        textAlign: TextAlign.center,
-                        style: const TextStyle(
-                          color: Colors.white, // Vurgu rengi üzerinde genelde beyaz okunur
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                          letterSpacing: 0.5,
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 18),
+                          child: Text(
+                            l10n.next, // "Next"
+                            textAlign: TextAlign.center,
+                            style: const TextStyle(
+                              color: Colors.white, // Vurgu rengi üzerinde genelde beyaz okunur
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                              letterSpacing: 0.5,
+                            ),
+                          ),
                         ),
                       ),
                     ),
@@ -333,6 +340,7 @@ class _EmailInputView extends StatelessWidget {
 
                   const SizedBox(height: 20),
                 ],
+              ),
               ),
             ),
           ),
@@ -366,13 +374,14 @@ class _PasswordInputView extends StatelessWidget {
       color: AppColors.background,
       child: SafeArea(
         child: Center(
-          child: SizedBox(
-            width: contentWidth,
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 32.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
+          child: SingleChildScrollView(
+            child: SizedBox(
+              width: contentWidth,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 32.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
                   const SizedBox(height: 20),
 
                   GestureDetector(
@@ -397,7 +406,7 @@ class _PasswordInputView extends StatelessWidget {
                     style: TextStyle(fontSize: 16, color: AppColors.tertiaryColor.withValues(alpha: 0.7)),
                   ),
 
-                  const Spacer(),
+                  SizedBox(height: constraints.maxHeight * 0.1),
 
                   _ShakeableInput(
                     controller: controller.passwordController,
@@ -416,45 +425,52 @@ class _PasswordInputView extends StatelessWidget {
 
                   const SizedBox(height: 16),
 
-                  GestureDetector(
-                    onTap: isLoading ? null : () => controller.submitEmailLogin(context),
-                    child: Container(
-                      width: double.infinity,
-                      padding: const EdgeInsets.symmetric(vertical: 18),
-                      decoration: BoxDecoration(
-                        color: AppColors.background, // Temanın arka plan rengi (outline stili için)
+                  Container(
+                    width: double.infinity,
+                    decoration: BoxDecoration(
+                      color: AppColors.background, // Temanın arka plan rengi (outline stili için)
+                      borderRadius: BorderRadius.circular(30),
+                      border: Border.all(color: AppColors.tertiaryColor, width: 2), // Çerçeve
+                    ),
+                    child: Material(
+                      color: Colors.transparent,
+                      child: InkWell(
+                        onTap: isLoading ? null : () => controller.submitEmailLogin(context),
                         borderRadius: BorderRadius.circular(30),
-                        border: Border.all(color: AppColors.tertiaryColor, width: 2), // Çerçeve
-                      ),
-                      child: isLoading
-                          ? SizedBox(
-                        height: 20,
-                        child: Center(
-                          child: SizedBox(
-                            width: 20,
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 18),
+                          child: isLoading
+                              ? SizedBox(
                             height: 20,
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2,
-                              valueColor: AlwaysStoppedAnimation<Color>(AppColors.tertiaryColor),
+                            child: Center(
+                              child: SizedBox(
+                                width: 20,
+                                height: 20,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  valueColor: AlwaysStoppedAnimation<Color>(AppColors.tertiaryColor),
+                                ),
+                              ),
+                            ),
+                          )
+                              : Text(
+                            l10n.signIn, // "Sign In"
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              color: AppColors.tertiaryColor,
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                              letterSpacing: 0.5,
                             ),
                           ),
-                        ),
-                      )
-                          : Text(
-                        l10n.signIn, // "Sign In"
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          color: AppColors.tertiaryColor,
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                          letterSpacing: 0.5,
                         ),
                       ),
                     ),
                   ),
 
                   const SizedBox(height: 20),
-                ],
+                 ],
+              ),
               ),
             ),
           ),
@@ -479,30 +495,36 @@ class _AuthButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        width: double.infinity,
-        padding: const EdgeInsets.symmetric(vertical: 18),
-        decoration: BoxDecoration(
-          color: AppColors.secondaryColor, // Buton arka planı
+    return Container(
+      width: double.infinity,
+      decoration: BoxDecoration(
+        color: AppColors.secondaryColor, // Buton arka planı
+        borderRadius: BorderRadius.circular(30),
+        border: Border.all(color: AppColors.border, width: 1),
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: onTap,
           borderRadius: BorderRadius.circular(30),
-          border: Border.all(color: AppColors.border, width: 1),
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(icon, color: AppColors.tertiaryColor, size: 24),
-            const SizedBox(width: 12),
-            Text(
-              text,
-              style: TextStyle(
-                color: AppColors.tertiaryColor,
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
-              ),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 18),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(icon, color: AppColors.tertiaryColor, size: 24),
+                const SizedBox(width: 12),
+                Text(
+                  text,
+                  style: TextStyle(
+                    color: AppColors.tertiaryColor,
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ],
             ),
-          ],
+          ),
         ),
       ),
     );
