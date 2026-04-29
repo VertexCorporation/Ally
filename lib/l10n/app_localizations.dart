@@ -2598,6 +2598,18 @@ abstract class AppLocalizations {
   /// **'Wake Ups'**
   String get wakeUps;
 
+  /// No description provided for @smartAlarm.
+  ///
+  /// In en, this message translates to:
+  /// **'Smart Alarm'**
+  String get smartAlarm;
+
+  /// No description provided for @smartAlarmDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Slowly wakes you up 30 minutes before your wake-up time'**
+  String get smartAlarmDesc;
+
   /// No description provided for @sleepSegmentNumber.
   ///
   /// In en, this message translates to:

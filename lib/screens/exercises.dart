@@ -87,7 +87,10 @@ class _ExercisesScreenState extends State<ExercisesScreen> {
                                 borderRadius: BorderRadius.circular(10),
                               ),
                               child: Icon(
-                                IconData(exercise['iconCodePoint'], fontFamily: 'MaterialIcons'),
+                                (exercise['id'] is String
+                                        ? ExerciseLibrary.getExerciseById(exercise['id'] as String)?.icon
+                                        : null) ??
+                                    Icons.fitness_center,
                                 color: const Color(0xFFE57373),
                                 size: 20,
                               ),
@@ -947,6 +950,12 @@ class _ExercisesScreenState extends State<ExercisesScreen> {
                           final timeStr = '${time.hour.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')}';
                           final name = exercise['name'] ?? exercise['nameKey'] ?? 'Exercise';
                           final isProgram = exercise['type'] == 'program';
+                          final icon = isProgram
+                              ? Icons.fitness_center
+                              : ((exercise['nameKey'] is String
+                                          ? ExerciseLibrary.getExerciseById(exercise['nameKey'] as String)?.icon
+                                          : null) ??
+                                      Icons.fitness_center);
 
                           return GestureDetector(
                             onTap: isProgram ? () => _showWorkoutDetails(exercise) : null,
@@ -971,9 +980,7 @@ class _ExercisesScreenState extends State<ExercisesScreen> {
                                       borderRadius: BorderRadius.circular(12),
                                     ),
                                     child: Icon(
-                                      isProgram
-                                          ? Icons.fitness_center
-                                          : IconData(exercise['iconCodePoint'], fontFamily: 'MaterialIcons'),
+                                      icon,
                                       color: isProgram
                                           ? const Color(0xFFE57373)
                                           : Color(exercise['color']),

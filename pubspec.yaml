@@ -71,6 +71,7 @@ dependencies:
   flutter_foreground_task: ^8.11.0
   internet_connection_checker_plus: ^2.9.1
   path: ^1.9.1
+  audioplayers: ^6.6.0
 
 dev_dependencies:
   flutter_test:
@@ -91,3 +92,4 @@ flutter:
 
   assets:
     - assets/images/
+    - assets/audio/

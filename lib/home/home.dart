@@ -581,38 +581,33 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
             boxShadow: [BoxShadow(color: color.withValues(alpha:0.3), blurRadius: 15, offset: const Offset(0, 8))],
           ),
           child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Icon(icon, size: 32, color: Colors.white),
-                        const Spacer(),
-                        Text(
-                          title,
-                          style: const TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                            height: 1.2,
-                          ),
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          value,
-                          style: const TextStyle(
-                            fontSize: 12,
-                            color: Colors.white70,
-                            height: 1.2,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Icon(icon, size: 32, color: Colors.white),
+              const Spacer(),
+              Text(
+                title,
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                  height: 1.2,
                 ),
               ),
-            ),
+              const SizedBox(height: 4),
+              Text(
+                value,
+                style: const TextStyle(
+                  fontSize: 12,
+                  color: Colors.white70,
+                  height: 1.2,
+                ),
+              ),
+            ],
           ),
-        );
-      },
+        ),
+      ),
     );
   }
 

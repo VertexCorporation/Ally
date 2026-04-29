@@ -1340,6 +1340,13 @@ class AppLocalizationsTr extends AppLocalizations {
   String get wakeUps => 'Uyanmalar';
 
   @override
+  String get smartAlarm => 'Akıllı Alarm';
+
+  @override
+  String get smartAlarmDesc =>
+      'Uyanma saatinizden 30 dakika önce sizi yavaş yavaş uyandırır';
+
+  @override
   String sleepSegmentNumber(Object number) {
     return 'Uyku Bölümü $number';
   }

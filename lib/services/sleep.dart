@@ -3,6 +3,8 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_foreground_task/flutter_foreground_task.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:audioplayers/audioplayers.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 @pragma('vm:entry-point')
 void startSleepCallback() {
@@ -16,9 +18,15 @@ class SleepForegroundHandler extends TaskHandler {
   bool _isInSleepWindow = false;
   int _checkCount = 0;
 
+  AudioPlayer? _audioPlayer;
+  bool _isAlarmPlaying = false;
+  bool _alarmDismissedToday = false;
+
   @override
   Future<void> onStart(DateTime timestamp, TaskStarter starter) async {
     debugPrint('🌙 Sleep tracker foreground service started');
+    
+    _audioPlayer = AudioPlayer();
     
     // Load settings
     _lastActivityTime = DateTime.now();
@@ -72,6 +80,7 @@ class SleepForegroundHandler extends TaskHandler {
     if (isInWindow && !_isInSleepWindow) {
       // Just entered sleep window
       _isInSleepWindow = true;
+      _alarmDismissedToday = false; // Reset for the new night
       debugPrint('🌙 Entered sleep window at ${now.hour}:${now.minute}');
       
       // Wait 2 minutes, then start checking for inactivity
@@ -81,12 +90,76 @@ class SleepForegroundHandler extends TaskHandler {
       // Exited sleep window
       _isInSleepWindow = false;
       _sleepStartTime = null;
+      _alarmDismissedToday = false;
+      await _stopSmartAlarm();
       debugPrint('☀️ Exited sleep window');
+    }
+
+    // Smart Alarm logic
+    final smartAlarmEnabled = prefs.getBool('smart_alarm_enabled') ?? false;
+    if (smartAlarmEnabled && !_alarmDismissedToday && _isInSleepWindow) {
+      int minutesToWakeUp = endMinutes - currentMinutes;
+      // Handle cross-midnight logic for remaining minutes
+      if (minutesToWakeUp < 0 && startMinutes > endMinutes) {
+        minutesToWakeUp += 24 * 60;
+      }
+      
+      if (minutesToWakeUp > 0 && minutesToWakeUp <= 30) {
+        await _handleSmartAlarm(minutesToWakeUp);
+      } else if (_isAlarmPlaying) {
+        await _stopSmartAlarm();
+      }
     }
 
     // If sleeping, check for wake up
     if (_sleepStartTime != null) {
       _checkWakeUp();
+    }
+  }
+
+  Future<void> _handleSmartAlarm(int minutesToWakeUp) async {
+    if (_audioPlayer == null) return;
+    
+    // Volume goes from 0.03 (at 30 mins) to 1.0 (at 1 min)
+    double volume = (30 - minutesToWakeUp + 1) / 30.0;
+    if (volume > 1.0) volume = 1.0;
+    if (volume < 0.0) volume = 0.0;
+
+    if (!_isAlarmPlaying) {
+      debugPrint('⏰ Smart Alarm started at volume $volume');
+      _isAlarmPlaying = true;
+      await _audioPlayer!.setReleaseMode(ReleaseMode.loop);
+      await _audioPlayer!.setVolume(volume);
+      await _audioPlayer!.play(AssetSource('audio/alarm.mp3'));
+      
+      FlutterForegroundTask.updateService(
+        notificationTitle: '⏰ Smart Alarm',
+        notificationText: 'Waking you up gently... Tap Stop to dismiss.',
+      );
+    } else {
+      debugPrint('⏰ Smart Alarm volume updated to $volume');
+      await _audioPlayer!.setVolume(volume);
+    }
+  }
+
+  Future<void> _stopSmartAlarm() async {
+    if (_isAlarmPlaying) {
+      _isAlarmPlaying = false;
+      await _audioPlayer?.stop();
+      debugPrint('⏰ Smart Alarm stopped');
+      
+      // Revert notification to normal
+      if (_sleepStartTime != null) {
+        FlutterForegroundTask.updateService(
+          notificationTitle: '😴 Sleep Tracking',
+          notificationText: 'Sleeping since ${_sleepStartTime!.hour.toString().padLeft(2, '0')}:${_sleepStartTime!.minute.toString().padLeft(2, '0')}',
+        );
+      } else {
+        FlutterForegroundTask.updateService(
+          notificationTitle: '🌙 Sleep Tracker Active',
+          notificationText: 'Monitoring your sleep pattern',
+        );
+      }
     }
   }
 
@@ -188,6 +261,10 @@ class SleepForegroundHandler extends TaskHandler {
 
   @override
   void onNotificationPressed() {
+    if (_isAlarmPlaying) {
+      _alarmDismissedToday = true;
+      _stopSmartAlarm();
+    }
     // Open app when notification is tapped
     FlutterForegroundTask.launchApp('/sleep');
   }
@@ -196,11 +273,16 @@ class SleepForegroundHandler extends TaskHandler {
   Future<void> onDestroy(DateTime timestamp) async {
     debugPrint('🌙 Sleep tracker service stopped');
     _checkTimer?.cancel();
+    await _audioPlayer?.stop();
+    await _audioPlayer?.dispose();
   }
 
   @override
   void onNotificationButtonPressed(String id) {
-    // Handle notification button press if needed
+    if (id == 'stop_alarm') {
+      _alarmDismissedToday = true;
+      _stopSmartAlarm();
+    }
   }
 
   @override
@@ -447,6 +529,16 @@ class SleepTrackerService {
   }
 
   Future<void> _startForegroundService() async {
+    // Android 14+ requires runtime permission for 'health' type foreground services
+    final activityStatus = await Permission.activityRecognition.status;
+    if (!activityStatus.isGranted) {
+      final result = await Permission.activityRecognition.request();
+      if (!result.isGranted) {
+        debugPrint('❌ ACTIVITY_RECOGNITION permission denied, cannot start sleep tracker service');
+        return;
+      }
+    }
+
     FlutterForegroundTask.init(
       androidNotificationOptions: AndroidNotificationOptions(
         channelId: 'sleep_tracker_channel',
@@ -473,14 +565,17 @@ class SleepTrackerService {
       await FlutterForegroundTask.requestIgnoreBatteryOptimization();
     }
 
-    final result = await FlutterForegroundTask.startService(
-      serviceId: 256,
-      notificationTitle: '🌙 Sleep Tracker Active',
-      notificationText: 'Monitoring your sleep pattern',
-      callback: startSleepCallback,
-    );
-
-    debugPrint('✅ Sleep tracker foreground service started: ${result.runtimeType}');
+    try {
+      final result = await FlutterForegroundTask.startService(
+        serviceId: 256,
+        notificationTitle: '🌙 Sleep Tracker Active',
+        notificationText: 'Monitoring your sleep pattern',
+        callback: startSleepCallback,
+      );
+      debugPrint('✅ Sleep tracker foreground service started: ${result.runtimeType}');
+    } catch (e) {
+      debugPrint('❌ Failed to start sleep tracker service: $e');
+    }
   }
 
   Future<void> stopTracking() async {

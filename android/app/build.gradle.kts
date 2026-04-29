@@ -40,24 +40,24 @@ android {
         versionName = "1.0.1"
     }
 
-    /*
     signingConfigs {
         create("release") {
-            keyAlias = keystoreProperties["keyAlias"] as String
-            keyPassword = keystoreProperties["keyPassword"] as String
-            storePassword = keystoreProperties["storePassword"] as String
-            storeFile = file(keystoreProperties["storeFile"] as String)
+            if (keystorePropertiesFile.exists()) {
+                keyAlias = keystoreProperties["keyAlias"] as String
+                keyPassword = keystoreProperties["keyPassword"] as String
+                storePassword = keystoreProperties["storePassword"] as String
+                storeFile = file(keystoreProperties["storeFile"] as String)
+            }
         }
     }
-    */
 
     buildTypes {
         release {
             isMinifyEnabled = true
             isShrinkResources = true
 
-           // signingConfig = signingConfigs.getByName("release")
-
+            signingConfig = signingConfigs.getByName("debug")
+           
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
@@ -68,6 +68,9 @@ android {
 
 dependencies {
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.5")
+    // Flutter's deferred components reference Play Feature Delivery classes in release/minify builds.
+    // Use the modern Play libraries (avoid the deprecated `play:core` to prevent duplicate classes).
+    implementation("com.google.android.play:feature-delivery:2.1.0")
 }
 
 flutter {

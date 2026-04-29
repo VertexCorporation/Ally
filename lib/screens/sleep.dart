@@ -21,6 +21,7 @@ class _SleepScreenState extends State<SleepScreen> {
   final _sleepService = SleepTrackerService();
   TimeOfDay _sleepStart = const TimeOfDay(hour: 22, minute: 0);
   TimeOfDay _sleepEnd = const TimeOfDay(hour: 7, minute: 0);
+  bool _smartAlarmEnabled = false;
 
   // Semantic Sleep Color (Purple)
   final Color _sleepColor = const Color(0xFFCE93D8);
@@ -45,6 +46,7 @@ class _SleepScreenState extends State<SleepScreen> {
           final endMinute = prefs.getInt('sleep_end_minute') ?? 0;
           _sleepStart = TimeOfDay(hour: startHour, minute: startMinute);
           _sleepEnd = TimeOfDay(hour: endHour, minute: endMinute);
+          _smartAlarmEnabled = prefs.getBool('smart_alarm_enabled') ?? false;
         }
       });
     }
@@ -169,7 +171,25 @@ class _SleepScreenState extends State<SleepScreen> {
                   ],
                 ),
               ),
-              SizedBox(height: sh * 0.025),
+              SizedBox(height: sh * 0.02),
+              SwitchListTile(
+                title: Text(
+                  AppLocalizations.of(context)!.smartAlarm,
+                  style: TextStyle(color: textColor, fontWeight: FontWeight.bold),
+                ),
+                subtitle: Text(
+                  AppLocalizations.of(context)!.smartAlarmDesc,
+                  style: TextStyle(color: subTextColor, fontSize: sw * 0.03),
+                ),
+                value: _smartAlarmEnabled,
+                onChanged: (val) {
+                  setState(() => _smartAlarmEnabled = val);
+                  setStateModal(() {});
+                },
+                activeColor: _sleepColor,
+                contentPadding: EdgeInsets.zero,
+              ),
+              SizedBox(height: sh * 0.015),
               Row(
                 children: [
                   Expanded(
@@ -205,6 +225,7 @@ class _SleepScreenState extends State<SleepScreen> {
                         await _sleepService.startTracking(_sleepStart, _sleepEnd);
                         final prefs = await SharedPreferences.getInstance();
                         await prefs.setBool('sleep_setup_done', true);
+                        await prefs.setBool('smart_alarm_enabled', _smartAlarmEnabled);
 
                         // 2. DÜZELTME BURADA: context.mounted kontrolü
                         if (!context.mounted) return;
@@ -331,6 +352,12 @@ class _SleepScreenState extends State<SleepScreen> {
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(AppLocalizations.of(context)!.sleep, style: TextStyle(color: textColor, fontWeight: FontWeight.bold)),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.settings, color: textColor),
+            onPressed: () => _showSleepSetupDialog(),
+          ),
+        ],
       ),
       body: SafeArea(
         child: SingleChildScrollView(

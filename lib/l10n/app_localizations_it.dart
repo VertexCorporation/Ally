@@ -1345,6 +1345,13 @@ class AppLocalizationsIt extends AppLocalizations {
   String get wakeUps => 'Risvegli';
 
   @override
+  String get smartAlarm => 'Smart Alarm';
+
+  @override
+  String get smartAlarmDesc =>
+      'Slowly wakes you up 30 minutes before your wake-up time';
+
+  @override
   String sleepSegmentNumber(Object number) {
     return 'Segmento di Sonno $number';
   }

@@ -1332,6 +1332,13 @@ class AppLocalizationsKo extends AppLocalizations {
   String get wakeUps => '깸';
 
   @override
+  String get smartAlarm => 'Smart Alarm';
+
+  @override
+  String get smartAlarmDesc =>
+      'Slowly wakes you up 30 minutes before your wake-up time';
+
+  @override
   String sleepSegmentNumber(Object number) {
     return '수면 구간 $number';
   }

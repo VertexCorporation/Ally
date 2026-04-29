@@ -34,7 +34,18 @@ class StepCounterService : Service(), SensorEventListener {
         
         android.util.Log.d("StepService", "🚀 Service onCreate called")
         
-        // Önce izin kontrolü
+        // MUST call startForeground IMMEDIATELY - Android kills the app if we don't
+        createNotificationChannel()
+        try {
+            startForeground(NOTIFICATION_ID, createNotification())
+            android.util.Log.d("StepService", "✅ Foreground service started")
+        } catch (e: Exception) {
+            android.util.Log.e("StepService", "❌ Failed to start foreground service: ${e.message}")
+            stopSelf()
+            return
+        }
+        
+        // Now check permission - if not granted, stop gracefully
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACTIVITY_RECOGNITION)
                 != PackageManager.PERMISSION_GRANTED) {
@@ -100,10 +111,6 @@ class StepCounterService : Service(), SensorEventListener {
                 }
             }, 1000)
         }
-        
-        // Foreground service olarak başlat (bildirimle)
-        startForeground(NOTIFICATION_ID, createNotification())
-        android.util.Log.d("StepService", "✅ Foreground service started")
     }
     
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -234,6 +241,8 @@ class StepCounterService : Service(), SensorEventListener {
     
     override fun onDestroy() {
         super.onDestroy()
-        sensorManager.unregisterListener(this)
+        if (::sensorManager.isInitialized) {
+            sensorManager.unregisterListener(this)
+        }
     }
 }

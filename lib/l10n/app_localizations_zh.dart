@@ -1330,6 +1330,13 @@ class AppLocalizationsZh extends AppLocalizations {
   String get wakeUps => '醒来次数';
 
   @override
+  String get smartAlarm => 'Smart Alarm';
+
+  @override
+  String get smartAlarmDesc =>
+      'Slowly wakes you up 30 minutes before your wake-up time';
+
+  @override
   String sleepSegmentNumber(Object number) {
     return '睡眠片段 $number';
   }

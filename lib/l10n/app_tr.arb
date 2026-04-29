@@ -386,6 +386,8 @@
   "sleepSegments": "Uyku Bölümleri",
   "sleepCycles": "Uyku Döngüleri",
   "wakeUps": "Uyanmalar",
+  "smartAlarm": "Akıllı Alarm",
+  "smartAlarmDesc": "Uyanma saatinizden 30 dakika önce sizi yavaş yavaş uyandırır",
   "sleepSegmentNumber": "Uyku Bölümü {number}",
   "heartbeat": "Kalp Atışı",
   "heartRate": "Kalp Atış Hızı",

@@ -412,6 +412,8 @@
   "sleepSegments": "Sleep Segments",
   "sleepCycles": "Sleep Cycles",
   "wakeUps": "Wake Ups",
+  "smartAlarm": "Smart Alarm",
+  "smartAlarmDesc": "Slowly wakes you up 30 minutes before your wake-up time",
   "sleepSegmentNumber": "Sleep Segment {number}",
   "heartbeat": "Heartbeat",
   "heartRate": "Heart Rate",
