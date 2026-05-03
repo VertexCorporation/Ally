@@ -5,6 +5,7 @@ import '../models/program.dart';
 import '../providers/workout.dart';
 import '../providers/health.dart';
 import '../l10n/app_localizations.dart';
+import '../widgets/notification.dart';
 
 class WorkoutBuilderScreen extends StatefulWidget {
   final WorkoutProgram? program;
@@ -300,11 +301,11 @@ class _WorkoutBuilderScreenState extends State<WorkoutBuilderScreen> {
                           if (mounted) {
                             Navigator.pop(dialogContext); // Close dialog
                             Navigator.pop(context); // Close builder
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text(widget.program != null ? l10n.programUpdated(name) : l10n.programSaved(name)),
-                                backgroundColor: const Color(0xFF4CAF50),
-                              ),
+                            CustomNotification.show(
+                              context,
+                              message: widget.program != null ? l10n.programUpdated(name) : l10n.programSaved(name),
+                              backgroundColor: const Color(0xFF4CAF50),
+                              icon: Icons.check_circle,
                             );
 
                             await workoutProvider.saveProgram(program);

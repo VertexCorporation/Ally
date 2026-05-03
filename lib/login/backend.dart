@@ -213,29 +213,33 @@ class LoginBackendService {
     final extrovertNotificationService = context.read<ExtrovertNotificationService>();
 
     try {
-      // Step 0: Initialize GoogleSignIn with the required serverClientId.
-      // This is the new, correct way to configure the sign-in process before starting.
-      await _googleSignIn.initialize(
-        serverClientId: '561391430514-nqjp6jl1s9oqi8ddg2fhm83lbvg94qca.apps.googleusercontent.com',
-      );
+      // Step 0: Clear any stale Google session before starting.
+      // This helps avoid cases where the account picker returns but auth does not complete.
+      await _googleSignIn.signOut().catchError((_) {});
 
-      // Step 1: Initiate the user-interactive sign-in process using authenticate().
-      // This shows the Google account picker UI.
+      // Step 1: Start the interactive sign-in flow.
       final GoogleSignInAccount googleUser = await _googleSignIn.authenticate();
 
-      // Step 2: Get the authentication tokens from the successful sign-in.
+      // Step 2: Get the authentication token from the signed-in account.
       final GoogleSignInAuthentication googleAuth = googleUser.authentication;
+      final String? idToken = googleAuth.idToken;
 
-      // Step 3: Create a Firebase credential using the idToken.
+      if (idToken == null) {
+        dev.log('[Auth.Google] GoogleAuth returned no id token.', name: 'LoginBackend');
+        notificationService.showNotification(message: l10n.googleSignInFailed, type: NotificationType.error);
+        return GoogleSignInFailure();
+      }
+
+      // Step 3: Create the Firebase credential.
       final AuthCredential credential = GoogleAuthProvider.credential(
-        idToken: googleAuth.idToken,
+        idToken: idToken,
       );
 
       // Step 4: Sign in to Firebase.
       final UserCredential userCredential = await _auth.signInWithCredential(credential);
       final User? user = userCredential.user;
       if (user == null) {
-        throw Exception("Firebase sign in with Google returned a null user.");
+        throw Exception('Firebase sign in with Google returned a null user.');
       }
 
       // --- Post-login logic ---
@@ -252,17 +256,15 @@ class LoginBackendService {
       dev.log('[Auth.Google] Sign-in complete for UID: ${user.uid}.', name: 'LoginBackend');
       return GoogleSignInSuccess(user);
 
-    }  catch (e, st) {
-
+    } catch (e, st) {
       if (e is PlatformException && e.code == 'network_error') {
         dev.log('[Auth.Google] A network error occurred during Google Sign-In', name: 'LoginBackend', error: e, stackTrace: st);
         notificationService.showNotification(message: l10n.noInternetConnection, type: NotificationType.error);
-      }
-      else if (e is GoogleSignInException && e.code == GoogleSignInExceptionCode.canceled) {
+      } else if (e is GoogleSignInException && e.code == GoogleSignInExceptionCode.canceled) {
         dev.log('[Auth.Google] Sign-in process was cancelled by the user.', name: 'LoginBackend');
       } else {
         dev.log('[Auth.Google] An unexpected error occurred during Google Sign-In', name: 'LoginBackend', error: e, stackTrace: st);
-        notificationService.showNotification(message: l10n.authError, type: NotificationType.error);
+        notificationService.showNotification(message: l10n.googleSignInFailed, type: NotificationType.error);
       }
 
       await _googleSignIn.disconnect().catchError((_) {});

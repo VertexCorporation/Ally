@@ -20,6 +20,7 @@ import '../screens/achievements.dart';
 import '../screens/settings.dart';
 import '../screens/account.dart';
 import '../screens/premium.dart';
+import '../widgets/notification.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -189,20 +190,18 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                             final pedometerService = PedometerService();
                             await pedometerService.startNativeService();
 
-                            messenger.showSnackBar(
-                              SnackBar(
-                                content: Text(localizations.stepTrackingEnabled),
-                                backgroundColor: const Color(0xFF4BAADF),
-                                behavior: SnackBarBehavior.floating,
-                              ),
+                            CustomNotification.show(
+                              context,
+                              message: localizations.stepTrackingEnabled,
+                              backgroundColor: const Color(0xFF4BAADF),
+                              icon: Icons.directions_walk,
                             );
                           } else {
-                            messenger.showSnackBar(
-                              SnackBar(
-                                content: Text(localizations.permissionDenied),
-                                backgroundColor: Colors.orange[700],
-                                behavior: SnackBarBehavior.floating,
-                              ),
+                            CustomNotification.show(
+                              context,
+                              message: localizations.permissionDenied,
+                              backgroundColor: Colors.orange[700]!,
+                              icon: Icons.warning,
                             );
                           }
                         },

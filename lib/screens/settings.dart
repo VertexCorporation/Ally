@@ -12,6 +12,7 @@ import '../language.dart'; // LocaleProvider
 import '../theme.dart';    // ThemeProvider
 import '../server/user.dart';
 import '../login/screen.dart';
+import '../widgets/notification.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -490,12 +491,11 @@ class _SettingsScreenState extends State<SettingsScreen> with SingleTickerProvid
             SizedBox(height: rw(24)),
             GestureDetector(
               onTap: () {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text(AppLocalizations.of(context)!.openingWebsite),
-                    backgroundColor: const Color(0xFF4BAADF),
-                    behavior: SnackBarBehavior.floating,
-                  ),
+                CustomNotification.show(
+                  context,
+                  message: AppLocalizations.of(context)!.openingWebsite,
+                  backgroundColor: const Color(0xFF4BAADF),
+                  icon: Icons.language,
                 );
               },
               child: Container(
@@ -591,12 +591,11 @@ class _SettingsScreenState extends State<SettingsScreen> with SingleTickerProvid
             // Example Button with dynamic sizing
             GestureDetector(
               onTap: () {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text(AppLocalizations.of(context)!.openingPrivacyPolicy),
-                    backgroundColor: const Color(0xFF4BAADF),
-                    behavior: SnackBarBehavior.floating,
-                  ),
+                CustomNotification.show(
+                  context,
+                  message: AppLocalizations.of(context)!.openingPrivacyPolicy,
+                  backgroundColor: const Color(0xFF4BAADF),
+                  icon: Icons.privacy_tip,
                 );
               },
               child: Container(

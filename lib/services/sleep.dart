@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_foreground_task/flutter_foreground_task.dart';
+import 'package:flutter_foreground_task/models/notification_button.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -135,6 +136,9 @@ class SleepForegroundHandler extends TaskHandler {
       FlutterForegroundTask.updateService(
         notificationTitle: '⏰ Smart Alarm',
         notificationText: 'Waking you up gently... Tap Stop to dismiss.',
+        notificationButtons: [
+          const NotificationButton(id: 'stop_alarm', text: 'Stop'),
+        ],
       );
     } else {
       debugPrint('⏰ Smart Alarm volume updated to $volume');

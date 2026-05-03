@@ -3,6 +3,7 @@ import '../l10n/app_localizations.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'onboard.dart';
 import '../main.dart' show isFirebaseInitialized;
+import '../widgets/notification.dart';
 
 class SignUpScreen extends StatefulWidget {
   const SignUpScreen({super.key});
@@ -172,11 +173,11 @@ class _SignUpScreenState extends State<SignUpScreen> with TickerProviderStateMix
       // If Firebase not initialized, skip auth
       if (!isFirebaseInitialized) {
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(AppLocalizations.of(context)!.firebaseNotConfiguredSignup),
-              backgroundColor: Colors.orange,
-            ),
+          CustomNotification.show(
+            context,
+            message: AppLocalizations.of(context)!.firebaseNotConfiguredSignup,
+            backgroundColor: Colors.orange,
+            icon: Icons.warning,
           );
           Navigator.pushReplacement(
             context,
@@ -202,11 +203,11 @@ class _SignUpScreenState extends State<SignUpScreen> with TickerProviderStateMix
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(AppLocalizations.of(context)!.signUpFailed(e.toString())),
-            backgroundColor: Colors.red,
-          ),
+        CustomNotification.show(
+          context,
+          message: AppLocalizations.of(context)!.signUpFailed(e.toString()),
+          backgroundColor: Colors.red,
+          icon: Icons.error,
         );
       }
     } finally {

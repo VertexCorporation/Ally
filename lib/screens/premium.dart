@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../l10n/app_localizations.dart';
+import '../widgets/notification.dart';
 
 class PremiumScreen extends StatefulWidget {
   const PremiumScreen({super.key});
@@ -305,11 +306,11 @@ class _PremiumScreenState extends State<PremiumScreen> {
             width: double.infinity,
             child: ElevatedButton(
               onPressed: () {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text(AppLocalizations.of(context)!.subscribeToPlan(title)),
-                    behavior: SnackBarBehavior.floating,
-                  ),
+                CustomNotification.show(
+                  context,
+                  message: AppLocalizations.of(context)!.subscribeToPlan(title),
+                  backgroundColor: const Color(0xFF4BAADF),
+                  icon: Icons.star,
                 );
               },
               style: ElevatedButton.styleFrom(
