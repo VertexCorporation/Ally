@@ -28,20 +28,19 @@ class SleepForegroundHandler extends TaskHandler {
     debugPrint('🌙 Sleep tracker foreground service started');
     
     _audioPlayer = AudioPlayer();
-    
-    // Load settings
     _lastActivityTime = DateTime.now();
+    _isAlarmPlaying = false; // Reset alarm flag
     
-    // Check sleep window every minute
-    _checkTimer = Timer.periodic(const Duration(minutes: 1), (timer) async {
-      await _checkSleepWindow();
-    });
+    // Immediately check sleep window (don't wait for first repeat event)
+    await _checkSleepWindow();
   }
 
   @override
   void onRepeatEvent(DateTime timestamp) async {
     // This is called every minute by the foreground task
     _checkCount++;
+    
+    debugPrint('🔄 Foreground task repeat event #$_checkCount at ${timestamp.hour}:${timestamp.minute}');
     
     // Send data to UI if needed
     FlutterForegroundTask.sendDataToMain({
@@ -51,20 +50,27 @@ class SleepForegroundHandler extends TaskHandler {
       'isInSleepWindow': _isInSleepWindow,
       'isSleeping': _sleepStartTime != null,
     });
+
+    // Check sleep window every minute
+    await _checkSleepWindow();
   }
 
   Future<void> _checkSleepWindow() async {
-    final prefs = await SharedPreferences.getInstance();
-    final enabled = prefs.getBool('sleep_tracking_enabled') ?? false;
-    
-    if (!enabled) return;
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final enabled = prefs.getBool('sleep_tracking_enabled') ?? false;
+      
+      debugPrint('🔍 Checking sleep window - enabled: $enabled');
+      
+      if (!enabled) return;
 
+      final now = DateTime.now();
+    
     final startHour = prefs.getInt('sleep_start_hour') ?? 23;
     final startMinute = prefs.getInt('sleep_start_minute') ?? 0;
     final endHour = prefs.getInt('sleep_end_hour') ?? 7;
     final endMinute = prefs.getInt('sleep_end_minute') ?? 0;
 
-    final now = DateTime.now();
     final currentMinutes = now.hour * 60 + now.minute;
     final startMinutes = startHour * 60 + startMinute;
     final endMinutes = endHour * 60 + endMinute;
@@ -86,7 +92,7 @@ class SleepForegroundHandler extends TaskHandler {
       
       // Wait 2 minutes, then start checking for inactivity
       await Future.delayed(const Duration(minutes: 2));
-      _checkInactivity();
+      await _checkInactivity();
     } else if (!isInWindow && _isInSleepWindow) {
       // Exited sleep window
       _isInSleepWindow = false;
@@ -98,12 +104,17 @@ class SleepForegroundHandler extends TaskHandler {
 
     // Smart Alarm logic
     final smartAlarmEnabled = prefs.getBool('smart_alarm_enabled') ?? false;
+    
+    debugPrint('⏰ Smart alarm check - enabled: $smartAlarmEnabled, dismissed: $_alarmDismissedToday, inWindow: $_isInSleepWindow');
+    
     if (smartAlarmEnabled && !_alarmDismissedToday && _isInSleepWindow) {
       int minutesToWakeUp = endMinutes - currentMinutes;
       // Handle cross-midnight logic for remaining minutes
       if (minutesToWakeUp < 0 && startMinutes > endMinutes) {
         minutesToWakeUp += 24 * 60;
       }
+      
+      debugPrint('⏰ Minutes to wake up: $minutesToWakeUp');
       
       if (minutesToWakeUp > 0 && minutesToWakeUp <= 30) {
         await _handleSmartAlarm(minutesToWakeUp);
@@ -114,12 +125,21 @@ class SleepForegroundHandler extends TaskHandler {
 
     // If sleeping, check for wake up
     if (_sleepStartTime != null) {
-      _checkWakeUp();
+      await _checkWakeUp();
+    }
+    } catch (e, stackTrace) {
+      debugPrint('❌ Error in _checkSleepWindow: $e');
+      debugPrint('📋 Stack trace: $stackTrace');
     }
   }
 
   Future<void> _handleSmartAlarm(int minutesToWakeUp) async {
-    if (_audioPlayer == null) return;
+    debugPrint('⏰ _handleSmartAlarm called with minutesToWakeUp: $minutesToWakeUp');
+    
+    if (_audioPlayer == null) {
+      debugPrint('❌ Audio player is null!');
+      return;
+    }
     
     // Volume goes from 0.03 (at 30 mins) to 1.0 (at 1 min)
     double volume = (30 - minutesToWakeUp + 1) / 30.0;
@@ -167,7 +187,7 @@ class SleepForegroundHandler extends TaskHandler {
     }
   }
 
-  void _checkInactivity() async {
+  Future<void> _checkInactivity() async {
     if (!_isInSleepWindow) return;
     if (_lastActivityTime == null) return;
 
@@ -179,14 +199,14 @@ class SleepForegroundHandler extends TaskHandler {
       // Still active, check again in 10 minutes
       debugPrint('📱 Phone still active, checking again in 10 min');
       await Future.delayed(const Duration(minutes: 10));
-      _checkInactivity();
+      await _checkInactivity();
     } else {
       // Phone inactive - user likely sleeping
-      _onSleepDetected();
+      await _onSleepDetected();
     }
   }
 
-  void _onSleepDetected() async {
+  Future<void> _onSleepDetected() async {
     if (_sleepStartTime != null) return; // Already sleeping
 
     _sleepStartTime = DateTime.now();
@@ -208,7 +228,7 @@ class SleepForegroundHandler extends TaskHandler {
     });
   }
 
-  void _checkWakeUp() {
+  Future<void> _checkWakeUp() async {
     if (_sleepStartTime == null) return;
     if (_lastActivityTime == null) return;
 
@@ -217,11 +237,11 @@ class SleepForegroundHandler extends TaskHandler {
     
     if (timeSinceActivity.inMinutes < 2) {
       // Phone is active - user woke up!
-      _onWakeUpDetected();
+      await _onWakeUpDetected();
     }
   }
 
-  void _onWakeUpDetected() async {
+  Future<void> _onWakeUpDetected() async {
     if (_sleepStartTime == null) return;
 
     final wakeTime = DateTime.now();
