@@ -21,7 +21,9 @@ class _SleepScreenState extends State<SleepScreen> {
   final _sleepService = SleepTrackerService();
   TimeOfDay _sleepStart = const TimeOfDay(hour: 22, minute: 0);
   TimeOfDay _sleepEnd = const TimeOfDay(hour: 7, minute: 0);
+  TimeOfDay _alarmTime = const TimeOfDay(hour: 7, minute: 0);
   bool _smartAlarmEnabled = false;
+  int _smartAlarmDuration = 30;
 
   // Semantic Sleep Color (Purple)
   final Color _sleepColor = const Color(0xFFCE93D8);
@@ -46,7 +48,13 @@ class _SleepScreenState extends State<SleepScreen> {
           final endMinute = prefs.getInt('sleep_end_minute') ?? 0;
           _sleepStart = TimeOfDay(hour: startHour, minute: startMinute);
           _sleepEnd = TimeOfDay(hour: endHour, minute: endMinute);
-          _smartAlarmEnabled = prefs.getBool('smart_alarm_enabled') ?? false;
+          
+          final alarmHour = prefs.getInt('alarm_hour') ?? endHour;
+          final alarmMinute = prefs.getInt('alarm_minute') ?? endMinute;
+          _alarmTime = TimeOfDay(hour: alarmHour, minute: alarmMinute);
+          
+          _smartAlarmEnabled = prefs.getBool('alarm_enabled') ?? false;
+          _smartAlarmDuration = prefs.getInt('alarm_minutes_before') ?? 30;
         }
       });
     }
@@ -174,11 +182,11 @@ class _SleepScreenState extends State<SleepScreen> {
               SizedBox(height: sh * 0.02),
               SwitchListTile(
                 title: Text(
-                  AppLocalizations.of(context)!.smartAlarm,
+                  '⏰ Enable Alarm',
                   style: TextStyle(color: textColor, fontWeight: FontWeight.bold),
                 ),
                 subtitle: Text(
-                  AppLocalizations.of(context)!.smartAlarmDesc,
+                  'Get an alarm at a specific time',
                   style: TextStyle(color: subTextColor, fontSize: sw * 0.03),
                 ),
                 value: _smartAlarmEnabled,
@@ -189,6 +197,94 @@ class _SleepScreenState extends State<SleepScreen> {
                 activeColor: _sleepColor,
                 contentPadding: EdgeInsets.zero,
               ),
+              if (_smartAlarmEnabled) ...[
+                SizedBox(height: sh * 0.02),
+                Container(
+                  padding: EdgeInsets.all(sw * 0.04),
+                  decoration: BoxDecoration(
+                    color: cardColor,
+                    borderRadius: BorderRadius.circular(sw * 0.04),
+                    border: Border.all(color: _sleepColor.withValues(alpha: 0.3)),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Alarm Settings',
+                        style: TextStyle(
+                          fontSize: sw * 0.038,
+                          fontWeight: FontWeight.w600,
+                          color: textColor,
+                        ),
+                      ),
+                      SizedBox(height: sh * 0.02),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: _buildTimePicker(
+                              'Target Time',
+                              _alarmTime,
+                              (time) {
+                                setState(() => _alarmTime = time);
+                                setStateModal(() {});
+                              },
+                            ),
+                          ),
+                          SizedBox(width: sw * 0.04),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'Start Before',
+                                  style: TextStyle(
+                                    fontSize: sw * 0.03,
+                                    color: subTextColor,
+                                  ),
+                                ),
+                                SizedBox(height: sw * 0.01),
+                                Container(
+                                  padding: EdgeInsets.symmetric(horizontal: sw * 0.03),
+                                  height: sw * 0.14, // Matches the height of the time picker box roughly
+                                  decoration: BoxDecoration(
+                                    color: backgroundColor.withValues(alpha: 0.5),
+                                    borderRadius: BorderRadius.circular(sw * 0.03),
+                                    border: Border.all(color: AppColors.border.withValues(alpha: 0.5)),
+                                  ),
+                                  child: DropdownButtonHideUnderline(
+                                    child: DropdownButton<int>(
+                                      value: _smartAlarmDuration,
+                                      isExpanded: true,
+                                      dropdownColor: backgroundColor,
+                                      style: TextStyle(
+                                        fontSize: sw * 0.045,
+                                        fontWeight: FontWeight.bold,
+                                        color: _sleepColor,
+                                      ),
+                                      items: [5, 10, 15, 20, 30, 45, 60]
+                                          .map((val) => DropdownMenuItem<int>(
+                                                value: val,
+                                                child: Text('$val min'),
+                                              ))
+                                          .toList(),
+                                      onChanged: (val) {
+                                        if (val != null) {
+                                          setState(() => _smartAlarmDuration = val);
+                                          setStateModal(() {});
+                                        }
+                                      },
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ],
               SizedBox(height: sh * 0.015),
               Row(
                 children: [
@@ -222,10 +318,13 @@ class _SleepScreenState extends State<SleepScreen> {
                           _isLoading = true;
                         });
                         // 1. Asenkron işlemler
-                        await _sleepService.startTracking(_sleepStart, _sleepEnd);
                         final prefs = await SharedPreferences.getInstance();
                         await prefs.setBool('sleep_setup_done', true);
-                        await prefs.setBool('smart_alarm_enabled', _smartAlarmEnabled);
+                        await prefs.setBool('alarm_enabled', _smartAlarmEnabled);
+                        await prefs.setInt('alarm_hour', _alarmTime.hour);
+                        await prefs.setInt('alarm_minute', _alarmTime.minute);
+                        await prefs.setInt('alarm_minutes_before', _smartAlarmDuration);
+                        await _sleepService.startTracking(_sleepStart, _sleepEnd);
 
                         // 2. DÜZELTME BURADA: context.mounted kontrolü
                         if (!context.mounted) return;

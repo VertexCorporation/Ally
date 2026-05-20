@@ -10,7 +10,7 @@ import io.flutter.embedding.android.FlutterActivity
 import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.plugin.common.MethodChannel
 
-class MainActivity : FlutterActivity() {
+class MainActivity: FlutterActivity() {
     private val CHANNEL = "com.vertex.ally/step_counter"
     private val ACTIVITY_RECOGNITION_REQUEST = 100
 

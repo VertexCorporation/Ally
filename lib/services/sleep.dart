@@ -58,14 +58,61 @@ class SleepForegroundHandler extends TaskHandler {
   Future<void> _checkSleepWindow() async {
     try {
       final prefs = await SharedPreferences.getInstance();
-      final enabled = prefs.getBool('sleep_tracking_enabled') ?? false;
-      
-      debugPrint('🔍 Checking sleep window - enabled: $enabled');
-      
-      if (!enabled) return;
-
       final now = DateTime.now();
-    
+
+      // ⏰ STANDALONE ALARM SYSTEM - Independent from sleep tracking
+      final alarmEnabled = prefs.getBool('alarm_enabled') ?? false;
+      
+      if (alarmEnabled) {
+        final alarmHour = prefs.getInt('alarm_hour') ?? 7;
+        final alarmMinute = prefs.getInt('alarm_minute') ?? 0;
+        final alarmMinutesBefore = prefs.getInt('alarm_minutes_before') ?? 5;
+
+        final currentMinutes = now.hour * 60 + now.minute;
+        final alarmMinutes = alarmHour * 60 + alarmMinute;
+        final alarmStartMinutes = alarmMinutes - alarmMinutesBefore;
+
+        debugPrint('⏰ Alarm check - Time: ${now.hour}:${now.minute}, Target: $alarmHour:$alarmMinute (start: ${alarmStartMinutes ~/ 60}:${(alarmStartMinutes % 60).toString().padLeft(2, '0')})');
+
+        // Check if current time is within alarm window
+        if (currentMinutes >= alarmStartMinutes && currentMinutes < alarmMinutes) {
+          // We're in the alarm window
+          int minutesToAlarm = alarmMinutes - currentMinutes;
+          debugPrint('⏰ In alarm window - $minutesToAlarm minutes until alarm');
+          
+          if (!_isAlarmPlaying) {
+            await _handleStandaloneAlarm(minutesToAlarm, alarmMinutesBefore);
+          } else {
+            // Update volume as we get closer
+            double volume = (minutesToAlarm + 1) / alarmMinutesBefore.toDouble();
+            if (volume > 1.0) volume = 1.0;
+            if (volume < 0.03) volume = 0.03;
+            await _audioPlayer?.setVolume(volume);
+          }
+        } else if (_isAlarmPlaying && currentMinutes >= alarmMinutes) {
+          // Alarm time has passed, keep it playing until dismissed
+          debugPrint('⏰ Alarm time reached - keeping alarm active');
+        } else if (_isAlarmPlaying) {
+          // Outside alarm window and still playing - stop it
+          await _stopSmartAlarm();
+        }
+      }
+
+      // Keep existing sleep tracking logic separate
+      final sleepEnabled = prefs.getBool('sleep_tracking_enabled') ?? false;
+      if (sleepEnabled) {
+        await _checkSleepTracking();
+      }
+    } catch (e, stackTrace) {
+      debugPrint('❌ Error in _checkSleepWindow: $e');
+      debugPrint('📋 Stack trace: $stackTrace');
+    }
+  }
+
+  Future<void> _checkSleepTracking() async {
+    final prefs = await SharedPreferences.getInstance();
+    final now = DateTime.now();
+
     final startHour = prefs.getInt('sleep_start_hour') ?? 23;
     final startMinute = prefs.getInt('sleep_start_minute') ?? 0;
     final endHour = prefs.getInt('sleep_end_hour') ?? 7;
@@ -77,63 +124,59 @@ class SleepForegroundHandler extends TaskHandler {
 
     bool isInWindow;
     if (startMinutes > endMinutes) {
-      // Sleep window crosses midnight (e.g., 23:00 - 07:00)
       isInWindow = currentMinutes >= startMinutes || currentMinutes <= endMinutes;
     } else {
-      // Sleep window in same day
       isInWindow = currentMinutes >= startMinutes && currentMinutes <= endMinutes;
     }
 
     if (isInWindow && !_isInSleepWindow) {
-      // Just entered sleep window
       _isInSleepWindow = true;
-      _alarmDismissedToday = false; // Reset for the new night
+      _alarmDismissedToday = false;
       debugPrint('🌙 Entered sleep window at ${now.hour}:${now.minute}');
-      
-      // Wait 2 minutes, then start checking for inactivity
       await Future.delayed(const Duration(minutes: 2));
       await _checkInactivity();
     } else if (!isInWindow && _isInSleepWindow) {
-      // Exited sleep window
       _isInSleepWindow = false;
       _sleepStartTime = null;
       _alarmDismissedToday = false;
-      await _stopSmartAlarm();
       debugPrint('☀️ Exited sleep window');
     }
 
-    // Smart Alarm logic
-    final smartAlarmEnabled = prefs.getBool('smart_alarm_enabled') ?? false;
-    
-    debugPrint('⏰ Smart alarm check - enabled: $smartAlarmEnabled, dismissed: $_alarmDismissedToday, inWindow: $_isInSleepWindow');
-    
-    if (smartAlarmEnabled && !_alarmDismissedToday && _isInSleepWindow) {
-      int minutesToWakeUp = endMinutes - currentMinutes;
-      // Handle cross-midnight logic for remaining minutes
-      if (minutesToWakeUp < 0 && startMinutes > endMinutes) {
-        minutesToWakeUp += 24 * 60;
-      }
-      
-      debugPrint('⏰ Minutes to wake up: $minutesToWakeUp');
-      
-      if (minutesToWakeUp > 0 && minutesToWakeUp <= 30) {
-        await _handleSmartAlarm(minutesToWakeUp);
-      } else if (_isAlarmPlaying) {
-        await _stopSmartAlarm();
-      }
-    }
-
-    // If sleeping, check for wake up
     if (_sleepStartTime != null) {
       await _checkWakeUp();
     }
-    } catch (e, stackTrace) {
-      debugPrint('❌ Error in _checkSleepWindow: $e');
-      debugPrint('📋 Stack trace: $stackTrace');
+  }
+
+  Future<void> _handleStandaloneAlarm(int minutesToAlarm, int totalDuration) async {
+    debugPrint('⏰ Standalone alarm triggered - $minutesToAlarm minutes to target time');
+    
+    if (_audioPlayer == null) {
+      debugPrint('❌ Audio player is null!');
+      return;
+    }
+    
+    double volume = (minutesToAlarm + 1) / totalDuration.toDouble();
+    if (volume > 1.0) volume = 1.0;
+    if (volume < 0.03) volume = 0.03;
+
+    if (!_isAlarmPlaying) {
+      _isAlarmPlaying = true;
+      await _audioPlayer!.setReleaseMode(ReleaseMode.loop);
+      await _audioPlayer!.setVolume(volume);
+      await _audioPlayer!.play(AssetSource('audio/alarm.mp3'));
+      
+      FlutterForegroundTask.updateService(
+        notificationTitle: '⏰ Alarm',
+        notificationText: 'Tap notification to dismiss',
+        notificationButtons: [
+          const NotificationButton(id: 'stop_alarm', text: 'Dismiss'),
+        ],
+      );
+      debugPrint('⏰ Alarm started at volume $volume');
     }
   }
 
-  Future<void> _handleSmartAlarm(int minutesToWakeUp) async {
+  Future<void> _handleSmartAlarm(int minutesToWakeUp, [int smartAlarmDuration = 30]) async {
     debugPrint('⏰ _handleSmartAlarm called with minutesToWakeUp: $minutesToWakeUp');
     
     if (_audioPlayer == null) {
@@ -141,8 +184,8 @@ class SleepForegroundHandler extends TaskHandler {
       return;
     }
     
-    // Volume goes from 0.03 (at 30 mins) to 1.0 (at 1 min)
-    double volume = (30 - minutesToWakeUp + 1) / 30.0;
+    // Volume goes from 0.03 (at max mins) to 1.0 (at 1 min)
+    double volume = (smartAlarmDuration - minutesToWakeUp + 1) / smartAlarmDuration.toDouble();
     if (volume > 1.0) volume = 1.0;
     if (volume < 0.0) volume = 0.0;
 
