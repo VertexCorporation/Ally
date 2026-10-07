@@ -91,7 +91,7 @@ class _SleepScreenState extends State<SleepScreen> {
       isDismissible: false,
       builder: (context) => StatefulBuilder(
         builder: (context, setStateModal) {
-          bool _isLoading = false;
+          bool isLoading = false;
           return PopScope(
             canPop: false,
         child: Container(
@@ -194,7 +194,7 @@ class _SleepScreenState extends State<SleepScreen> {
                   setState(() => _smartAlarmEnabled = val);
                   setStateModal(() {});
                 },
-                activeColor: _sleepColor,
+                activeThumbColor: _sleepColor,
                 contentPadding: EdgeInsets.zero,
               ),
               if (_smartAlarmEnabled) ...[
@@ -313,9 +313,9 @@ class _SleepScreenState extends State<SleepScreen> {
                   SizedBox(width: sw * 0.03),
                   Expanded(
                     child: ElevatedButton(
-                      onPressed: _isLoading ? null : () async {
+                      onPressed: isLoading ? null : () async {
                         setStateModal(() {
-                          _isLoading = true;
+                          isLoading = true;
                         });
                         // 1. Asenkron işlemler
                         final prefs = await SharedPreferences.getInstance();
@@ -344,7 +344,7 @@ class _SleepScreenState extends State<SleepScreen> {
                         ),
                         elevation: 0,
                       ),
-                      child: _isLoading
+                      child: isLoading
                           ? const SizedBox(
                               height: 20,
                               width: 20,

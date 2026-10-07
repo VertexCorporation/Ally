@@ -1,8 +1,8 @@
 import 'dart:async';
 import 'dart:convert';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_foreground_task/flutter_foreground_task.dart';
-import 'package:flutter_foreground_task/models/notification_button.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -432,6 +432,11 @@ class SleepTrackerService {
   }
 
   Future<void> startTracking(TimeOfDay sleepStart, TimeOfDay sleepEnd) async {
+    if (kIsWeb) {
+      debugPrint('Sleep tracking is disabled on web because Android foreground services are not supported in the browser.');
+      return;
+    }
+
     _sleepStartSchedule = sleepStart;
     _sleepEndSchedule = sleepEnd;
     _isTracking = true;
@@ -596,6 +601,11 @@ class SleepTrackerService {
   }
 
   Future<void> _startForegroundService() async {
+    if (kIsWeb) {
+      debugPrint('Foreground service startup skipped on web.');
+      return;
+    }
+
     // Android 14+ requires runtime permission for 'health' type foreground services
     final activityStatus = await Permission.activityRecognition.status;
     if (!activityStatus.isGranted) {

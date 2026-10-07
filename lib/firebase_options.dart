@@ -17,10 +17,7 @@ import 'package:flutter/foundation.dart'
 class DefaultFirebaseOptions {
   static FirebaseOptions get currentPlatform {
     if (kIsWeb) {
-      throw UnsupportedError(
-        'DefaultFirebaseOptions have not been configured for web - '
-        'you can reconfigure this by running the FlutterFire CLI again.',
-      );
+      return web;
     }
     switch (defaultTargetPlatform) {
       case TargetPlatform.android:
@@ -49,24 +46,30 @@ class DefaultFirebaseOptions {
     }
   }
 
-  static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyAaNXY_dmb7cV9iFWffX-2B6e13Tbichx0',
-    appId: '1:561391430514:android:ea1d848d92b7289eb10beb',
-    messagingSenderId: '561391430514',
-    projectId: 'vertex-ai-1618',
-    databaseURL: 'https://vertex-ai-1618-default-rtdb.europe-west1.firebasedatabase.app',
-    storageBucket: 'vertex-ai-1618.firebasestorage.app',
+  static const FirebaseOptions web = FirebaseOptions(
+    apiKey: 'AIzaSyAE4lKRadCTcp_DNtrhSn2UHyQyrpX_9bk',
+    appId: '1:362105572173:web:e9a423e64bba2a13e14504',
+    messagingSenderId: '362105572173',
+    projectId: 'project-f90df',
+    authDomain: 'project-f90df.firebaseapp.com',
+    storageBucket: 'project-f90df.firebasestorage.app',
+    measurementId: 'G-8QL7E0R42B',
   );
 
   static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyDFIo-pezcOsrVZXGMymGwwNNyZ1eVUpUQ',
-    appId: '1:561391430514:ios:7bfd48ae073a5869b10beb',
-    messagingSenderId: '561391430514',
-    projectId: 'vertex-ai-1618',
-    databaseURL: 'https://vertex-ai-1618-default-rtdb.europe-west1.firebasedatabase.app',
-    storageBucket: 'vertex-ai-1618.firebasestorage.app',
-    androidClientId: '561391430514-4146b6ulvo0gvcmor771ftckb84tbpbg.apps.googleusercontent.com',
-    iosClientId: '561391430514-82vhknitjnj5urjdkhk5nnp7d44d00vn.apps.googleusercontent.com',
+    apiKey: 'AIzaSyAOmAJqTXePmFSEamh95vkBEk5zYpiVr4A',
+    appId: '1:362105572173:ios:c5b83f52e6cbaf4de14504',
+    messagingSenderId: '362105572173',
+    projectId: 'project-f90df',
+    storageBucket: 'project-f90df.firebasestorage.app',
     iosBundleId: 'com.vertex.ally',
+  );
+
+  static const FirebaseOptions android = FirebaseOptions(
+    apiKey: 'AIzaSyAj_jx8pwB0wtfVa_w_I9UkPDzb2QSHP_I',
+    appId: '1:362105572173:android:10c9b5c36f288d12e14504',
+    messagingSenderId: '362105572173',
+    projectId: 'project-f90df',
+    storageBucket: 'project-f90df.firebasestorage.app',
   );
 }
