@@ -13,6 +13,8 @@ import 'package:provider/provider.dart';
 import 'package:ally/l10n/app_localizations.dart';
 import 'package:ally/theme.dart';
 import 'package:ally/notifications/introvert.dart';
+import 'package:ally/login/backend.dart';
+import 'package:ally/screens/onboard.dart';
 
 import '../screen.dart';
 
@@ -47,6 +49,7 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
   bool _isVerified = false;
   bool _isResendLoading = false;
   bool _isContinuing = false;
+  bool _isCheckingVerification = false;
 
   @override
   void initState() {
@@ -76,8 +79,10 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
       }
     });
 
-    // 2. Periodic Email Check (For Firebase)
-    _emailCheckTimer = Timer.periodic(const Duration(seconds: 3), (timer) async {
+    // Poll less aggressively to avoid unnecessary network calls and overlapping reloads.
+    _emailCheckTimer = Timer.periodic(const Duration(seconds: 10), (timer) async {
+      if (_isCheckingVerification) return;
+      _isCheckingVerification = true;
       try {
         final user = FirebaseAuth.instance.currentUser;
         if (user == null) {
@@ -85,22 +90,23 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
           return;
         }
 
-        // Refresh user data from server
         await user.reload();
+        if (!mounted) return;
         final freshUser = FirebaseAuth.instance.currentUser;
 
         if (freshUser != null && freshUser.emailVerified) {
           dev.log('[Verify] Email verified automatically.', name: 'EmailVerification');
-          _handleVerified();
+          await _handleVerified();
           timer.cancel();
         }
       } on FirebaseAuthException catch (e) {
-        // Ignore network errors to prevent log spamming when offline
         if (e.code != 'network-request-failed') {
           dev.log('[Verify] Firebase Error: ${e.code}', name: 'EmailVerification');
         }
       } catch (e) {
         dev.log('[Verify] Generic Error checking verification', name: 'EmailVerification');
+      } finally {
+        _isCheckingVerification = false;
       }
     });
   }
@@ -143,27 +149,37 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
     await _navigateToMainScreen();
   }
 
-  Future<void> _continueWithoutVerification() async {
+  Future<void> _continueAsGuest() async {
     if (_isContinuing) return;
     setState(() => _isContinuing = true);
     _cancelTimers();
 
     try {
-      await _saveRememberMeState();
+      // Guest access is a separate Firebase anonymous account, not a bypass
+      // that grants an unverified email account full access.
+      final result = await LoginBackendService().signInAnonymously(
+        context: context,
+        notificationService: _notificationService,
+      );
 
-      if (mounted) {
-        Navigator.of(context).pushReplacement(
+      if (!mounted) return;
+      if (result is AnonymousSignInSuccess) {
+        Navigator.of(context).pushAndRemoveUntil(
           PageRouteBuilder(
-            pageBuilder: (_, __, ___) => const MainScreen(),
+            pageBuilder: (_, __, ___) => const OnboardingScreen(),
             transitionsBuilder: (_, animation, __, child) => FadeTransition(opacity: animation, child: child),
           ),
+          (_) => false,
         );
+      } else {
+        setState(() => _isContinuing = false);
+        _startTimers();
       }
     } catch (e) {
       if (mounted) {
         _notificationService.showNotification(
-            message: AppLocalizations.of(context)!.authFailed,
-            type: NotificationType.error
+          message: AppLocalizations.of(context)!.authFailed,
+          type: NotificationType.error,
         );
         setState(() => _isContinuing = false);
         _startTimers();
@@ -217,9 +233,8 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
     const secureStorage = FlutterSecureStorage();
     await secureStorage.write(key: 'remember_me', value: 'true');
     await secureStorage.write(key: 'email', value: widget.email);
-    if (widget.password != null) {
-      await secureStorage.write(key: 'password', value: widget.password);
-    }
+    // Clear passwords persisted by older versions; Firebase Auth owns the session.
+    await secureStorage.delete(key: 'password');
   }
 
   Future<void> _navigateToMainScreen() async {
@@ -326,7 +341,7 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
 
                         // Continue Button (Ghost/Text Button)
                         TextButton(
-                          onPressed: _isContinuing ? null : _continueWithoutVerification,
+                          onPressed: _isContinuing ? null : _continueAsGuest,
                           style: TextButton.styleFrom(
                             padding: EdgeInsets.symmetric(vertical: 12 * scale, horizontal: 16 * scale),
                           ),
@@ -340,7 +355,7 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
                             ),
                           )
                               : Text(
-                            AppLocalizations.of(context)!.verificationScreenContinueWithoutVerification,
+                            AppLocalizations.of(context)!.continueAsAnonymous,
                             style: TextStyle(
                               fontSize: 14 * scale,
                               fontWeight: FontWeight.w600,

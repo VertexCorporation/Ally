@@ -104,12 +104,11 @@ class _SettingsScreenState extends State<SettingsScreen> with SingleTickerProvid
     final userProvider = context.read<UserProvider>();
     await userProvider.clearDataOnSignOut();
     
-    if (mounted) {
-      Navigator.of(context).pushAndRemoveUntil(
-        MaterialPageRoute(builder: (_) => const LoginScreen()),
-        (route) => false,
-      );
-    }
+    if (!context.mounted) return;
+    Navigator.of(context).pushAndRemoveUntil(
+      MaterialPageRoute(builder: (_) => const LoginScreen()),
+      (route) => false,
+    );
   }
 
   void _handleBack() {

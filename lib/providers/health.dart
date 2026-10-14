@@ -1,6 +1,8 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../services/user_records.dart';
 import 'dart:convert';
 import '../models/health.dart';
 
@@ -9,17 +11,48 @@ class HealthProvider extends ChangeNotifier {
   Timer? _sleepUpdateTimer;
   Timer? _midnightResetTimer;
   Timer? _stepUpdateTimer;
+  StreamSubscription<User?>? _authSubscription;
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+  final UserRecordsService _recordsService = UserRecordsService();
+  String? _currentUid;
+  bool _hasObservedAuthState = false;
 
   HealthProvider() {
+    _currentUid = _auth.currentUser?.uid;
     loadData();
+    _authSubscription = _auth.authStateChanges().listen((user) {
+      final nextUid = user?.uid;
+      if (nextUid == _currentUid && _hasObservedAuthState) return;
+
+      final previousUid = _currentUid;
+      _hasObservedAuthState = true;
+      if (nextUid != previousUid) {
+        _currentUid = nextUid;
+        _healthData = HealthData();
+        _units = 'metric';
+        loadData();
+      }
+    });
   }
 
   HealthData get healthData => _healthData;
 
   Future<void> loadData() async {
     final prefs = await SharedPreferences.getInstance();
-    final String? healthDataJson = prefs.getString('health_data');
-    _units = prefs.getString('units') ?? 'metric';
+    final uid = _auth.currentUser?.uid;
+    if (uid != _currentUid) return;
+
+    // Legacy global keys are read only before auth state has been observed.
+    // Once accounts are in use, each account gets an isolated local cache.
+    final localKey = uid != null
+        ? 'health_data_$uid'
+        : (_hasObservedAuthState ? null : 'health_data');
+    final unitsKey = uid != null
+        ? 'units_$uid'
+        : (_hasObservedAuthState ? null : 'units');
+    final String? healthDataJson =
+        localKey == null ? null : prefs.getString(localKey);
+    _units = unitsKey == null ? 'metric' : (prefs.getString(unitsKey) ?? 'metric');
 
     if (healthDataJson != null) {
       try {
@@ -27,6 +60,20 @@ class HealthProvider extends ChangeNotifier {
         _healthData = HealthData.fromJson(json);
       } catch (e) {
         debugPrint('Error loading health data: $e');
+      }
+    }
+
+    // Cloud data is authoritative when available. Local state remains available
+    // if the device is offline or the cloud read fails.
+    if (uid != null) {
+      try {
+        final cloudData = await _recordsService.loadHealthSnapshot();
+        if (_auth.currentUser?.uid != uid || _currentUid != uid) return;
+        if (cloudData != null) {
+          _healthData = HealthData.fromJson(cloudData);
+        }
+      } catch (e) {
+        debugPrint('Unable to load health snapshot from cloud; using local cache: $e');
       }
     }
 
@@ -42,14 +89,31 @@ class HealthProvider extends ChangeNotifier {
   Future<void> _checkAndResetDailyData() async {
     final prefs = await SharedPreferences.getInstance();
     final today = _getTodayDateString();
-    final lastResetDate = prefs.getString('last_reset_date');
+    final uid = _auth.currentUser?.uid;
+    final resetKey = uid != null
+        ? 'last_reset_date_$uid'
+        : (_hasObservedAuthState ? null : 'last_reset_date');
+    final lastResetDate = resetKey == null ? null : prefs.getString(resetKey);
 
     if (lastResetDate != today) {
+      // Archive the previous day's final snapshot before resetting counters.
+      // Failure to reach Firestore must never block the local daily reset.
+      if (uid != null && lastResetDate != null) {
+        try {
+          await _recordsService.saveDailyHealthRecord(
+            lastResetDate,
+            _healthData.toJson(),
+          );
+        } catch (e) {
+          debugPrint('Unable to archive previous health day: $e');
+        }
+      }
+
       _healthData.currentSteps = 0;
       _healthData.waterGlasses = 0;
       _healthData.caloriesConsumed = 0;
 
-      await prefs.setString('last_reset_date', today);
+      if (resetKey != null) await prefs.setString(resetKey, today);
       await _saveData();
 
       debugPrint('🔄 Daily data reset for $today');
@@ -117,6 +181,7 @@ class HealthProvider extends ChangeNotifier {
 
   @override
   void dispose() {
+    _authSubscription?.cancel();
     _sleepUpdateTimer?.cancel();
     _midnightResetTimer?.cancel();
     _stepUpdateTimer?.cancel();
@@ -125,9 +190,26 @@ class HealthProvider extends ChangeNotifier {
   
   // Save data to storage
   Future<void> _saveData() async {
+    final uid = _auth.currentUser?.uid;
+    if (uid != _currentUid) return;
+
     final prefs = await SharedPreferences.getInstance();
-    final String healthDataJson = jsonEncode(_healthData.toJson());
-    await prefs.setString('health_data', healthDataJson);
+    final data = _healthData.toJson();
+    final String healthDataJson = jsonEncode(data);
+    final localKey = uid != null
+        ? 'health_data_$uid'
+        : (_hasObservedAuthState ? null : 'health_data');
+    if (localKey != null) {
+      await prefs.setString(localKey, healthDataJson);
+    }
+
+    if (uid != null && _auth.currentUser?.uid == uid) {
+      try {
+        await _recordsService.saveHealthSnapshot(data);
+      } catch (e) {
+        debugPrint('Health data saved locally; cloud sync failed: $e');
+      }
+    }
   }
   
   // Water methods
@@ -279,12 +361,20 @@ class HealthProvider extends ChangeNotifier {
   Future<void> saveUserProfile(Map<String, dynamic> profile) async {
     final prefs = await SharedPreferences.getInstance();
     final String profileJson = jsonEncode(profile);
-    await prefs.setString('user_profile', profileJson);
+    final uid = _auth.currentUser?.uid;
+    final key = uid != null
+        ? 'user_profile_$uid'
+        : (_hasObservedAuthState ? null : 'user_profile');
+    if (key != null) await prefs.setString(key, profileJson);
   }
   
   Future<Map<String, dynamic>?> loadUserProfile() async {
     final prefs = await SharedPreferences.getInstance();
-    final String? profileJson = prefs.getString('user_profile');
+    final uid = _auth.currentUser?.uid;
+    final key = uid != null
+        ? 'user_profile_$uid'
+        : (_hasObservedAuthState ? null : 'user_profile');
+    final String? profileJson = key == null ? null : prefs.getString(key);
     
     if (profileJson != null) {
       try {
@@ -309,7 +399,11 @@ class HealthProvider extends ChangeNotifier {
     _units = units;
     notifyListeners();
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setString('units', units);
+    final uid = _auth.currentUser?.uid;
+    final key = uid != null
+        ? 'units_$uid'
+        : (_hasObservedAuthState ? null : 'units');
+    if (key != null) await prefs.setString(key, units);
   }
 
 // Meal log methods

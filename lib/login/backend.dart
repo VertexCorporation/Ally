@@ -26,6 +26,10 @@ class LoginSuccess extends LoginResult {
   final User user;
   LoginSuccess(this.user);
 }
+class LoginEmailNotVerified extends LoginResult {
+  final User user;
+  LoginEmailNotVerified(this.user);
+}
 class LoginInvalidCredentials extends LoginResult {}
 class LoginUserDisabled extends LoginResult {}
 class LoginNetworkError extends LoginResult {}
@@ -103,7 +107,7 @@ class LoginBackendService {
       final user = userCredential.user;
       if (user == null) throw FirebaseAuthException(code: 'user-not-found-after-signin');
 
-      await _handleSessionPersistence(email, password, rememberMe);
+      await _handleSessionPersistence(email, rememberMe);
       await user.reload();
       final freshUser = _auth.currentUser;
       if (freshUser == null) throw FirebaseAuthException(code: 'user-disappeared-after-reload');
@@ -113,7 +117,7 @@ class LoginBackendService {
 
         _safeTokenSync(extrovertNotificationService);
 
-        return LoginSuccess(freshUser);
+        return LoginEmailNotVerified(freshUser);
       }
 
       dev.log('[Auth.Login] User verified. UID: ${freshUser.uid}. Running post-login tasks.', name: 'LoginBackend');
@@ -249,7 +253,11 @@ class LoginBackendService {
       }
 
       await _secureStorage.write(key: 'remember_me', value: 'true');
-      await _secureStorage.write(key: 'email', value: user.email);
+      if (user.email != null) {
+        await _secureStorage.write(key: 'email', value: user.email);
+      }
+      // Firebase Auth persists the session. Never retain the user's password.
+      await _secureStorage.delete(key: 'password');
 
       _safeTokenSync(extrovertNotificationService);
 
@@ -281,6 +289,7 @@ class LoginBackendService {
   }) async {
     final l10n = AppLocalizations.of(context)!;
     final extrovertNotificationService = context.read<ExtrovertNotificationService>();
+    final userProvider = context.read<UserProvider>();
 
     if (!await InternetConnection().hasInternetAccess) {
       notificationService.showNotification(
@@ -295,6 +304,12 @@ class LoginBackendService {
       final User? user = userCredential.user;
 
       if (user == null) throw FirebaseAuthException(code: 'anonymous-user-null');
+
+      // Keep the profile provider attached to the current guest UID as well.
+      userProvider.listenToUserData(user);
+      await _secureStorage.delete(key: 'password');
+      await _secureStorage.delete(key: 'email');
+      await _secureStorage.write(key: 'remember_me', value: 'true');
 
       _safeTokenSync(extrovertNotificationService);
 
@@ -477,11 +492,13 @@ class LoginBackendService {
     }
   }
 
-  Future<void> _handleSessionPersistence(String email, String password, bool rememberMe) async {
+  Future<void> _handleSessionPersistence(String email, bool rememberMe) async {
     if (rememberMe) {
       await _secureStorage.write(key: 'email', value: email);
-      await _secureStorage.write(key: 'password', value: password);
       await _secureStorage.write(key: 'remember_me', value: 'true');
+      // Remove credentials saved by older app versions. Firebase Auth manages
+      // the signed-in session, so the password is not needed for persistence.
+      await _secureStorage.delete(key: 'password');
     } else {
       await _secureStorage.deleteAll();
     }

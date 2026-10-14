@@ -179,7 +179,6 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                         onPressed: () async {
                           Navigator.pop(sheetContext);
 
-                          final messenger = ScaffoldMessenger.of(context);
                           final localizations = AppLocalizations.of(context)!;
 
                           final status = await Permission.activityRecognition.request();
@@ -189,6 +188,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                           if (status.isGranted) {
                             final pedometerService = PedometerService();
                             await pedometerService.startNativeService();
+                            if (!context.mounted) return;
 
                             CustomNotification.show(
                               context,

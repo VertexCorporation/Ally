@@ -18,6 +18,7 @@ class UserProvider with ChangeNotifier {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   Map<String, dynamic>? _userData;
+  String? _currentUid;
   StreamSubscription<DocumentSnapshot>? _userSubscription;
 
   // --- Public Getters ---
@@ -34,8 +35,9 @@ class UserProvider with ChangeNotifier {
   /// Checks if the current user is in 'Guest/Anonymous' mode.
   /// Returns true ONLY if the accountType is explicitly 'anonymous'.
   bool get isAnonymous {
-    if (_userData == null) return false;
-    return _userData!['accountType'] == 'anonymous';
+    // Firebase Auth is authoritative even before the guest profile arrives.
+    if (_auth.currentUser?.isAnonymous == true) return true;
+    return _userData?['accountType'] == 'anonymous';
   }
 
   /// Returns true if the user has any active, non-free subscription tier.
@@ -100,6 +102,14 @@ class UserProvider with ChangeNotifier {
   /// This method should be called when a user signs in. It sets up a stream
   /// that automatically updates the provider's state when data changes.
   void listenToUserData(User user) {
+    // Never keep another account's profile visible while switching identities.
+    if (_currentUid != user.uid) {
+      _userData = null;
+      _currentUid = user.uid;
+      _clearLegacyCachedUserData();
+      notifyListeners();
+    }
+
     // Cancel any existing subscription to avoid memory leaks.
     _userSubscription?.cancel();
 
@@ -112,9 +122,9 @@ class UserProvider with ChangeNotifier {
         final data = snapshot.data();
 
         // Safety: Only update if data is not null.
-        if (data != null) {
+        if (data != null && _currentUid == user.uid) {
           _userData = data;
-          _cacheUserData(data); // Persist updated data to local cache.
+          _cacheUserData(data, user.uid); // Persist this account's data to its own cache.
 
           debugPrint("[LOG | UserProvider] Firing notifyListeners() due to Firestore snapshot update.");
           notifyListeners();
@@ -140,8 +150,15 @@ class UserProvider with ChangeNotifier {
   /// then fetches the latest data from the server to ensure freshness.
   Future<void> fetchInitialData(User user) async {
     try {
-      // 1. Load from cache so the UI isn't blocked/blank.
-      await _loadCachedUserData();
+      if (_currentUid != user.uid) {
+        _userData = null;
+        _currentUid = user.uid;
+        _clearLegacyCachedUserData();
+      }
+
+      // 1. Load only this account's cache so a different account's profile
+      // can never be shown while the server request is in flight.
+      await _loadCachedUserData(user.uid);
       // If we found cached data, notify immediately to show the UI.
       if (_userData != null) notifyListeners();
 
@@ -150,8 +167,9 @@ class UserProvider with ChangeNotifier {
       if (doc.exists) {
         final data = doc.data();
         if (data != null) {
+          if (_currentUid != user.uid) return;
           _userData = data;
-          await _cacheUserData(data);
+          await _cacheUserData(data, user.uid);
           notifyListeners(); // Rebuild with fresh data.
           debugPrint("[UserProvider] Initial user data fetched for: ${user.uid}");
         }
@@ -171,8 +189,11 @@ class UserProvider with ChangeNotifier {
   Future<void> clearDataOnSignOut() async {
     await _userSubscription?.cancel();
     _userSubscription = null;
+    final uid = _currentUid;
+    _currentUid = null;
     _userData = null;
-    await _clearCachedUserData();
+    await _clearCachedUserData(uid);
+    await _clearLegacyCachedUserData();
     
     try {
       await FirebaseAuth.instance.signOut();
@@ -188,7 +209,7 @@ class UserProvider with ChangeNotifier {
 
   /// Caches the user data to SharedPreferences as a JSON string.
   /// Handles Firestore [Timestamp] conversion to String for JSON compatibility.
-  Future<void> _cacheUserData(Map<String, dynamic> data) async {
+  Future<void> _cacheUserData(Map<String, dynamic> data, String uid) async {
     try {
       final prefs = await SharedPreferences.getInstance();
       final jsonString = jsonEncode(
@@ -196,16 +217,19 @@ class UserProvider with ChangeNotifier {
         toEncodable: (object) =>
         object is Timestamp ? object.toDate().toIso8601String() : object,
       );
-      await prefs.setString('cached_user_data', jsonString);
+      if (_currentUid == uid) {
+        await prefs.setString('cached_user_data_$uid', jsonString);
+      }
     } catch (e) {
       debugPrint("[UserProvider] Cache write error: $e");
     }
   }
 
   /// Loads user data from the SharedPreferences cache, if it exists.
-  Future<void> _loadCachedUserData() async {
+  Future<void> _loadCachedUserData(String uid) async {
     final prefs = await SharedPreferences.getInstance();
-    final jsonString = prefs.getString('cached_user_data');
+    if (_currentUid != uid) return;
+    final jsonString = prefs.getString('cached_user_data_$uid');
     if (jsonString != null) {
       try {
         _userData = jsonDecode(jsonString);
@@ -216,7 +240,13 @@ class UserProvider with ChangeNotifier {
   }
 
   /// Removes the user data from the SharedPreferences cache.
-  Future<void> _clearCachedUserData() async {
+  Future<void> _clearCachedUserData(String? uid) async {
+    final prefs = await SharedPreferences.getInstance();
+    if (uid != null) await prefs.remove('cached_user_data_$uid');
+  }
+
+  /// Removes the pre-UID cache key used by older app versions.
+  Future<void> _clearLegacyCachedUserData() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove('cached_user_data');
   }

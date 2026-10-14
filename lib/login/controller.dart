@@ -3,6 +3,7 @@
 import 'package:ally/l10n/app_localizations.dart';
 import 'package:ally/screens/onboard.dart';
 import 'package:ally/screens/signup_screen.dart';
+import 'package:ally/login/verify.dart';
 import 'package:ally/notifications/introvert.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -177,6 +178,21 @@ class LoginController extends ChangeNotifier {
       switch (result) {
         case LoginSuccess():
           _navigateAfterSuccess(context);
+          break;
+        case LoginEmailNotVerified(:final user):
+          final emailAddress = user.email ?? email;
+          final displayName = user.displayName?.trim();
+          Navigator.of(context).pushReplacement(
+            MaterialPageRoute(
+              builder: (_) => EmailVerificationScreen(
+                email: emailAddress,
+                username: displayName != null && displayName.isNotEmpty
+                    ? displayName
+                    : emailAddress.split('@').first,
+                userId: user.uid,
+              ),
+            ),
+          );
           break;
         case LoginInvalidCredentials():
         // We shake the password field for invalid creds usually

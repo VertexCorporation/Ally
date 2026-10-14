@@ -84,6 +84,7 @@ class _SleepScreenState extends State<SleepScreen> {
     final textColor = AppColors.primaryColor.inverted;
     final subTextColor = AppColors.tertiaryColor;
 
+    bool isLoading = false;
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.transparent,
@@ -91,7 +92,6 @@ class _SleepScreenState extends State<SleepScreen> {
       isDismissible: false,
       builder: (context) => StatefulBuilder(
         builder: (context, setStateModal) {
-          bool isLoading = false;
           return PopScope(
             canPop: false,
         child: Container(
@@ -313,7 +313,8 @@ class _SleepScreenState extends State<SleepScreen> {
                   SizedBox(width: sw * 0.03),
                   Expanded(
                     child: ElevatedButton(
-                      onPressed: isLoading ? null : () async {
+                      onPressed: () async {
+                        if (isLoading) return;
                         setStateModal(() {
                           isLoading = true;
                         });
