@@ -1,0 +1,18 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Every record is private to the authenticated UID that owns it.
+    // Server/Admin SDK operations in the private AI backend bypass these rules
+    // and must implement their own authorization checks.
+    match /users/{userId} {
+      allow read, create, update, delete: if request.auth != null
+        && request.auth.uid == userId;
+
+      match /{document=**} {
+        allow read, create, update, delete: if request.auth != null
+          && request.auth.uid == userId;
+      }
+    }
+  }
+}
