@@ -183,7 +183,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
 
                           final status = await Permission.activityRecognition.request();
 
-                          if (!mounted) return;
+                          if (!context.mounted) return;
 
                           if (status.isGranted) {
                             final pedometerService = PedometerService();
