@@ -313,7 +313,8 @@ class _SleepScreenState extends State<SleepScreen> {
                   SizedBox(width: sw * 0.03),
                   Expanded(
                     child: ElevatedButton(
-                      onPressed: isLoading ? null : () async {
+                      onPressed: () async {
+                        if (isLoading) return;
                         setStateModal(() {
                           isLoading = true;
                         });
