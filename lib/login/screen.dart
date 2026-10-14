@@ -63,14 +63,14 @@ class _LoginScreenContent extends StatelessWidget {
         data: Theme.of(context),
         child: Scaffold(
           backgroundColor: AppColors.background,
-          resizeToAvoidBottomInset: false,
+          resizeToAvoidBottomInset: true,
           body: LayoutBuilder(
             builder: (context, constraints) {
               return SizedBox(
                 width: constraints.maxWidth,
                 height: constraints.maxHeight,
                 child: AnimatedSwitcher(
-                  duration: const Duration(milliseconds: 600),
+                  duration: const Duration(milliseconds: 280),
                   transitionBuilder: (Widget child, Animation<double> animation) {
                     final offsetAnimation = Tween<Offset>(
                       begin: const Offset(0.0, 1.0),
@@ -139,99 +139,120 @@ class _MethodSelectionView extends StatelessWidget {
     final controller = context.read<LoginController>();
     final l10n = AppLocalizations.of(context)!;
     final isLoading = context.select<LoginController, bool>((c) => c.isLoading);
+    final accent = AppColors.senaryColor;
 
     return Container(
       width: constraints.maxWidth,
       height: constraints.maxHeight,
-      color: AppColors.background, // Tema rengi
+      color: AppColors.background,
       child: SafeArea(
         child: Center(
-          child: SizedBox(
-            width: contentWidth,
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 32.0),
+          child: ConstrainedBox(
+            constraints: BoxConstraints(maxWidth: contentWidth),
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 20),
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  SizedBox(height: constraints.maxHeight * 0.05),
-
-                  Text(
-                    l10n.signIn, // "Sign in"
-                    style: TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                      color: AppColors.tertiaryColor, // Tema metin rengi
-                      letterSpacing: 1,
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: Container(
+                      width: 58,
+                      height: 58,
+                      decoration: BoxDecoration(
+                        color: accent.withValues(alpha: 0.12),
+                        borderRadius: BorderRadius.circular(19),
+                      ),
+                      child: Icon(
+                        Icons.favorite_rounded,
+                        color: accent,
+                        size: 31,
+                      ),
                     ),
                   ),
-                  const SizedBox(height: 8),
+                  const SizedBox(height: 28),
                   Text(
-                    l10n.chooseSignInMethod, // "Choose your sign in method"
+                    l10n.signIn,
                     style: TextStyle(
-                      fontSize: 16,
-                      color: AppColors.tertiaryColor.withValues(alpha: 0.7),
+                      color: AppColors.tertiaryColor,
+                      fontSize: 32,
+                      height: 1.1,
+                      fontWeight: FontWeight.w800,
+                      letterSpacing: -0.7,
                     ),
                   ),
-
-                  const Spacer(),
-
-                  // --- Butonlar ---
-
+                  const SizedBox(height: 10),
+                  Text(
+                    l10n.chooseSignInMethod,
+                    style: TextStyle(
+                      color: AppColors.tertiaryColor.withValues(alpha: 0.72),
+                      fontSize: 15,
+                      height: 1.45,
+                    ),
+                  ),
+                  const SizedBox(height: 30),
                   _AuthButton(
                     text: l10n.continueWithGoogle,
                     icon: Icons.g_mobiledata_rounded,
                     onTap: isLoading ? null : () => controller.signInWithGoogle(context),
                   ),
-
-                  const SizedBox(height: 16),
-
+                  const SizedBox(height: 12),
                   _AuthButton(
-                    text: l10n.continueWithApple, // "Continue with Apple"
+                    text: l10n.continueWithApple,
                     icon: Icons.apple,
                     onTap: isLoading ? null : () => controller.signInWithApple(context),
                   ),
-
-                  const SizedBox(height: 16),
-
+                  const SizedBox(height: 12),
                   _AuthButton(
                     text: l10n.continueWithEmail,
-                    icon: Icons.email_outlined,
+                    icon: Icons.mail_outline_rounded,
                     onTap: isLoading ? null : controller.goToEmailStep,
                   ),
-
-                  const SizedBox(height: 16),
-
+                  const SizedBox(height: 12),
                   _AuthButton(
                     text: l10n.continueAsAnonymous,
                     icon: Icons.person_outline_rounded,
+                    isPrimary: true,
                     onTap: isLoading ? null : () => controller.signInAnonymously(context),
                   ),
-
-                  SizedBox(height: constraints.maxHeight * 0.04),
-
-                  // Footer
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
+                  if (isLoading) ...[
+                    const SizedBox(height: 18),
+                    const Center(
+                      child: SizedBox(
+                        width: 22,
+                        height: 22,
+                        child: CircularProgressIndicator(strokeWidth: 2.4),
+                      ),
+                    ),
+                  ],
+                  const SizedBox(height: 28),
+                  Wrap(
+                    alignment: WrapAlignment.center,
+                    crossAxisAlignment: WrapCrossAlignment.center,
                     children: [
                       Text(
-                        l10n.dontHaveAccount, // "Don't have an account? "
-                        style: TextStyle(color: AppColors.tertiaryColor.withValues(alpha: 0.7), fontSize: 14),
+                        l10n.dontHaveAccount,
+                        style: TextStyle(
+                          color: AppColors.tertiaryColor.withValues(alpha: 0.72),
+                          fontSize: 14,
+                        ),
                       ),
-                      GestureDetector(
-                        onTap: () => controller.goToSignUp(context),
+                      const SizedBox(width: 5),
+                      TextButton(
+                        onPressed: isLoading ? null : () => controller.goToSignUp(context),
+                        style: TextButton.styleFrom(
+                          foregroundColor: accent,
+                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
+                          minimumSize: Size.zero,
+                          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                        ),
                         child: Text(
-                          l10n.signUp, // "Sign Up"
-                          style: TextStyle(
-                            color: AppColors.tertiaryColor,
-                            fontSize: 14,
-                            fontWeight: FontWeight.bold,
-                          ),
+                          l10n.signUp,
+                          style: const TextStyle(fontWeight: FontWeight.w700),
                         ),
                       ),
                     ],
                   ),
-
-                  const SizedBox(height: 20),
                 ],
               ),
             ),
@@ -486,42 +507,53 @@ class _AuthButton extends StatelessWidget {
   final String text;
   final IconData icon;
   final VoidCallback? onTap;
+  final bool isPrimary;
 
   const _AuthButton({
     required this.text,
     required this.icon,
     this.onTap,
+    this.isPrimary = false,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    final foreground = isPrimary ? Colors.white : AppColors.tertiaryColor;
+
+    return SizedBox(
       width: double.infinity,
-      decoration: BoxDecoration(
-        color: AppColors.secondaryColor, // Buton arka planı
-        borderRadius: BorderRadius.circular(30),
-        border: Border.all(color: AppColors.border, width: 1),
-      ),
       child: Material(
-        color: Colors.transparent,
+        color: isPrimary ? AppColors.senaryColor : AppColors.secondaryColor,
+        borderRadius: BorderRadius.circular(18),
         child: InkWell(
           onTap: onTap,
-          borderRadius: BorderRadius.circular(30),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 18),
+          borderRadius: BorderRadius.circular(18),
+          child: Container(
+            constraints: const BoxConstraints(minHeight: 56),
+            padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(18),
+              border: Border.all(
+                color: isPrimary ? AppColors.senaryColor : AppColors.border,
+                width: 1,
+              ),
+            ),
             child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(icon, color: AppColors.tertiaryColor, size: 24),
-                const SizedBox(width: 12),
-                Text(
-                  text,
-                  style: TextStyle(
-                    color: AppColors.tertiaryColor,
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
+                Icon(icon, color: foreground, size: 23),
+                const SizedBox(width: 14),
+                Expanded(
+                  child: Text(
+                    text,
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: foreground,
+                      fontSize: 15,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                 ),
+                const SizedBox(width: 23),
               ],
             ),
           ),
