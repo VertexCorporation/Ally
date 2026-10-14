@@ -335,13 +335,13 @@ class _EmailInputView extends StatelessWidget {
                     width: double.infinity,
                     decoration: BoxDecoration(
                       color: AppColors.senaryColor, // Tema vurgu rengi
-                      borderRadius: BorderRadius.circular(30),
+                      borderRadius: BorderRadius.circular(18),
                     ),
                     child: Material(
                       color: Colors.transparent,
                       child: InkWell(
                         onTap: controller.goToPasswordStep,
-                        borderRadius: BorderRadius.circular(30),
+                        borderRadius: BorderRadius.circular(18),
                         child: Padding(
                           padding: const EdgeInsets.symmetric(vertical: 18),
                           child: Text(
@@ -449,15 +449,15 @@ class _PasswordInputView extends StatelessWidget {
                   Container(
                     width: double.infinity,
                     decoration: BoxDecoration(
-                      color: AppColors.background, // Temanın arka plan rengi (outline stili için)
-                      borderRadius: BorderRadius.circular(30),
-                      border: Border.all(color: AppColors.tertiaryColor, width: 2), // Çerçeve
+                      color: AppColors.senaryColor,
+                      borderRadius: BorderRadius.circular(18),
+                      border: Border.all(color: AppColors.senaryColor, width: 1),
                     ),
                     child: Material(
                       color: Colors.transparent,
                       child: InkWell(
                         onTap: isLoading ? null : () => controller.submitEmailLogin(context),
-                        borderRadius: BorderRadius.circular(30),
+                        borderRadius: BorderRadius.circular(18),
                         child: Padding(
                           padding: const EdgeInsets.symmetric(vertical: 18),
                           child: isLoading
@@ -469,7 +469,7 @@ class _PasswordInputView extends StatelessWidget {
                                 height: 20,
                                 child: CircularProgressIndicator(
                                   strokeWidth: 2,
-                                  valueColor: AlwaysStoppedAnimation<Color>(AppColors.tertiaryColor),
+                                  valueColor: const AlwaysStoppedAnimation<Color>(Colors.white),
                                 ),
                               ),
                             ),
@@ -478,7 +478,7 @@ class _PasswordInputView extends StatelessWidget {
                             l10n.signIn, // "Sign In"
                             textAlign: TextAlign.center,
                             style: TextStyle(
-                              color: AppColors.tertiaryColor,
+                              color: Colors.white,
                               fontSize: 16,
                               fontWeight: FontWeight.w600,
                               letterSpacing: 0.5,
@@ -626,21 +626,21 @@ class _ShakeableInput extends StatelessWidget {
 
               // Hata ve Normal Durum Sınırları
               border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(30),
+                borderRadius: BorderRadius.circular(18),
                 borderSide: BorderSide(
                   color: errorText != null ? AppColors.septenaryColor : AppColors.border,
                   width: 1.5,
                 ),
               ),
               enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(30),
+                borderRadius: BorderRadius.circular(18),
                 borderSide: BorderSide(
                   color: errorText != null ? AppColors.septenaryColor : AppColors.border,
                   width: 1.5,
                 ),
               ),
               focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(30),
+                borderRadius: BorderRadius.circular(18),
                 borderSide: BorderSide(
                   color: errorText != null ? AppColors.septenaryColor : AppColors.tertiaryColor,
                   width: 1.5,
