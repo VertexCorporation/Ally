@@ -96,6 +96,7 @@ class LoginBackendService {
   }) async {
     final l10n = AppLocalizations.of(context)!;
     final extrovertNotificationService = context.read<ExtrovertNotificationService>();
+    final userProvider = context.read<UserProvider>();
 
     if (!await InternetConnection().hasInternetAccess) {
       notificationService.showNotification(message: l10n.noInternetConnection, type: NotificationType.error);
@@ -305,7 +306,7 @@ class LoginBackendService {
       if (user == null) throw FirebaseAuthException(code: 'anonymous-user-null');
 
       // Keep the profile provider attached to the current guest UID as well.
-      context.read<UserProvider>().listenToUserData(user);
+      userProvider.listenToUserData(user);
       await _secureStorage.delete(key: 'password');
       await _secureStorage.delete(key: 'email');
       await _secureStorage.write(key: 'remember_me', value: 'true');
