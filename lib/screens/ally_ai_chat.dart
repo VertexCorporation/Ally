@@ -44,7 +44,7 @@ class _AllyAiChatScreenState extends State<AllyAiChatScreen> {
     _scrollToBottom();
 
     try {
-      final response = await _aiService.generateResponse(message);
+      final response = await _aiService.generateResponse(_buildConversationPrompt());
       if (!mounted) return;
 
       setState(() {
@@ -69,6 +69,32 @@ class _AllyAiChatScreenState extends State<AllyAiChatScreen> {
     } finally {
       if (mounted) setState(() => _isSending = false);
     }
+  }
+
+  String _buildConversationPrompt() {
+    const instructions =
+        'You are Ally AI, a helpful general wellness companion. '
+        'Provide practical, cautious general information. Do not claim to diagnose '
+        'medical conditions or replace a qualified professional. Use the conversation '
+        'history only as context and answer the latest user message.';
+
+    final lines = <String>[];
+    var remainingCharacters = 7800;
+    for (final message in _messages.reversed.take(8)) {
+      final speaker = message.isFromUser ? 'User' : 'Ally';
+      final line = '$speaker: ${message.text}';
+      if (line.length > remainingCharacters) {
+        if (lines.isEmpty) {
+          lines.add(line.substring(line.length - remainingCharacters));
+        }
+        break;
+      }
+      lines.add(line);
+      remainingCharacters -= line.length + 2;
+    }
+
+    return '$instructions\n\nConversation:\n'
+        '${lines.reversed.join('\n\n')}';
   }
 
   void _scrollToBottom() {
@@ -134,7 +160,7 @@ class _AllyAiChatScreenState extends State<AllyAiChatScreen> {
           children: [
             Expanded(
               child: _messages.isEmpty
-                  ? _buildWelcome(colorScheme, theme)
+                  ? _buildWelcome(theme)
                   : ListView.builder(
                       controller: _scrollController,
                       padding: const EdgeInsets.fromLTRB(16, 20, 16, 16),
@@ -177,7 +203,7 @@ class _AllyAiChatScreenState extends State<AllyAiChatScreen> {
     );
   }
 
-  Widget _buildWelcome(ColorScheme colorScheme, ThemeData theme) {
+  Widget _buildWelcome(ThemeData theme) {
     return ListView(
       padding: const EdgeInsets.fromLTRB(24, 44, 24, 24),
       children: [
@@ -362,7 +388,7 @@ class _AllyAiChatScreenState extends State<AllyAiChatScreen> {
               controller: _messageController,
               minLines: 1,
               maxLines: 4,
-              maxLength: 8000,
+              maxLength: 6000,
               textCapitalization: TextCapitalization.sentences,
               textInputAction: TextInputAction.newline,
               onChanged: (_) {
