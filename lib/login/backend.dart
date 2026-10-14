@@ -26,6 +26,10 @@ class LoginSuccess extends LoginResult {
   final User user;
   LoginSuccess(this.user);
 }
+class LoginEmailNotVerified extends LoginResult {
+  final User user;
+  LoginEmailNotVerified(this.user);
+}
 class LoginInvalidCredentials extends LoginResult {}
 class LoginUserDisabled extends LoginResult {}
 class LoginNetworkError extends LoginResult {}
@@ -113,7 +117,7 @@ class LoginBackendService {
 
         _safeTokenSync(extrovertNotificationService);
 
-        return LoginSuccess(freshUser);
+        return LoginEmailNotVerified(freshUser);
       }
 
       dev.log('[Auth.Login] User verified. UID: ${freshUser.uid}. Running post-login tasks.', name: 'LoginBackend');
@@ -254,8 +258,6 @@ class LoginBackendService {
       }
       // Firebase Auth persists the session. Never retain the user's password.
       await _secureStorage.delete(key: 'password');
-      // Firebase Auth persists the session. Never retain the user's password.
-      await _secureStorage.delete(key: 'password');
 
       _safeTokenSync(extrovertNotificationService);
 
@@ -301,6 +303,12 @@ class LoginBackendService {
       final User? user = userCredential.user;
 
       if (user == null) throw FirebaseAuthException(code: 'anonymous-user-null');
+
+      // Keep the profile provider attached to the current guest UID as well.
+      context.read<UserProvider>().listenToUserData(user);
+      await _secureStorage.delete(key: 'password');
+      await _secureStorage.delete(key: 'email');
+      await _secureStorage.write(key: 'remember_me', value: 'true');
 
       _safeTokenSync(extrovertNotificationService);
 
