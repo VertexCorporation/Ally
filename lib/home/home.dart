@@ -179,7 +179,6 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                         onPressed: () async {
                           Navigator.pop(sheetContext);
 
-                          final messenger = ScaffoldMessenger.of(context);
                           final localizations = AppLocalizations.of(context)!;
 
                           final status = await Permission.activityRecognition.request();
