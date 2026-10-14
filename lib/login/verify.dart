@@ -217,9 +217,8 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
     const secureStorage = FlutterSecureStorage();
     await secureStorage.write(key: 'remember_me', value: 'true');
     await secureStorage.write(key: 'email', value: widget.email);
-    if (widget.password != null) {
-      await secureStorage.write(key: 'password', value: widget.password);
-    }
+    // Clear passwords persisted by older versions; Firebase Auth owns the session.
+    await secureStorage.delete(key: 'password');
   }
 
   Future<void> _navigateToMainScreen() async {
