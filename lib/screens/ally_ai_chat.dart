@@ -386,6 +386,7 @@ class _AllyAiChatScreenState extends State<AllyAiChatScreen> {
           Expanded(
             child: TextField(
               controller: _messageController,
+              enabled: !_isSending,
               minLines: 1,
               maxLines: 4,
               maxLength: 6000,
