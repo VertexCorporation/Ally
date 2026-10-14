@@ -49,6 +49,22 @@ class UserRecordsService {
     }, SetOptions(merge: true));
   }
 
+  /// Archives one day's health summary under a stable local-date key.
+  Future<void> saveDailyHealthRecord(
+    String date,
+    Map<String, dynamic> data,
+  ) async {
+    final user = _userDocument;
+    if (user == null) return;
+
+    await user.collection('daily_health').doc(date).set({
+      'data': data,
+      'date': date,
+      'updatedAt': FieldValue.serverTimestamp(),
+      'schemaVersion': 1,
+    }, SetOptions(merge: true));
+  }
+
   /// Loads all saved workout programs for the current user.
   Future<List<Map<String, dynamic>>> loadWorkoutPrograms() async {
     final user = _userDocument;
