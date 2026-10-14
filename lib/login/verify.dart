@@ -49,6 +49,7 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
   bool _isVerified = false;
   bool _isResendLoading = false;
   bool _isContinuing = false;
+  bool _isCheckingVerification = false;
 
   @override
   void initState() {
@@ -78,8 +79,10 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
       }
     });
 
-    // 2. Periodic Email Check (For Firebase)
-    _emailCheckTimer = Timer.periodic(const Duration(seconds: 3), (timer) async {
+    // Poll less aggressively to avoid unnecessary network calls and overlapping reloads.
+    _emailCheckTimer = Timer.periodic(const Duration(seconds: 10), (timer) async {
+      if (_isCheckingVerification) return;
+      _isCheckingVerification = true;
       try {
         final user = FirebaseAuth.instance.currentUser;
         if (user == null) {
@@ -87,22 +90,22 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
           return;
         }
 
-        // Refresh user data from server
         await user.reload();
         final freshUser = FirebaseAuth.instance.currentUser;
 
         if (freshUser != null && freshUser.emailVerified) {
           dev.log('[Verify] Email verified automatically.', name: 'EmailVerification');
-          _handleVerified();
+          await _handleVerified();
           timer.cancel();
         }
       } on FirebaseAuthException catch (e) {
-        // Ignore network errors to prevent log spamming when offline
         if (e.code != 'network-request-failed') {
           dev.log('[Verify] Firebase Error: ${e.code}', name: 'EmailVerification');
         }
       } catch (e) {
         dev.log('[Verify] Generic Error checking verification', name: 'EmailVerification');
+      } finally {
+        _isCheckingVerification = false;
       }
     });
   }
