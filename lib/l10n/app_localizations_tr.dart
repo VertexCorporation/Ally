@@ -1713,15 +1713,15 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get firebaseNotConfigured =>
-      'Firebase yapılandırılmadı. Anonim giriş kullanılıyor.';
+      'Firebase projesinde Kimlik Doğrulama kurulumu tamamlanmamış. Firebase Console\'da Authentication kurulumunu tamamlayıp kullanacağınız giriş yöntemlerini etkinleştirin.';
 
   @override
   String get firebaseNotConfiguredSignup =>
-      'Firebase yapılandırılmadı. Kayıt olmadan devam ediliyor.';
+      'Firebase\'e bağlanılamadı. Ayarlar düzeltilene kadar kayıt yapılamaz.';
 
   @override
   String get googleSignInFailed =>
-      'Google girişi başarısız. Lütfen anonim girişi kullanın.';
+      'Google girişi yapılandırılamadı. Firebase Console\'da Google sağlayıcısını etkinleştirip Android SHA parmak izlerini ve OAuth istemcisini ekleyin.';
 
   @override
   String emailSignInFailed(Object error) {
@@ -1825,7 +1825,7 @@ class AppLocalizationsTr extends AppLocalizations {
   String get confirmPassword => 'Şifreyi Onayla';
 
   @override
-  String get invalidEmail => 'Geçerli bir e.';
+  String get invalidEmail => 'Geçerli bir e-posta adresi girin.';
 
   @override
   String get invalidPassword =>

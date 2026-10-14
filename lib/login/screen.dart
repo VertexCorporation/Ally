@@ -11,7 +11,8 @@ class LoginScreen extends StatefulWidget {
   State<LoginScreen> createState() => _LoginScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin {
+class _LoginScreenState extends State<LoginScreen>
+    with TickerProviderStateMixin {
   late final LoginController _controller;
 
   @override
@@ -63,42 +64,72 @@ class _LoginScreenContent extends StatelessWidget {
         data: Theme.of(context),
         child: Scaffold(
           backgroundColor: AppColors.background,
-          resizeToAvoidBottomInset: false,
-          body: LayoutBuilder(
-            builder: (context, constraints) {
-              return SizedBox(
-                width: constraints.maxWidth,
-                height: constraints.maxHeight,
-                child: AnimatedSwitcher(
-                  duration: const Duration(milliseconds: 600),
-                  transitionBuilder: (Widget child, Animation<double> animation) {
-                    final offsetAnimation = Tween<Offset>(
-                      begin: const Offset(0.0, 1.0),
-                      end: Offset.zero,
-                    ).animate(CurvedAnimation(
-                      parent: animation,
-                      curve: Curves.easeInOutCubic,
-                    ));
-                    return SlideTransition(
-                      position: offsetAnimation,
-                      child: child,
-                    );
-                  },
-                  child: _buildStepView(
-                    controller.currentStep,
-                    constraints,
-                    contentWidth,
+          resizeToAvoidBottomInset: true,
+          body: Stack(
+            fit: StackFit.expand,
+            children: [
+              AnimatedSwitcher(
+                duration: const Duration(milliseconds: 350),
+                child: Opacity(
+                  key: ValueKey(controller.currentStep),
+                  opacity: 0.16,
+                  child: Image.asset(
+                    controller.currentStep == LoginStep.passwordInput
+                        ? 'assets/images/background_signin.png'
+                        : 'assets/images/background_password.png',
+                    fit: BoxFit.cover,
+                    alignment: Alignment.bottomCenter,
                   ),
                 ),
-              );
-            },
+              ),
+              LayoutBuilder(
+                builder: (context, constraints) {
+                  return SizedBox(
+                    width: constraints.maxWidth,
+                    height: constraints.maxHeight,
+                    child: AnimatedSwitcher(
+                      duration: const Duration(milliseconds: 400),
+                      transitionBuilder:
+                          (Widget child, Animation<double> animation) {
+                            final offsetAnimation =
+                                Tween<Offset>(
+                                  begin: const Offset(0.0, 0.08),
+                                  end: Offset.zero,
+                                ).animate(
+                                  CurvedAnimation(
+                                    parent: animation,
+                                    curve: Curves.easeOutCubic,
+                                  ),
+                                );
+                            return FadeTransition(
+                              opacity: animation,
+                              child: SlideTransition(
+                                position: offsetAnimation,
+                                child: child,
+                              ),
+                            );
+                          },
+                      child: _buildStepView(
+                        controller.currentStep,
+                        constraints,
+                        contentWidth,
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ],
           ),
         ),
       ),
     );
   }
 
-  Widget _buildStepView(LoginStep step, BoxConstraints constraints, double contentWidth) {
+  Widget _buildStepView(
+    LoginStep step,
+    BoxConstraints constraints,
+    double contentWidth,
+  ) {
     switch (step) {
       case LoginStep.methodSelection:
         return _MethodSelectionView(
@@ -143,96 +174,115 @@ class _MethodSelectionView extends StatelessWidget {
     return Container(
       width: constraints.maxWidth,
       height: constraints.maxHeight,
-      color: AppColors.background, // Tema rengi
+      color: Colors.transparent,
       child: SafeArea(
-        child: Center(
-          child: SizedBox(
-            width: contentWidth,
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 32.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  SizedBox(height: constraints.maxHeight * 0.05),
+        child: LayoutBuilder(
+          builder: (context, safeConstraints) => SingleChildScrollView(
+            child: ConstrainedBox(
+              constraints: BoxConstraints(minHeight: safeConstraints.maxHeight),
+              child: Center(
+                child: SizedBox(
+                  width: contentWidth,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 32.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        SizedBox(height: constraints.maxHeight * 0.05),
 
-                  Text(
-                    l10n.signIn, // "Sign in"
-                    style: TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                      color: AppColors.tertiaryColor, // Tema metin rengi
-                      letterSpacing: 1,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    l10n.chooseSignInMethod, // "Choose your sign in method"
-                    style: TextStyle(
-                      fontSize: 16,
-                      color: AppColors.tertiaryColor.withValues(alpha: 0.7),
-                    ),
-                  ),
-
-                  const Spacer(),
-
-                  // --- Butonlar ---
-
-                  _AuthButton(
-                    text: l10n.continueWithGoogle,
-                    icon: Icons.g_mobiledata_rounded,
-                    onTap: isLoading ? null : () => controller.signInWithGoogle(context),
-                  ),
-
-                  const SizedBox(height: 16),
-
-                  _AuthButton(
-                    text: l10n.continueWithApple, // "Continue with Apple"
-                    icon: Icons.apple,
-                    onTap: isLoading ? null : () => controller.signInWithApple(context),
-                  ),
-
-                  const SizedBox(height: 16),
-
-                  _AuthButton(
-                    text: l10n.continueWithEmail,
-                    icon: Icons.email_outlined,
-                    onTap: isLoading ? null : controller.goToEmailStep,
-                  ),
-
-                  const SizedBox(height: 16),
-
-                  _AuthButton(
-                    text: l10n.continueAsAnonymous,
-                    icon: Icons.person_outline_rounded,
-                    onTap: isLoading ? null : () => controller.signInAnonymously(context),
-                  ),
-
-                  SizedBox(height: constraints.maxHeight * 0.04),
-
-                  // Footer
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        l10n.dontHaveAccount, // "Don't have an account? "
-                        style: TextStyle(color: AppColors.tertiaryColor.withValues(alpha: 0.7), fontSize: 14),
-                      ),
-                      GestureDetector(
-                        onTap: () => controller.goToSignUp(context),
-                        child: Text(
-                          l10n.signUp, // "Sign Up"
+                        Text(
+                          l10n.signIn, // "Sign in"
                           style: TextStyle(
-                            color: AppColors.tertiaryColor,
-                            fontSize: 14,
+                            fontSize: 24,
                             fontWeight: FontWeight.bold,
+                            color: AppColors.tertiaryColor, // Tema metin rengi
+                            letterSpacing: 1,
                           ),
                         ),
-                      ),
-                    ],
-                  ),
+                        const SizedBox(height: 8),
+                        Text(
+                          l10n.chooseSignInMethod, // "Choose your sign in method"
+                          style: TextStyle(
+                            fontSize: 16,
+                            color: AppColors.tertiaryColor.withValues(
+                              alpha: 0.7,
+                            ),
+                          ),
+                        ),
 
-                  const SizedBox(height: 20),
-                ],
+                        SizedBox(height: constraints.maxHeight * 0.15),
+
+                        // --- Butonlar ---
+                        _AuthButton(
+                          text: l10n.continueWithGoogle,
+                          icon: Icons.g_mobiledata_rounded,
+                          onTap: isLoading
+                              ? null
+                              : () => controller.signInWithGoogle(context),
+                        ),
+
+                        const SizedBox(height: 16),
+
+                        _AuthButton(
+                          text: l10n.continueWithApple, // "Continue with Apple"
+                          icon: Icons.apple,
+                          onTap: isLoading
+                              ? null
+                              : () => controller.signInWithApple(context),
+                        ),
+
+                        const SizedBox(height: 16),
+
+                        _AuthButton(
+                          text: l10n.continueWithEmail,
+                          icon: Icons.email_outlined,
+                          onTap: isLoading ? null : controller.goToEmailStep,
+                        ),
+
+                        const SizedBox(height: 16),
+
+                        _AuthButton(
+                          text: l10n.continueAsAnonymous,
+                          icon: Icons.person_outline_rounded,
+                          onTap: isLoading
+                              ? null
+                              : () => controller.signInAnonymously(context),
+                        ),
+
+                        SizedBox(height: constraints.maxHeight * 0.04),
+
+                        // Footer
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              l10n.dontHaveAccount, // "Don't have an account? "
+                              style: TextStyle(
+                                color: AppColors.tertiaryColor.withValues(
+                                  alpha: 0.7,
+                                ),
+                                fontSize: 14,
+                              ),
+                            ),
+                            GestureDetector(
+                              onTap: () => controller.goToSignUp(context),
+                              child: Text(
+                                l10n.signUp, // "Sign Up"
+                                style: TextStyle(
+                                  color: AppColors.tertiaryColor,
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+
+                        const SizedBox(height: 20),
+                      ],
+                    ),
+                  ),
+                ),
               ),
             ),
           ),
@@ -255,13 +305,15 @@ class _EmailInputView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final controller = context.read<LoginController>();
-    final errorText = context.select<LoginController, String?>((c) => c.emailError);
+    final errorText = context.select<LoginController, String?>(
+      (c) => c.emailError,
+    );
     final l10n = AppLocalizations.of(context)!;
 
     return Container(
       width: constraints.maxWidth,
       height: constraints.maxHeight,
-      color: AppColors.background,
+      color: Colors.transparent,
       child: SafeArea(
         child: Center(
           child: SingleChildScrollView(
@@ -272,75 +324,83 @@ class _EmailInputView extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                  const SizedBox(height: 20),
+                    const SizedBox(height: 20),
 
-                  GestureDetector(
-                    onTap: controller.goBack,
-                    child: Icon(Icons.chevron_left, color: AppColors.tertiaryColor, size: 32),
-                  ),
-
-                  SizedBox(height: constraints.maxHeight * 0.02),
-
-                  Text(
-                    l10n.signInWithEmail, // "Sign in with email"
-                    style: TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                      color: AppColors.tertiaryColor,
-                      letterSpacing: 1,
+                    GestureDetector(
+                      onTap: controller.goBack,
+                      child: Icon(
+                        Icons.chevron_left,
+                        color: AppColors.tertiaryColor,
+                        size: 32,
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    l10n.enterEmailAddress, // "Enter your email address"
-                    style: TextStyle(fontSize: 16, color: AppColors.tertiaryColor.withValues(alpha: 0.7)),
-                  ),
 
-                  SizedBox(height: constraints.maxHeight * 0.1),
+                    SizedBox(height: constraints.maxHeight * 0.02),
 
-                  _ShakeableInput(
-                    controller: controller.emailController,
-                    animationController: controller.emailShakeController,
-                    hintText: l10n.emailHint,
-                    icon: Icons.email_outlined,
-                    keyboardType: TextInputType.emailAddress,
-                    onChanged: (_) => controller.clearErrorsOnInput(),
-                    errorText: errorText == " " ? null : errorText,
-                  ),
-
-                  const SizedBox(height: 16),
-
-                  Container(
-                    width: double.infinity,
-                    decoration: BoxDecoration(
-                      color: AppColors.senaryColor, // Tema vurgu rengi
-                      borderRadius: BorderRadius.circular(30),
+                    Text(
+                      l10n.signInWithEmail, // "Sign in with email"
+                      style: TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                        color: AppColors.tertiaryColor,
+                        letterSpacing: 1,
+                      ),
                     ),
-                    child: Material(
-                      color: Colors.transparent,
-                      child: InkWell(
-                        onTap: controller.goToPasswordStep,
+                    const SizedBox(height: 8),
+                    Text(
+                      l10n.enterEmailAddress, // "Enter your email address"
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: AppColors.tertiaryColor.withValues(alpha: 0.7),
+                      ),
+                    ),
+
+                    SizedBox(height: constraints.maxHeight * 0.1),
+
+                    _ShakeableInput(
+                      controller: controller.emailController,
+                      animationController: controller.emailShakeController,
+                      hintText: l10n.emailHint,
+                      icon: Icons.email_outlined,
+                      keyboardType: TextInputType.emailAddress,
+                      onChanged: (_) => controller.clearErrorsOnInput(),
+                      errorText: errorText == " " ? null : errorText,
+                    ),
+
+                    const SizedBox(height: 16),
+
+                    Container(
+                      width: double.infinity,
+                      decoration: BoxDecoration(
+                        color: AppColors.senaryColor, // Tema vurgu rengi
                         borderRadius: BorderRadius.circular(30),
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 18),
-                          child: Text(
-                            l10n.next, // "Next"
-                            textAlign: TextAlign.center,
-                            style: const TextStyle(
-                              color: Colors.white, // Vurgu rengi üzerinde genelde beyaz okunur
-                              fontSize: 16,
-                              fontWeight: FontWeight.w600,
-                              letterSpacing: 0.5,
+                      ),
+                      child: Material(
+                        color: Colors.transparent,
+                        child: InkWell(
+                          onTap: () => controller.goToPasswordStep(context),
+                          borderRadius: BorderRadius.circular(30),
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 18),
+                            child: Text(
+                              l10n.next, // "Next"
+                              textAlign: TextAlign.center,
+                              style: const TextStyle(
+                                color: Colors
+                                    .white, // Vurgu rengi üzerinde genelde beyaz okunur
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                                letterSpacing: 0.5,
+                              ),
                             ),
                           ),
                         ),
                       ),
                     ),
-                  ),
 
-                  const SizedBox(height: 20),
-                ],
-              ),
+                    const SizedBox(height: 20),
+                  ],
+                ),
               ),
             ),
           ),
@@ -364,14 +424,18 @@ class _PasswordInputView extends StatelessWidget {
   Widget build(BuildContext context) {
     final controller = context.read<LoginController>();
     final isLoading = context.select<LoginController, bool>((c) => c.isLoading);
-    final isVisible = context.select<LoginController, bool>((c) => c.isPasswordVisible);
-    final errorText = context.select<LoginController, String?>((c) => c.passwordError);
+    final isVisible = context.select<LoginController, bool>(
+      (c) => c.isPasswordVisible,
+    );
+    final errorText = context.select<LoginController, String?>(
+      (c) => c.passwordError,
+    );
     final l10n = AppLocalizations.of(context)!;
 
     return Container(
       width: constraints.maxWidth,
       height: constraints.maxHeight,
-      color: AppColors.background,
+      color: Colors.transparent,
       child: SafeArea(
         child: Center(
           child: SingleChildScrollView(
@@ -382,95 +446,115 @@ class _PasswordInputView extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                  const SizedBox(height: 20),
+                    const SizedBox(height: 20),
 
-                  GestureDetector(
-                    onTap: controller.goBack,
-                    child: Icon(Icons.chevron_left, color: AppColors.tertiaryColor, size: 32),
-                  ),
-
-                  SizedBox(height: constraints.maxHeight * 0.02),
-
-                  Text(
-                    l10n.signInWithEmail,
-                    style: TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                      color: AppColors.tertiaryColor,
-                      letterSpacing: 1,
+                    GestureDetector(
+                      onTap: controller.goBack,
+                      child: Icon(
+                        Icons.chevron_left,
+                        color: AppColors.tertiaryColor,
+                        size: 32,
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    l10n.enterPassword, // "Enter your password"
-                    style: TextStyle(fontSize: 16, color: AppColors.tertiaryColor.withValues(alpha: 0.7)),
-                  ),
 
-                  SizedBox(height: constraints.maxHeight * 0.1),
+                    SizedBox(height: constraints.maxHeight * 0.02),
 
-                  _ShakeableInput(
-                    controller: controller.passwordController,
-                    animationController: controller.passwordShakeController,
-                    hintText: l10n.passwordHint,
-                    icon: Icons.lock_outline,
-                    obscureText: !isVisible,
-                    suffixIcon: IconButton(
-                      icon: Icon(isVisible ? Icons.visibility_outlined : Icons.visibility_off_outlined),
-                      color: AppColors.tertiaryColor.withValues(alpha: 0.6),
-                      onPressed: controller.togglePasswordVisibility,
+                    Text(
+                      l10n.signInWithEmail,
+                      style: TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                        color: AppColors.tertiaryColor,
+                        letterSpacing: 1,
+                      ),
                     ),
-                    onChanged: (_) => controller.clearErrorsOnInput(),
-                    errorText: errorText == " " ? null : errorText,
-                  ),
-
-                  const SizedBox(height: 16),
-
-                  Container(
-                    width: double.infinity,
-                    decoration: BoxDecoration(
-                      color: AppColors.background, // Temanın arka plan rengi (outline stili için)
-                      borderRadius: BorderRadius.circular(30),
-                      border: Border.all(color: AppColors.tertiaryColor, width: 2), // Çerçeve
+                    const SizedBox(height: 8),
+                    Text(
+                      l10n.enterPassword, // "Enter your password"
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: AppColors.tertiaryColor.withValues(alpha: 0.7),
+                      ),
                     ),
-                    child: Material(
-                      color: Colors.transparent,
-                      child: InkWell(
-                        onTap: isLoading ? null : () => controller.submitEmailLogin(context),
+
+                    SizedBox(height: constraints.maxHeight * 0.1),
+
+                    _ShakeableInput(
+                      controller: controller.passwordController,
+                      animationController: controller.passwordShakeController,
+                      hintText: l10n.passwordHint,
+                      icon: Icons.lock_outline,
+                      obscureText: !isVisible,
+                      suffixIcon: IconButton(
+                        icon: Icon(
+                          isVisible
+                              ? Icons.visibility_outlined
+                              : Icons.visibility_off_outlined,
+                        ),
+                        color: AppColors.tertiaryColor.withValues(alpha: 0.6),
+                        onPressed: controller.togglePasswordVisibility,
+                      ),
+                      onChanged: (_) => controller.clearErrorsOnInput(),
+                      errorText: errorText == " " ? null : errorText,
+                    ),
+
+                    const SizedBox(height: 16),
+
+                    Container(
+                      width: double.infinity,
+                      decoration: BoxDecoration(
+                        color: AppColors
+                            .background, // Temanın arka plan rengi (outline stili için)
                         borderRadius: BorderRadius.circular(30),
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 18),
-                          child: isLoading
-                              ? SizedBox(
-                            height: 20,
-                            child: Center(
-                              child: SizedBox(
-                                width: 20,
-                                height: 20,
-                                child: CircularProgressIndicator(
-                                  strokeWidth: 2,
-                                  valueColor: AlwaysStoppedAnimation<Color>(AppColors.tertiaryColor),
-                                ),
-                              ),
-                            ),
-                          )
-                              : Text(
-                            l10n.signIn, // "Sign In"
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                              color: AppColors.tertiaryColor,
-                              fontSize: 16,
-                              fontWeight: FontWeight.w600,
-                              letterSpacing: 0.5,
-                            ),
+                        border: Border.all(
+                          color: AppColors.tertiaryColor,
+                          width: 2,
+                        ), // Çerçeve
+                      ),
+                      child: Material(
+                        color: Colors.transparent,
+                        child: InkWell(
+                          onTap: isLoading
+                              ? null
+                              : () => controller.submitEmailLogin(context),
+                          borderRadius: BorderRadius.circular(30),
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 18),
+                            child: isLoading
+                                ? SizedBox(
+                                    height: 20,
+                                    child: Center(
+                                      child: SizedBox(
+                                        width: 20,
+                                        height: 20,
+                                        child: CircularProgressIndicator(
+                                          strokeWidth: 2,
+                                          valueColor:
+                                              AlwaysStoppedAnimation<Color>(
+                                                AppColors.tertiaryColor,
+                                              ),
+                                        ),
+                                      ),
+                                    ),
+                                  )
+                                : Text(
+                                    l10n.signIn, // "Sign In"
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(
+                                      color: AppColors.tertiaryColor,
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w600,
+                                      letterSpacing: 0.5,
+                                    ),
+                                  ),
                           ),
                         ),
                       ),
                     ),
-                  ),
 
-                  const SizedBox(height: 20),
-                 ],
-              ),
+                    const SizedBox(height: 20),
+                  ],
+                ),
               ),
             ),
           ),
@@ -487,11 +571,7 @@ class _AuthButton extends StatelessWidget {
   final IconData icon;
   final VoidCallback? onTap;
 
-  const _AuthButton({
-    required this.text,
-    required this.icon,
-    this.onTap,
-  });
+  const _AuthButton({required this.text, required this.icon, this.onTap});
 
   @override
   Widget build(BuildContext context) {
@@ -563,11 +643,17 @@ class _ShakeableInput extends StatelessWidget {
       builder: (context, child) {
         // Basit bir sinüs dalgası simülasyonu
         // (math kütüphanesi import etmeden temiz kod için)
-        final double translateX = 10.0 * (
-            animationController.value > 0 && animationController.value < 0.25 ? -1 :
-            animationController.value >= 0.25 && animationController.value < 0.75 ? 1 :
-            animationController.value >= 0.75 && animationController.value < 1.0 ? -0.5 : 0
-        );
+        final double translateX =
+            10.0 *
+            (animationController.value > 0 && animationController.value < 0.25
+                ? -1
+                : animationController.value >= 0.25 &&
+                      animationController.value < 0.75
+                ? 1
+                : animationController.value >= 0.75 &&
+                      animationController.value < 1.0
+                ? -0.5
+                : 0);
 
         return Transform.translate(
           offset: Offset(translateX * (1 - animationController.value), 0),
@@ -582,39 +668,54 @@ class _ShakeableInput extends StatelessWidget {
             obscureText: obscureText,
             keyboardType: keyboardType,
             onChanged: onChanged,
-            style: TextStyle(color: AppColors.tertiaryColor), // Yazılan metin rengi
+            style: TextStyle(
+              color: AppColors.tertiaryColor,
+            ), // Yazılan metin rengi
             cursorColor: AppColors.tertiaryColor,
             decoration: InputDecoration(
               hintText: hintText,
-              hintStyle: TextStyle(color: AppColors.tertiaryColor.withValues(alpha: 0.5)),
-              prefixIcon: Icon(icon, color: AppColors.tertiaryColor.withValues(alpha: 0.7)),
+              hintStyle: TextStyle(
+                color: AppColors.tertiaryColor.withValues(alpha: 0.5),
+              ),
+              prefixIcon: Icon(
+                icon,
+                color: AppColors.tertiaryColor.withValues(alpha: 0.7),
+              ),
               suffixIcon: suffixIcon,
               filled: true,
               fillColor: AppColors.secondaryColor, // Input arka planı
-
               // Hata ve Normal Durum Sınırları
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(30),
                 borderSide: BorderSide(
-                  color: errorText != null ? AppColors.septenaryColor : AppColors.border,
+                  color: errorText != null
+                      ? AppColors.septenaryColor
+                      : AppColors.border,
                   width: 1.5,
                 ),
               ),
               enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(30),
                 borderSide: BorderSide(
-                  color: errorText != null ? AppColors.septenaryColor : AppColors.border,
+                  color: errorText != null
+                      ? AppColors.septenaryColor
+                      : AppColors.border,
                   width: 1.5,
                 ),
               ),
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(30),
                 borderSide: BorderSide(
-                  color: errorText != null ? AppColors.septenaryColor : AppColors.tertiaryColor,
+                  color: errorText != null
+                      ? AppColors.septenaryColor
+                      : AppColors.tertiaryColor,
                   width: 1.5,
                 ),
               ),
-              contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
+              contentPadding: const EdgeInsets.symmetric(
+                horizontal: 20,
+                vertical: 18,
+              ),
             ),
           ),
           if (errorText != null && errorText!.trim().isNotEmpty)

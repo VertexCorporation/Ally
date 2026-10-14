@@ -103,6 +103,14 @@ class FirebaseSafeWrapper extends StatelessWidget {
     required this.navigatorKey,
   });
 
+  Future<FirebaseApp> _initializeFirebase() async {
+    final app = await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
+    isFirebaseInitialized = true;
+    return app;
+  }
+
   @override
   Widget build(BuildContext context) {
     // Eğer Firebase zaten main içinde saniyeler içinde başarıyla bağlandıysa 
@@ -117,9 +125,7 @@ class FirebaseSafeWrapper extends StatelessWidget {
     // Eğer bir aksilik olduysa ve asenkron bekleme henüz bitmediyse, 
     // kısa bir süre güvenli bir şekilde arka planda asenkron süreci bekler.
     return FutureBuilder(
-      future: Firebase.initializeApp(
-        options: DefaultFirebaseOptions.currentPlatform,
-      ),
+      future: _initializeFirebase(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const MaterialApp(

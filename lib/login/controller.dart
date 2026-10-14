@@ -1,9 +1,14 @@
 // lib/login/controller.dart
 
+import 'dart:developer' as dev;
+
 import 'package:ally/l10n/app_localizations.dart';
 import 'package:ally/screens/onboard.dart';
 import 'package:ally/screens/signup_screen.dart';
 import 'package:ally/notifications/introvert.dart';
+import 'package:ally/login/verify.dart';
+import 'package:email_validator/email_validator.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'backend.dart';
@@ -54,11 +59,20 @@ class LoginController extends ChangeNotifier {
   /// Must be called from the View's `initState`.
   void initialize(TickerProvider vsync, BuildContext context) {
     _backendService = LoginBackendService();
-    _notificationService = Provider.of<IntrovertNotificationService>(context, listen: false);
+    _notificationService = Provider.of<IntrovertNotificationService>(
+      context,
+      listen: false,
+    );
 
     const shakeDuration = Duration(milliseconds: 500);
-    emailShakeController = AnimationController(vsync: vsync, duration: shakeDuration);
-    passwordShakeController = AnimationController(vsync: vsync, duration: shakeDuration);
+    emailShakeController = AnimationController(
+      vsync: vsync,
+      duration: shakeDuration,
+    );
+    passwordShakeController = AnimationController(
+      vsync: vsync,
+      duration: shakeDuration,
+    );
   }
 
   @override
@@ -80,10 +94,11 @@ class LoginController extends ChangeNotifier {
   }
 
   /// Advances from Email Input to Password Input.
-  void goToPasswordStep() {
+  void goToPasswordStep(BuildContext context) {
     _clearErrors();
-    if (emailController.text.trim().isEmpty) {
-      _emailError = " "; // Trigger visual error state
+    final email = emailController.text.trim();
+    if (!EmailValidator.validate(email)) {
+      _emailError = AppLocalizations.of(context)!.invalidEmail;
       emailShakeController.forward(from: 0);
       notifyListeners();
       return;
@@ -111,13 +126,20 @@ class LoginController extends ChangeNotifier {
     Navigator.push(
       context,
       PageRouteBuilder(
-        pageBuilder: (context, animation, secondaryAnimation) => const SignUpScreen(),
+        pageBuilder: (context, animation, secondaryAnimation) =>
+            const SignUpScreen(),
         transitionsBuilder: (context, animation, secondaryAnimation, child) {
           const begin = Offset(1.0, 0.0);
           const end = Offset.zero;
           const curve = Curves.easeInOutCubic;
-          var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
-          return SlideTransition(position: animation.drive(tween), child: child);
+          var tween = Tween(
+            begin: begin,
+            end: end,
+          ).chain(CurveTween(curve: curve));
+          return SlideTransition(
+            position: animation.drive(tween),
+            child: child,
+          );
         },
         transitionDuration: const Duration(milliseconds: 600),
       ),
@@ -176,11 +198,12 @@ class LoginController extends ChangeNotifier {
 
       switch (result) {
         case LoginSuccess():
-          _navigateAfterSuccess(context);
+          _handleSuccessfulLogin(context, result.user);
           break;
         case LoginInvalidCredentials():
-        // We shake the password field for invalid creds usually
-          _passwordError = l10n.invalidCredentials; // Ensure this key exists or use authFailed
+          // We shake the password field for invalid creds usually
+          _passwordError = l10n
+              .invalidCredentials; // Ensure this key exists or use authFailed
           passwordShakeController.forward(from: 0);
           break;
         case LoginUserDisabled():
@@ -189,9 +212,11 @@ class LoginController extends ChangeNotifier {
           break;
         case LoginNetworkError():
         case LoginUnknownError():
-        // Notification is handled by backend
+          // Notification is handled by backend
           break;
       }
+    } catch (error, stackTrace) {
+      _showUnexpectedAuthenticationError(context, error, stackTrace);
     } finally {
       _setLoading(false);
     }
@@ -211,9 +236,11 @@ class LoginController extends ChangeNotifier {
       if (!context.mounted) return;
 
       if (result is GoogleSignInSuccess) {
-        _navigateAfterSuccess(context);
+        _handleSuccessfulLogin(context, result.user);
       }
       // Failures are handled via notifications in backend
+    } catch (error, stackTrace) {
+      _showUnexpectedAuthenticationError(context, error, stackTrace);
     } finally {
       _setLoading(false);
     }
@@ -233,8 +260,10 @@ class LoginController extends ChangeNotifier {
       if (!context.mounted) return;
 
       if (result is AppleSignInSuccess) {
-        _navigateAfterSuccess(context);
+        _handleSuccessfulLogin(context, result.user);
       }
+    } catch (error, stackTrace) {
+      _showUnexpectedAuthenticationError(context, error, stackTrace);
     } finally {
       _setLoading(false);
     }
@@ -254,8 +283,10 @@ class LoginController extends ChangeNotifier {
       if (!context.mounted) return;
 
       if (result is AnonymousSignInSuccess) {
-        _navigateAfterSuccess(context);
+        _handleSuccessfulLogin(context, result.user);
       }
+    } catch (error, stackTrace) {
+      _showUnexpectedAuthenticationError(context, error, stackTrace);
     } finally {
       _setLoading(false);
     }
@@ -274,7 +305,40 @@ class LoginController extends ChangeNotifier {
     _passwordError = null;
   }
 
-  void _navigateAfterSuccess(BuildContext context) {
+  void _showUnexpectedAuthenticationError(
+    BuildContext context,
+    Object error,
+    StackTrace stackTrace,
+  ) {
+    dev.log(
+      '[Auth.Login] Unexpected authentication error',
+      name: 'LoginController',
+      error: error,
+      stackTrace: stackTrace,
+    );
+    if (!context.mounted) return;
+    _notificationService.showNotification(
+      message: _backendService.userFacingAuthenticationError(
+        error,
+        AppLocalizations.of(context)!,
+      ),
+      type: NotificationType.error,
+    );
+  }
+
+  void _handleSuccessfulLogin(BuildContext context, User user) {
+    if (user.email != null && !user.emailVerified) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (_) => EmailVerificationScreen(
+            email: user.email!,
+          ),
+        ),
+      );
+      return;
+    }
+
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(builder: (context) => const OnboardingScreen()),

@@ -26,11 +26,11 @@ class SleepForegroundHandler extends TaskHandler {
   @override
   Future<void> onStart(DateTime timestamp, TaskStarter starter) async {
     debugPrint('🌙 Sleep tracker foreground service started');
-    
+
     _audioPlayer = AudioPlayer();
     _lastActivityTime = DateTime.now();
     _isAlarmPlaying = false; // Reset alarm flag
-    
+
     // Immediately check sleep window (don't wait for first repeat event)
     await _checkSleepWindow();
   }
@@ -39,9 +39,11 @@ class SleepForegroundHandler extends TaskHandler {
   void onRepeatEvent(DateTime timestamp) async {
     // This is called every minute by the foreground task
     _checkCount++;
-    
-    debugPrint('🔄 Foreground task repeat event #$_checkCount at ${timestamp.hour}:${timestamp.minute}');
-    
+
+    debugPrint(
+      '🔄 Foreground task repeat event #$_checkCount at ${timestamp.hour}:${timestamp.minute}',
+    );
+
     // Send data to UI if needed
     FlutterForegroundTask.sendDataToMain({
       'action': 'update',
@@ -62,7 +64,7 @@ class SleepForegroundHandler extends TaskHandler {
 
       // ⏰ STANDALONE ALARM SYSTEM - Independent from sleep tracking
       final alarmEnabled = prefs.getBool('alarm_enabled') ?? false;
-      
+
       if (alarmEnabled) {
         final alarmHour = prefs.getInt('alarm_hour') ?? 7;
         final alarmMinute = prefs.getInt('alarm_minute') ?? 0;
@@ -71,20 +73,28 @@ class SleepForegroundHandler extends TaskHandler {
         final currentMinutes = now.hour * 60 + now.minute;
         final alarmMinutes = alarmHour * 60 + alarmMinute;
         final alarmStartMinutes = alarmMinutes - alarmMinutesBefore;
+        if (currentMinutes < alarmStartMinutes) {
+          _alarmDismissedToday = false;
+        }
 
-        debugPrint('⏰ Alarm check - Time: ${now.hour}:${now.minute}, Target: $alarmHour:$alarmMinute (start: ${alarmStartMinutes ~/ 60}:${(alarmStartMinutes % 60).toString().padLeft(2, '0')})');
+        debugPrint(
+          '⏰ Alarm check - Time: ${now.hour}:${now.minute}, Target: $alarmHour:$alarmMinute (start: ${alarmStartMinutes ~/ 60}:${(alarmStartMinutes % 60).toString().padLeft(2, '0')})',
+        );
 
         // Check if current time is within alarm window
-        if (currentMinutes >= alarmStartMinutes && currentMinutes < alarmMinutes) {
+        if (!_alarmDismissedToday &&
+            currentMinutes >= alarmStartMinutes &&
+            currentMinutes < alarmMinutes) {
           // We're in the alarm window
           int minutesToAlarm = alarmMinutes - currentMinutes;
           debugPrint('⏰ In alarm window - $minutesToAlarm minutes until alarm');
-          
+
           if (!_isAlarmPlaying) {
             await _handleStandaloneAlarm(minutesToAlarm, alarmMinutesBefore);
           } else {
             // Update volume as we get closer
-            double volume = (minutesToAlarm + 1) / alarmMinutesBefore.toDouble();
+            double volume =
+                (minutesToAlarm + 1) / alarmMinutesBefore.toDouble();
             if (volume > 1.0) volume = 1.0;
             if (volume < 0.03) volume = 0.03;
             await _audioPlayer?.setVolume(volume);
@@ -124,9 +134,11 @@ class SleepForegroundHandler extends TaskHandler {
 
     bool isInWindow;
     if (startMinutes > endMinutes) {
-      isInWindow = currentMinutes >= startMinutes || currentMinutes <= endMinutes;
+      isInWindow =
+          currentMinutes >= startMinutes || currentMinutes <= endMinutes;
     } else {
-      isInWindow = currentMinutes >= startMinutes && currentMinutes <= endMinutes;
+      isInWindow =
+          currentMinutes >= startMinutes && currentMinutes <= endMinutes;
     }
 
     if (isInWindow && !_isInSleepWindow) {
@@ -147,14 +159,19 @@ class SleepForegroundHandler extends TaskHandler {
     }
   }
 
-  Future<void> _handleStandaloneAlarm(int minutesToAlarm, int totalDuration) async {
-    debugPrint('⏰ Standalone alarm triggered - $minutesToAlarm minutes to target time');
-    
+  Future<void> _handleStandaloneAlarm(
+    int minutesToAlarm,
+    int totalDuration,
+  ) async {
+    debugPrint(
+      '⏰ Standalone alarm triggered - $minutesToAlarm minutes to target time',
+    );
+
     if (_audioPlayer == null) {
       debugPrint('❌ Audio player is null!');
       return;
     }
-    
+
     double volume = (minutesToAlarm + 1) / totalDuration.toDouble();
     if (volume > 1.0) volume = 1.0;
     if (volume < 0.03) volume = 0.03;
@@ -164,7 +181,7 @@ class SleepForegroundHandler extends TaskHandler {
       await _audioPlayer!.setReleaseMode(ReleaseMode.loop);
       await _audioPlayer!.setVolume(volume);
       await _audioPlayer!.play(AssetSource('audio/alarm.mp3'));
-      
+
       FlutterForegroundTask.updateService(
         notificationTitle: '⏰ Alarm',
         notificationText: 'Tap notification to dismiss',
@@ -176,50 +193,18 @@ class SleepForegroundHandler extends TaskHandler {
     }
   }
 
-  Future<void> _handleSmartAlarm(int minutesToWakeUp, [int smartAlarmDuration = 30]) async {
-    debugPrint('⏰ _handleSmartAlarm called with minutesToWakeUp: $minutesToWakeUp');
-    
-    if (_audioPlayer == null) {
-      debugPrint('❌ Audio player is null!');
-      return;
-    }
-    
-    // Volume goes from 0.03 (at max mins) to 1.0 (at 1 min)
-    double volume = (smartAlarmDuration - minutesToWakeUp + 1) / smartAlarmDuration.toDouble();
-    if (volume > 1.0) volume = 1.0;
-    if (volume < 0.0) volume = 0.0;
-
-    if (!_isAlarmPlaying) {
-      debugPrint('⏰ Smart Alarm started at volume $volume');
-      _isAlarmPlaying = true;
-      await _audioPlayer!.setReleaseMode(ReleaseMode.loop);
-      await _audioPlayer!.setVolume(volume);
-      await _audioPlayer!.play(AssetSource('audio/alarm.mp3'));
-      
-      FlutterForegroundTask.updateService(
-        notificationTitle: '⏰ Smart Alarm',
-        notificationText: 'Waking you up gently... Tap Stop to dismiss.',
-        notificationButtons: [
-          const NotificationButton(id: 'stop_alarm', text: 'Stop'),
-        ],
-      );
-    } else {
-      debugPrint('⏰ Smart Alarm volume updated to $volume');
-      await _audioPlayer!.setVolume(volume);
-    }
-  }
-
   Future<void> _stopSmartAlarm() async {
     if (_isAlarmPlaying) {
       _isAlarmPlaying = false;
       await _audioPlayer?.stop();
       debugPrint('⏰ Smart Alarm stopped');
-      
+
       // Revert notification to normal
       if (_sleepStartTime != null) {
         FlutterForegroundTask.updateService(
           notificationTitle: '😴 Sleep Tracking',
-          notificationText: 'Sleeping since ${_sleepStartTime!.hour.toString().padLeft(2, '0')}:${_sleepStartTime!.minute.toString().padLeft(2, '0')}',
+          notificationText:
+              'Sleeping since ${_sleepStartTime!.hour.toString().padLeft(2, '0')}:${_sleepStartTime!.minute.toString().padLeft(2, '0')}',
         );
       } else {
         FlutterForegroundTask.updateService(
@@ -253,15 +238,21 @@ class SleepForegroundHandler extends TaskHandler {
     if (_sleepStartTime != null) return; // Already sleeping
 
     _sleepStartTime = DateTime.now();
-    debugPrint('😴 Sleep detected at ${_sleepStartTime!.hour}:${_sleepStartTime!.minute}');
+    debugPrint(
+      '😴 Sleep detected at ${_sleepStartTime!.hour}:${_sleepStartTime!.minute}',
+    );
 
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setString('current_sleep_start', _sleepStartTime!.toIso8601String());
+    await prefs.setString(
+      'current_sleep_start',
+      _sleepStartTime!.toIso8601String(),
+    );
 
     // Update notification
     FlutterForegroundTask.updateService(
       notificationTitle: '😴 Sleep Tracking',
-      notificationText: 'Sleeping since ${_sleepStartTime!.hour.toString().padLeft(2, '0')}:${_sleepStartTime!.minute.toString().padLeft(2, '0')}',
+      notificationText:
+          'Sleeping since ${_sleepStartTime!.hour.toString().padLeft(2, '0')}:${_sleepStartTime!.minute.toString().padLeft(2, '0')}',
     );
 
     // Notify UI
@@ -277,7 +268,7 @@ class SleepForegroundHandler extends TaskHandler {
 
     // Check if phone became active (screen on, app opened, etc.)
     final timeSinceActivity = DateTime.now().difference(_lastActivityTime!);
-    
+
     if (timeSinceActivity.inMinutes < 2) {
       // Phone is active - user woke up!
       await _onWakeUpDetected();
@@ -289,20 +280,27 @@ class SleepForegroundHandler extends TaskHandler {
 
     final wakeTime = DateTime.now();
     final sleepDuration = wakeTime.difference(_sleepStartTime!);
-    
+
     debugPrint('☀️ Wake up detected at ${wakeTime.hour}:${wakeTime.minute}');
-    debugPrint('💤 Sleep duration: ${sleepDuration.inHours}h ${sleepDuration.inMinutes % 60}m');
+    debugPrint(
+      '💤 Sleep duration: ${sleepDuration.inHours}h ${sleepDuration.inMinutes % 60}m',
+    );
 
     // Save sleep data
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setString('last_sleep_start', _sleepStartTime!.toIso8601String());
+    await prefs.setString(
+      'last_sleep_start',
+      _sleepStartTime!.toIso8601String(),
+    );
     await prefs.setString('last_sleep_end', wakeTime.toIso8601String());
     await prefs.setInt('last_sleep_duration', sleepDuration.inMinutes);
     await prefs.remove('current_sleep_start');
 
     // Add to history
     final history = prefs.getStringList('sleep_history') ?? [];
-    history.add('${_sleepStartTime!.toIso8601String()}|${wakeTime.toIso8601String()}|${sleepDuration.inMinutes}');
+    history.add(
+      '${_sleepStartTime!.toIso8601String()}|${wakeTime.toIso8601String()}|${sleepDuration.inMinutes}',
+    );
     if (history.length > 30) {
       history.removeAt(0); // Keep only last 30 records
     }
@@ -311,7 +309,8 @@ class SleepForegroundHandler extends TaskHandler {
     // Update notification
     FlutterForegroundTask.updateService(
       notificationTitle: '☀️ Good Morning!',
-      notificationText: 'Slept ${sleepDuration.inHours}h ${sleepDuration.inMinutes % 60}m',
+      notificationText:
+          'Slept ${sleepDuration.inHours}h ${sleepDuration.inMinutes % 60}m',
     );
 
     // Notify UI
@@ -359,8 +358,7 @@ class SleepForegroundHandler extends TaskHandler {
       if (data['action'] == 'activity') {
         // User interacted with app - update activity time
         _lastActivityTime = DateTime.now();
-      } else if (data['action'] == 'screen_off') {
-      }
+      } else if (data['action'] == 'screen_off') {}
     }
   }
 }
@@ -433,7 +431,9 @@ class SleepTrackerService {
 
   Future<void> startTracking(TimeOfDay sleepStart, TimeOfDay sleepEnd) async {
     if (kIsWeb) {
-      debugPrint('Sleep tracking is disabled on web because Android foreground services are not supported in the browser.');
+      debugPrint(
+        'Sleep tracking is disabled on web because Android foreground services are not supported in the browser.',
+      );
       return;
     }
 
@@ -456,7 +456,7 @@ class SleepTrackerService {
     _checkTimer?.cancel();
     _checkTimer = Timer.periodic(
       Duration(seconds: checkIntervalSeconds),
-          (_) => _checkSleepStatus(),
+      (_) => _checkSleepStatus(),
     );
   }
 
@@ -486,7 +486,9 @@ class SleepTrackerService {
   }
 
   Future<void> _startNewSleepSegment() async {
-    final sleepStartTime = _lastActivityTime.add(Duration(minutes: inactivityThresholdMinutes));
+    final sleepStartTime = _lastActivityTime.add(
+      Duration(minutes: inactivityThresholdMinutes),
+    );
 
     _currentSegment = SleepSegment(startTime: sleepStartTime);
     _todaySegments.add(_currentSegment!);
@@ -495,7 +497,9 @@ class SleepTrackerService {
     await _saveSegments();
     await _updateHealthProvider();
 
-    debugPrint('😴 Sleep segment started at ${sleepStartTime.hour}:${sleepStartTime.minute}');
+    debugPrint(
+      '😴 Sleep segment started at ${sleepStartTime.hour}:${sleepStartTime.minute}',
+    );
   }
 
   Future<void> _endCurrentSleepSegment() async {
@@ -507,7 +511,9 @@ class SleepTrackerService {
     await _saveSegments();
     await _updateHealthProvider();
 
-    debugPrint('⏰ Sleep segment ended. Duration: ${_currentSegment!.durationInMinutes} minutes');
+    debugPrint(
+      '⏰ Sleep segment ended. Duration: ${_currentSegment!.durationInMinutes} minutes',
+    );
     _currentSegment = null;
   }
 
@@ -515,7 +521,8 @@ class SleepTrackerService {
     if (_sleepStartSchedule == null || _sleepEndSchedule == null) return false;
 
     final currentMinutes = now.hour * 60 + now.minute;
-    final startMinutes = _sleepStartSchedule!.hour * 60 + _sleepStartSchedule!.minute;
+    final startMinutes =
+        _sleepStartSchedule!.hour * 60 + _sleepStartSchedule!.minute;
     final endMinutes = _sleepEndSchedule!.hour * 60 + _sleepEndSchedule!.minute;
 
     if (startMinutes < endMinutes) {
@@ -544,9 +551,13 @@ class SleepTrackerService {
     if (segmentsStr != null && segmentsStr.isNotEmpty) {
       try {
         final List<dynamic> jsonList = jsonDecode(segmentsStr);
-        _todaySegments = jsonList.map((json) => SleepSegment.fromJson(json)).toList();
+        _todaySegments = jsonList
+            .map((json) => SleepSegment.fromJson(json))
+            .toList();
 
-        final openSegment = _todaySegments.where((s) => s.endTime == null).firstOrNull;
+        final openSegment = _todaySegments
+            .where((s) => s.endTime == null)
+            .firstOrNull;
         if (openSegment != null) {
           _currentSegment = openSegment;
           _isCurrentlySleeping = true;
@@ -568,7 +579,10 @@ class SleepTrackerService {
   }
 
   int getTotalSleepMinutesToday() {
-    return _todaySegments.fold(0, (sum, segment) => sum + segment.durationInMinutes);
+    return _todaySegments.fold(
+      0,
+      (sum, segment) => sum + segment.durationInMinutes,
+    );
   }
 
   Future<void> _updateHealthProvider() async {
@@ -590,8 +604,11 @@ class SleepTrackerService {
     if (_isCurrentlySleeping) {
       notificationText = '😴 Sleeping now • Total: ${hours}h ${minutes}m';
     } else {
-      final minutesSinceActivity = DateTime.now().difference(_lastActivityTime).inMinutes;
-      notificationText = '👀 Awake ${minutesSinceActivity}m • Total: ${hours}h ${minutes}m';
+      final minutesSinceActivity = DateTime.now()
+          .difference(_lastActivityTime)
+          .inMinutes;
+      notificationText =
+          '👀 Awake ${minutesSinceActivity}m • Total: ${hours}h ${minutes}m';
     }
 
     await FlutterForegroundTask.updateService(
@@ -611,7 +628,9 @@ class SleepTrackerService {
     if (!activityStatus.isGranted) {
       final result = await Permission.activityRecognition.request();
       if (!result.isGranted) {
-        debugPrint('❌ ACTIVITY_RECOGNITION permission denied, cannot start sleep tracker service');
+        debugPrint(
+          '❌ ACTIVITY_RECOGNITION permission denied, cannot start sleep tracker service',
+        );
         return;
       }
     }
@@ -637,7 +656,8 @@ class SleepTrackerService {
       ),
     );
 
-    final batteryOptStatus = await FlutterForegroundTask.isIgnoringBatteryOptimizations;
+    final batteryOptStatus =
+        await FlutterForegroundTask.isIgnoringBatteryOptimizations;
     if (batteryOptStatus == false) {
       await FlutterForegroundTask.requestIgnoreBatteryOptimization();
     }
@@ -649,7 +669,9 @@ class SleepTrackerService {
         notificationText: 'Monitoring your sleep pattern',
         callback: startSleepCallback,
       );
-      debugPrint('✅ Sleep tracker foreground service started: ${result.runtimeType}');
+      debugPrint(
+        '✅ Sleep tracker foreground service started: ${result.runtimeType}',
+      );
     } catch (e) {
       debugPrint('❌ Failed to start sleep tracker service: $e');
     }

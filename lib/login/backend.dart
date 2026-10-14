@@ -26,20 +26,30 @@ class LoginSuccess extends LoginResult {
   final User user;
   LoginSuccess(this.user);
 }
-class LoginInvalidCredentials extends LoginResult {}
-class LoginUserDisabled extends LoginResult {}
-class LoginNetworkError extends LoginResult {}
-class LoginUnknownError extends LoginResult {}
 
+class LoginInvalidCredentials extends LoginResult {}
+
+class LoginUserDisabled extends LoginResult {}
+
+class LoginNetworkError extends LoginResult {}
+
+class LoginUnknownError extends LoginResult {}
 
 /// Represents the exhaustive set of outcomes for a registration attempt.
 sealed class RegistrationResult {}
 
 class RegistrationSuccess extends RegistrationResult {}
+
+class RegistrationVerificationEmailFailed extends RegistrationResult {}
+
 class RegistrationUsernameTaken extends RegistrationResult {}
+
 class RegistrationEmailInUse extends RegistrationResult {}
+
 class RegistrationWeakPassword extends RegistrationResult {}
+
 class RegistrationNetworkError extends RegistrationResult {}
+
 class RegistrationUnknownError extends RegistrationResult {}
 
 /// Represents the exhaustive set of outcomes for a Google Sign-In attempt.
@@ -49,6 +59,7 @@ class GoogleSignInSuccess extends GoogleSignInResult {
   final User user;
   GoogleSignInSuccess(this.user);
 }
+
 class GoogleSignInFailure extends GoogleSignInResult {}
 
 /// Represents the outcomes for an anonymous sign-in attempt.
@@ -58,7 +69,9 @@ class AnonymousSignInSuccess extends AnonymousSignInResult {
   final User user;
   AnonymousSignInSuccess(this.user);
 }
+
 class AnonymousSignInNetworkError extends AnonymousSignInResult {}
+
 class AnonymousSignInFailure extends AnonymousSignInResult {}
 
 /// Represents the exhaustive set of outcomes for an Apple Sign-In attempt.
@@ -68,6 +81,7 @@ class AppleSignInSuccess extends AppleSignInResult {
   final User user;
   AppleSignInSuccess(this.user);
 }
+
 class AppleSignInFailure extends AppleSignInResult {}
 
 /// A service class that encapsulates all backend authentication logic.
@@ -79,8 +93,112 @@ class LoginBackendService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final GoogleSignIn _googleSignIn = GoogleSignIn.instance;
-  final FirebaseFunctions _functions = FirebaseFunctions.instanceFor(region: 'europe-west1');
+  final FirebaseFunctions _functions = FirebaseFunctions.instanceFor(
+    region: 'europe-west1',
+  );
   final FlutterSecureStorage _secureStorage = const FlutterSecureStorage();
+  static Future<void>? _googleSignInInitialization;
+
+  Future<void> _initializeGoogleSignIn() async {
+    final initialization = _googleSignInInitialization ??= _googleSignIn
+        .initialize();
+    try {
+      await initialization;
+    } catch (_) {
+      if (identical(_googleSignInInitialization, initialization)) {
+        _googleSignInInitialization = null;
+      }
+      rethrow;
+    }
+  }
+
+  String _authenticationErrorMessage(String errorCode, AppLocalizations l10n) {
+    final normalizedCode = errorCode.toLowerCase().replaceAll('_', '-');
+    final code = normalizedCode.split('/').last;
+    if (const {
+      'network-request-failed',
+      'network-error',
+      'network_error',
+    }.contains(code)) {
+      return l10n.noInternetConnection;
+    }
+    if (const {
+      'configuration-not-found',
+      'operation-not-allowed',
+      'app-not-authorized',
+      'project-not-found',
+      'invalid-api-key',
+      'api-key-not-valid',
+      'billing-not-enabled',
+    }.contains(code)) {
+      return l10n.firebaseNotConfigured;
+    }
+    return l10n.authenticationFailed;
+  }
+
+  String _googleSignInErrorMessage(Object error, AppLocalizations l10n) {
+    if (error is GoogleSignInException) {
+      final details = '${error.description ?? ''} ${error.details ?? ''}'
+          .toLowerCase();
+      if (details.contains('network')) return l10n.noInternetConnection;
+      if (error.code == GoogleSignInExceptionCode.clientConfigurationError ||
+          error.code == GoogleSignInExceptionCode.providerConfigurationError ||
+          error.code == GoogleSignInExceptionCode.unknownError ||
+          error.code == GoogleSignInExceptionCode.uiUnavailable) {
+        return l10n.googleSignInFailed;
+      }
+    }
+
+    final errorCode = error is String ? error : _authenticationErrorCode(error);
+    final code = errorCode.toLowerCase().replaceAll('_', '-').split('/').last;
+    if (const {
+      'missing-id-token',
+      'sign-in-failed',
+      'developer-error',
+      'client-id-missing',
+      'server-client-id-missing',
+      'clientconfigurationerror',
+      'providerconfigurationerror',
+      'unknownerror',
+      'uiunavailable',
+      '10',
+      '12500',
+    }.contains(code)) {
+      return l10n.googleSignInFailed;
+    }
+    return _authenticationErrorMessage(errorCode, l10n);
+  }
+
+  String userFacingAuthenticationError(Object error, AppLocalizations l10n) =>
+      _authenticationErrorMessage(_authenticationErrorCode(error), l10n);
+
+  String _authenticationErrorCode(Object error) {
+    return switch (error) {
+      FirebaseAuthException() => _normalizedFirebaseError(
+        error.code,
+        error.message,
+      ),
+      FirebaseException() => _normalizedFirebaseError(
+        error.code,
+        error.message,
+      ),
+      GoogleSignInException() => error.code.name,
+      PlatformException() => _normalizedFirebaseError(
+        error.code,
+        error.message,
+      ),
+      _ => 'unexpected-error',
+    };
+  }
+
+  String _normalizedFirebaseError(String code, String? message) {
+    final details = '${code.toLowerCase()} ${message?.toLowerCase() ?? ''}';
+    if (details.contains('configuration_not_found') ||
+        details.contains('configuration-not-found')) {
+      return 'configuration-not-found';
+    }
+    return code;
+  }
 
   /// Handles the entire email and password login flow.
   Future<LoginResult> loginWithEmail({
@@ -91,39 +209,46 @@ class LoginBackendService {
     required bool rememberMe,
   }) async {
     final l10n = AppLocalizations.of(context)!;
-    final extrovertNotificationService = context.read<ExtrovertNotificationService>();
-
-    if (!await InternetConnection().hasInternetAccess) {
-      notificationService.showNotification(message: l10n.noInternetConnection, type: NotificationType.error);
-      return LoginNetworkError();
-    }
+    final extrovertNotificationService = context
+        .read<ExtrovertNotificationService>();
 
     try {
-      final userCredential = await _auth.signInWithEmailAndPassword(email: email, password: password);
+      final userCredential = await _auth.signInWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
       final user = userCredential.user;
-      if (user == null) throw FirebaseAuthException(code: 'user-not-found-after-signin');
+      if (user == null) {
+        throw FirebaseAuthException(code: 'user-not-found-after-signin');
+      }
 
       await _handleSessionPersistence(email, password, rememberMe);
-      await user.reload();
-      final freshUser = _auth.currentUser;
-      if (freshUser == null) throw FirebaseAuthException(code: 'user-disappeared-after-reload');
 
-      if (!freshUser.emailVerified) {
-        dev.log('[Auth.Login] User email not verified. UID: ${freshUser.uid}. Triggering verification flow.', name: 'LoginBackend');
+      if (!user.emailVerified) {
+        dev.log(
+          '[Auth.Login] User email not verified. UID: ${user.uid}. Triggering verification flow.',
+          name: 'LoginBackend',
+        );
 
         _safeTokenSync(extrovertNotificationService);
 
-        return LoginSuccess(freshUser);
+        return LoginSuccess(user);
       }
 
-      dev.log('[Auth.Login] User verified. UID: ${freshUser.uid}. Running post-login tasks.', name: 'LoginBackend');
+      dev.log(
+        '[Auth.Login] User verified. UID: ${user.uid}. Running post-login tasks.',
+        name: 'LoginBackend',
+      );
 
       _safeTokenSync(extrovertNotificationService);
 
-      return LoginSuccess(freshUser);
-
+      return LoginSuccess(user);
     } on FirebaseAuthException catch (e) {
-      dev.log('[Auth.Login] FirebaseAuthException: ${e.code}', name: 'LoginBackend', error: e.message);
+      dev.log(
+        '[Auth.Login] FirebaseAuthException: ${e.code}',
+        name: 'LoginBackend',
+        error: e.message,
+      );
       switch (e.code) {
         case 'invalid-credential':
         case 'user-not-found':
@@ -132,12 +257,23 @@ class LoginBackendService {
         case 'user-disabled':
           return LoginUserDisabled();
         default:
-          notificationService.showNotification(message: l10n.authError, type: NotificationType.error);
+          notificationService.showNotification(
+            message: _authenticationErrorMessage(e.code, l10n),
+            type: NotificationType.error,
+          );
           return LoginUnknownError();
       }
     } catch (e, st) {
-      dev.log('[Auth.Login] Generic error', name: 'LoginBackend', error: e, stackTrace: st);
-      notificationService.showNotification(message: l10n.authError, type: NotificationType.error);
+      dev.log(
+        '[Auth.Login] Generic error',
+        name: 'LoginBackend',
+        error: e,
+        stackTrace: st,
+      );
+      notificationService.showNotification(
+        message: _authenticationErrorMessage('unexpected-error', l10n),
+        type: NotificationType.error,
+      );
       return LoginUnknownError();
     }
   }
@@ -151,25 +287,40 @@ class LoginBackendService {
     required String password,
   }) async {
     final l10n = AppLocalizations.of(context)!;
-    final extrovertNotificationService = context.read<ExtrovertNotificationService>();
+    final extrovertNotificationService = context
+        .read<ExtrovertNotificationService>();
     final userProvider = context.read<UserProvider>();
+    var accountCreated = false;
 
     if (!await InternetConnection().hasInternetAccess) {
-      notificationService.showNotification(message: l10n.noInternetConnection, type: NotificationType.error);
+      notificationService.showNotification(
+        message: l10n.noInternetConnection,
+        type: NotificationType.error,
+      );
       return RegistrationNetworkError();
     }
 
     try {
       // --- ASYNC GAP 1 ---
-      final isAvailable = await _isUsernameAvailable(username, notificationService, l10n);
+      final isAvailable = await _isUsernameAvailable(
+        username,
+        notificationService,
+        l10n,
+      );
       if (!isAvailable) {
         return RegistrationUsernameTaken();
       }
 
       // --- ASYNC GAP 2 ---
-      final userCredential = await _auth.createUserWithEmailAndPassword(email: email, password: password);
+      final userCredential = await _auth.createUserWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
       final user = userCredential.user;
-      if (user == null) throw FirebaseAuthException(code: 'user-creation-returned-null');
+      if (user == null) {
+        throw FirebaseAuthException(code: 'user-creation-returned-null');
+      }
+      accountCreated = true;
 
       userProvider.listenToUserData(user);
       dev.log(
@@ -182,24 +333,70 @@ class LoginBackendService {
       await _postUsernameSuggestion(uid: user.uid, username: username);
 
       await user.sendEmailVerification();
-      dev.log('[Auth.Register] Verification email sent for UID: ${user.uid}.', name: 'LoginBackend');
+      dev.log(
+        '[Auth.Register] Verification email sent for UID: ${user.uid}.',
+        name: 'LoginBackend',
+      );
 
       return RegistrationSuccess();
-
     } on FirebaseAuthException catch (e) {
-      dev.log('[Auth.Register] FirebaseAuthException: ${e.code}', name: 'LoginBackend', error: e.message);
+      dev.log(
+        '[Auth.Register] FirebaseAuthException: ${e.code}',
+        name: 'LoginBackend',
+        error: e.message,
+      );
+      if (accountCreated) {
+        notificationService.showNotification(
+          message: l10n.emailNotVerified,
+          type: NotificationType.error,
+        );
+        return RegistrationVerificationEmailFailed();
+      }
       switch (e.code) {
         case 'email-already-in-use':
           return RegistrationEmailInUse();
         case 'weak-password':
           return RegistrationWeakPassword();
+        case 'configuration-not-found':
+        case 'operation-not-allowed':
+        case 'app-not-authorized':
+        case 'project-not-found':
+          notificationService.showNotification(
+            message: l10n.firebaseNotConfiguredSignup,
+            type: NotificationType.error,
+          );
+          return RegistrationUnknownError();
+        case 'network-request-failed':
+          notificationService.showNotification(
+            message: l10n.noInternetConnection,
+            type: NotificationType.error,
+          );
+          return RegistrationNetworkError();
         default:
-          notificationService.showNotification(message: l10n.authError, type: NotificationType.error);
+          notificationService.showNotification(
+            message: l10n.authError,
+            type: NotificationType.error,
+          );
           return RegistrationUnknownError();
       }
     } catch (e, st) {
-      dev.log('[Auth.Register] Generic error', name: 'LoginBackend', error: e, stackTrace: st);
-      notificationService.showNotification(message: l10n.authError, type: NotificationType.error);
+      dev.log(
+        '[Auth.Register] Generic error',
+        name: 'LoginBackend',
+        error: e,
+        stackTrace: st,
+      );
+      if (accountCreated) {
+        notificationService.showNotification(
+          message: l10n.emailNotVerified,
+          type: NotificationType.error,
+        );
+        return RegistrationVerificationEmailFailed();
+      }
+      notificationService.showNotification(
+        message: l10n.authError,
+        type: NotificationType.error,
+      );
       return RegistrationUnknownError();
     }
   }
@@ -210,14 +407,12 @@ class LoginBackendService {
     required IntrovertNotificationService notificationService,
   }) async {
     final l10n = AppLocalizations.of(context)!;
-    final extrovertNotificationService = context.read<ExtrovertNotificationService>();
+    final extrovertNotificationService = context
+        .read<ExtrovertNotificationService>();
 
     try {
-      // Step 0: Clear any stale Google session before starting.
-      // This helps avoid cases where the account picker returns but auth does not complete.
-      await _googleSignIn.signOut().catchError((_) {});
+      await _initializeGoogleSignIn();
 
-      // Step 1: Start the interactive sign-in flow.
       final GoogleSignInAccount googleUser = await _googleSignIn.authenticate();
 
       // Step 2: Get the authentication token from the signed-in account.
@@ -225,8 +420,14 @@ class LoginBackendService {
       final String? idToken = googleAuth.idToken;
 
       if (idToken == null) {
-        dev.log('[Auth.Google] GoogleAuth returned no id token.', name: 'LoginBackend');
-        notificationService.showNotification(message: l10n.googleSignInFailed, type: NotificationType.error);
+        dev.log(
+          '[Auth.Google] GoogleAuth returned no id token.',
+          name: 'LoginBackend',
+        );
+        notificationService.showNotification(
+          message: _googleSignInErrorMessage('missing-id-token', l10n),
+          type: NotificationType.error,
+        );
         return GoogleSignInFailure();
       }
 
@@ -236,39 +437,60 @@ class LoginBackendService {
       );
 
       // Step 4: Sign in to Firebase.
-      final UserCredential userCredential = await _auth.signInWithCredential(credential);
+      final UserCredential userCredential = await _auth.signInWithCredential(
+        credential,
+      );
       final User? user = userCredential.user;
       if (user == null) {
         throw Exception('Firebase sign in with Google returned a null user.');
       }
 
       // --- Post-login logic ---
-      final bool isNewUser = userCredential.additionalUserInfo?.isNewUser ?? false;
+      final bool isNewUser =
+          userCredential.additionalUserInfo?.isNewUser ?? false;
       if (isNewUser) {
         _postUsernameSuggestion(uid: user.uid, username: null);
       }
 
-      await _secureStorage.write(key: 'remember_me', value: 'true');
-      await _secureStorage.write(key: 'email', value: user.email);
+      await _persistProviderSession(user);
 
       _safeTokenSync(extrovertNotificationService);
 
-      dev.log('[Auth.Google] Sign-in complete for UID: ${user.uid}.', name: 'LoginBackend');
+      dev.log(
+        '[Auth.Google] Sign-in complete for UID: ${user.uid}.',
+        name: 'LoginBackend',
+      );
       return GoogleSignInSuccess(user);
-
     } catch (e, st) {
       if (e is PlatformException && e.code == 'network_error') {
-        dev.log('[Auth.Google] A network error occurred during Google Sign-In', name: 'LoginBackend', error: e, stackTrace: st);
-        notificationService.showNotification(message: l10n.noInternetConnection, type: NotificationType.error);
-      } else if (e is GoogleSignInException && e.code == GoogleSignInExceptionCode.canceled) {
-        dev.log('[Auth.Google] Sign-in process was cancelled by the user.', name: 'LoginBackend');
+        dev.log(
+          '[Auth.Google] A network error occurred during Google Sign-In',
+          name: 'LoginBackend',
+          error: e,
+          stackTrace: st,
+        );
+        notificationService.showNotification(
+          message: l10n.noInternetConnection,
+          type: NotificationType.error,
+        );
+      } else if (e is GoogleSignInException &&
+          e.code == GoogleSignInExceptionCode.canceled) {
+        dev.log(
+          '[Auth.Google] Sign-in process was cancelled by the user.',
+          name: 'LoginBackend',
+        );
       } else {
-        dev.log('[Auth.Google] An unexpected error occurred during Google Sign-In', name: 'LoginBackend', error: e, stackTrace: st);
-        notificationService.showNotification(message: l10n.googleSignInFailed, type: NotificationType.error);
+        dev.log(
+          '[Auth.Google] An unexpected error occurred during Google Sign-In',
+          name: 'LoginBackend',
+          error: e,
+          stackTrace: st,
+        );
+        notificationService.showNotification(
+          message: _googleSignInErrorMessage(e, l10n),
+          type: NotificationType.error,
+        );
       }
-
-      await _googleSignIn.disconnect().catchError((_) {});
-      await _auth.signOut().catchError((_) {});
 
       return GoogleSignInFailure();
     }
@@ -280,39 +502,36 @@ class LoginBackendService {
     required IntrovertNotificationService notificationService,
   }) async {
     final l10n = AppLocalizations.of(context)!;
-    final extrovertNotificationService = context.read<ExtrovertNotificationService>();
-
-    if (!await InternetConnection().hasInternetAccess) {
-      notificationService.showNotification(
-        message: l10n.noInternetConnection,
-        type: NotificationType.error,
-      );
-      return AnonymousSignInNetworkError();
-    }
+    final extrovertNotificationService = context
+        .read<ExtrovertNotificationService>();
 
     try {
       final UserCredential userCredential = await _auth.signInAnonymously();
       final User? user = userCredential.user;
 
-      if (user == null) throw FirebaseAuthException(code: 'anonymous-user-null');
+      if (user == null) {
+        throw FirebaseAuthException(code: 'anonymous-user-null');
+      }
 
       _safeTokenSync(extrovertNotificationService);
 
-      dev.log('[Auth.Anonymous] Signed in anonymously. UID: ${user.uid}', name: 'LoginBackend');
+      dev.log(
+        '[Auth.Anonymous] Signed in anonymously. UID: ${user.uid}',
+        name: 'LoginBackend',
+      );
 
       return AnonymousSignInSuccess(user);
-
     } catch (e, st) {
       dev.log(
-          '[Auth.Anonymous] Error during anonymous sign-in',
-          name: 'LoginBackend',
-          error: e,
-          stackTrace: st
+        '[Auth.Anonymous] Error during anonymous sign-in',
+        name: 'LoginBackend',
+        error: e,
+        stackTrace: st,
       );
 
       notificationService.showNotification(
-          message: l10n.authError,
-          type: NotificationType.error
+        message: _authenticationErrorMessage(_authenticationErrorCode(e), l10n),
+        type: NotificationType.error,
       );
       return AnonymousSignInFailure();
     }
@@ -325,7 +544,8 @@ class LoginBackendService {
     required IntrovertNotificationService notificationService,
   }) async {
     final l10n = AppLocalizations.of(context)!;
-    final extrovertNotificationService = context.read<ExtrovertNotificationService>();
+    final extrovertNotificationService = context
+        .read<ExtrovertNotificationService>();
 
     try {
       // 1) Use Firebase's native provider flow
@@ -333,8 +553,8 @@ class LoginBackendService {
         ..addScope('email')
         ..addScope('name');
 
-      final UserCredential userCredential =
-      await FirebaseAuth.instance.signInWithProvider(appleProvider);
+      final UserCredential userCredential = await FirebaseAuth.instance
+          .signInWithProvider(appleProvider);
 
       final User? user = userCredential.user;
       if (user == null) {
@@ -342,7 +562,8 @@ class LoginBackendService {
       }
 
       // 2) Post-login logic
-      final bool isNewUser = userCredential.additionalUserInfo?.isNewUser ?? false;
+      final bool isNewUser =
+          userCredential.additionalUserInfo?.isNewUser ?? false;
 
       if (isNewUser) {
         // Apple provider may set displayName (not guaranteed). Prefer Firebase user fields when available.
@@ -358,29 +579,40 @@ class LoginBackendService {
       }
 
       // 3) Persist session
-      await _secureStorage.write(key: 'remember_me', value: 'true');
-      if (user.email != null) {
-        await _secureStorage.write(key: 'email', value: user.email);
-      }
+      await _persistProviderSession(user);
 
       // 4) Token sync (non-blocking)
       _safeTokenSync(extrovertNotificationService);
 
-      dev.log('[Auth.Apple] Sign-in complete for UID: ${user.uid}.',
-          name: 'LoginBackend');
+      dev.log(
+        '[Auth.Apple] Sign-in complete for UID: ${user.uid}.',
+        name: 'LoginBackend',
+      );
 
       return AppleSignInSuccess(user);
     } catch (e, st) {
-      if (e is FirebaseAuthException && e.code == 'canceled') {
-        dev.log('[Auth.Apple] Sign-in cancelled by user.', name: 'LoginBackend');
+      if (e is FirebaseAuthException &&
+          const {
+            'canceled',
+            'cancelled',
+            'web-context-cancelled',
+          }.contains(e.code)) {
+        dev.log(
+          '[Auth.Apple] Sign-in cancelled by user.',
+          name: 'LoginBackend',
+        );
         return AppleSignInFailure();
       }
 
-      dev.log('[Auth.Apple] Error during Apple Sign-In',
-          name: 'LoginBackend', error: e, stackTrace: st);
+      dev.log(
+        '[Auth.Apple] Error during Apple Sign-In',
+        name: 'LoginBackend',
+        error: e,
+        stackTrace: st,
+      );
 
       notificationService.showNotification(
-        message: l10n.authError,
+        message: _authenticationErrorMessage(_authenticationErrorCode(e), l10n),
         type: NotificationType.error,
       );
       return AppleSignInFailure();
@@ -398,29 +630,41 @@ class LoginBackendService {
   }) async {
     final l10n = AppLocalizations.of(context)!;
     final user = _auth.currentUser;
-    final extrovertNotificationService = context.read<ExtrovertNotificationService>();
+    final extrovertNotificationService = context
+        .read<ExtrovertNotificationService>();
 
     if (user == null || !user.isAnonymous) return RegistrationUnknownError();
 
     if (!await InternetConnection().hasInternetAccess) {
-      notificationService.showNotification(message: l10n.noInternetConnection, type: NotificationType.error);
+      notificationService.showNotification(
+        message: l10n.noInternetConnection,
+        type: NotificationType.error,
+      );
       return RegistrationNetworkError();
     }
 
     try {
-      final isAvailable = await _isUsernameAvailable(username, notificationService, l10n);
+      final isAvailable = await _isUsernameAvailable(
+        username,
+        notificationService,
+        l10n,
+      );
       if (!isAvailable) return RegistrationUsernameTaken();
 
-      final credential = EmailAuthProvider.credential(email: email, password: password);
+      final credential = EmailAuthProvider.credential(
+        email: email,
+        password: password,
+      );
       await user.linkWithCredential(credential);
 
-      final callable = _functions.httpsCallable('completeAnonymousRegistration');
+      final callable = _functions.httpsCallable(
+        'completeAnonymousRegistration',
+      );
       await callable.call();
 
       _safeTokenSync(extrovertNotificationService);
 
       return RegistrationSuccess();
-
     } on FirebaseAuthException catch (e) {
       dev.log('[Auth.Link] Error: ${e.code}', name: 'LoginBackend');
       switch (e.code) {
@@ -430,19 +674,28 @@ class LoginBackendService {
         case 'weak-password':
           return RegistrationWeakPassword();
         default:
-          notificationService.showNotification(message: l10n.authError, type: NotificationType.error);
+          notificationService.showNotification(
+            message: l10n.authError,
+            type: NotificationType.error,
+          );
           return RegistrationUnknownError();
       }
     } catch (e) {
       dev.log('[Auth.Link] Generic Error: $e', name: 'LoginBackend');
-      notificationService.showNotification(message: l10n.authError, type: NotificationType.error);
+      notificationService.showNotification(
+        message: l10n.authError,
+        type: NotificationType.error,
+      );
       return RegistrationUnknownError();
     }
   }
 
   // --- Private Helper Methods ---
 
-  Future<void> _postUsernameSuggestion({required String uid, String? username}) async {
+  Future<void> _postUsernameSuggestion({
+    required String uid,
+    String? username,
+  }) async {
     try {
       final expirationTime = DateTime.now().add(const Duration(hours: 1));
 
@@ -451,7 +704,10 @@ class LoginBackendService {
         'invitedBy': null,
         'expireAt': Timestamp.fromDate(expirationTime),
       });
-      dev.log('[Auth.Suggestion] Posted suggestion for UID: $uid', name: 'LoginBackend');
+      dev.log(
+        '[Auth.Suggestion] Posted suggestion for UID: $uid',
+        name: 'LoginBackend',
+      );
     } catch (error) {
       dev.log(
         '[Auth.Suggestion] WARNING: Failed to post username suggestion. The backend will self-heal.',
@@ -461,29 +717,74 @@ class LoginBackendService {
     }
   }
 
-  Future<bool> _isUsernameAvailable(String username, IntrovertNotificationService ns, AppLocalizations l10n) async {
+  Future<bool> _isUsernameAvailable(
+    String username,
+    IntrovertNotificationService ns,
+    AppLocalizations l10n,
+  ) async {
     try {
       final callable = _functions.httpsCallable('isUsernameAvailable');
-      final result = await callable.call<Map<String, dynamic>>({'username': username});
+      final result = await callable.call<Map<String, dynamic>>({
+        'username': username,
+      });
       return result.data['available'] as bool? ?? false;
     } on FirebaseFunctionsException catch (e) {
-      dev.log('[UsernameCheck] FirebaseFunctionsException: ${e.code}', name: 'LoginBackend', error: e.message);
-      ns.showNotification(message: l10n.anErrorOccurred, type: NotificationType.error);
+      dev.log(
+        '[UsernameCheck] FirebaseFunctionsException: ${e.code}',
+        name: 'LoginBackend',
+        error: e.message,
+      );
+      ns.showNotification(
+        message: l10n.anErrorOccurred,
+        type: NotificationType.error,
+      );
       return false;
     } catch (e) {
       dev.log('[UsernameCheck] Generic error: $e', name: 'LoginBackend');
-      ns.showNotification(message: l10n.noInternetConnection, type: NotificationType.error);
+      ns.showNotification(
+        message: l10n.noInternetConnection,
+        type: NotificationType.error,
+      );
       return false;
     }
   }
 
-  Future<void> _handleSessionPersistence(String email, String password, bool rememberMe) async {
-    if (rememberMe) {
-      await _secureStorage.write(key: 'email', value: email);
-      await _secureStorage.write(key: 'password', value: password);
+  Future<void> _handleSessionPersistence(
+    String email,
+    String password,
+    bool rememberMe,
+  ) async {
+    try {
+      if (rememberMe) {
+        await _secureStorage.write(key: 'email', value: email);
+        await _secureStorage.write(key: 'password', value: password);
+        await _secureStorage.write(key: 'remember_me', value: 'true');
+      } else {
+        await _secureStorage.deleteAll();
+      }
+    } catch (error, stackTrace) {
+      dev.log(
+        '[Auth.Session] Could not persist login session.',
+        name: 'LoginBackend',
+        error: error,
+        stackTrace: stackTrace,
+      );
+    }
+  }
+
+  Future<void> _persistProviderSession(User user) async {
+    try {
       await _secureStorage.write(key: 'remember_me', value: 'true');
-    } else {
-      await _secureStorage.deleteAll();
+      if (user.email != null) {
+        await _secureStorage.write(key: 'email', value: user.email);
+      }
+    } catch (error, stackTrace) {
+      dev.log(
+        '[Auth.Session] Could not persist provider session.',
+        name: 'LoginBackend',
+        error: error,
+        stackTrace: stackTrace,
+      );
     }
   }
 

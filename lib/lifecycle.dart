@@ -2,8 +2,12 @@
 
 import 'package:ally/screen.dart';
 import 'package:ally/services/sleep.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
+
+import 'login/verify.dart';
 
 /// Represents the general states of the application.
 /// Since Ally is currently simple, it only has initializing and ready states.
@@ -121,6 +125,12 @@ class _AppLifecycleManagerState extends State<AppLifecycleManager>
         return const SizedBox.shrink(key: ValueKey('Initializing'));
 
       case AppStatus.ready:
+        final user = Firebase.apps.isEmpty
+            ? null
+            : FirebaseAuth.instance.currentUser;
+        if (user?.email != null && !user!.emailVerified) {
+          return EmailVerificationScreen(email: user.email!);
+        }
         return const MainScreen(key: ValueKey('MainScreen'));
     }
   }

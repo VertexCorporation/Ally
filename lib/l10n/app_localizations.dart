@@ -3321,19 +3321,19 @@ abstract class AppLocalizations {
   /// No description provided for @firebaseNotConfigured.
   ///
   /// In en, this message translates to:
-  /// **'Firebase not configured. Use anonymous login.'**
+  /// **'Firebase Authentication has not been initialized for this project. Complete Authentication setup in Firebase Console and enable the sign-in providers you need.'**
   String get firebaseNotConfigured;
 
   /// No description provided for @firebaseNotConfiguredSignup.
   ///
   /// In en, this message translates to:
-  /// **'Firebase not configured. Continuing without registration.'**
+  /// **'Firebase could not be reached. Sign-up is unavailable until the configuration is fixed.'**
   String get firebaseNotConfiguredSignup;
 
   /// No description provided for @googleSignInFailed.
   ///
   /// In en, this message translates to:
-  /// **'Google sign in failed. Use anonymous login instead.'**
+  /// **'Google sign-in is not configured. Enable Google in Firebase Console and add the Android SHA fingerprints and OAuth client.'**
   String get googleSignInFailed;
 
   /// No description provided for @emailSignInFailed.
