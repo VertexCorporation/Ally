@@ -96,7 +96,6 @@ class LoginBackendService {
   }) async {
     final l10n = AppLocalizations.of(context)!;
     final extrovertNotificationService = context.read<ExtrovertNotificationService>();
-    final userProvider = context.read<UserProvider>();
 
     if (!await InternetConnection().hasInternetAccess) {
       notificationService.showNotification(message: l10n.noInternetConnection, type: NotificationType.error);
@@ -290,6 +289,7 @@ class LoginBackendService {
   }) async {
     final l10n = AppLocalizations.of(context)!;
     final extrovertNotificationService = context.read<ExtrovertNotificationService>();
+    final userProvider = context.read<UserProvider>();
 
     if (!await InternetConnection().hasInternetAccess) {
       notificationService.showNotification(
