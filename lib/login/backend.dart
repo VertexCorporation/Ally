@@ -249,7 +249,13 @@ class LoginBackendService {
       }
 
       await _secureStorage.write(key: 'remember_me', value: 'true');
-      await _secureStorage.write(key: 'email', value: user.email);
+      if (user.email != null) {
+        await _secureStorage.write(key: 'email', value: user.email);
+      }
+      // Firebase Auth persists the session. Never retain the user's password.
+      await _secureStorage.delete(key: 'password');
+      // Firebase Auth persists the session. Never retain the user's password.
+      await _secureStorage.delete(key: 'password');
 
       _safeTokenSync(extrovertNotificationService);
 
@@ -480,8 +486,10 @@ class LoginBackendService {
   Future<void> _handleSessionPersistence(String email, String password, bool rememberMe) async {
     if (rememberMe) {
       await _secureStorage.write(key: 'email', value: email);
-      await _secureStorage.write(key: 'password', value: password);
       await _secureStorage.write(key: 'remember_me', value: 'true');
+      // Remove credentials saved by older app versions. Firebase Auth manages
+      // the signed-in session, so the password is not needed for persistence.
+      await _secureStorage.delete(key: 'password');
     } else {
       await _secureStorage.deleteAll();
     }
