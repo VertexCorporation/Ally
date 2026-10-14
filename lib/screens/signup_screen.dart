@@ -51,7 +51,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
     if (_step == 0) {
       if (_usernameController.text.trim().isEmpty) {
-        setState(() => _fieldError = l10n.usernameHint);
+        setState(() => _fieldError = l10n.invalidUsername);
         return;
       }
     } else if (_step == 1) {
@@ -130,7 +130,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
           break;
         case RegistrationEmailInUse():
           notifications.showNotification(
-            message: l10n.signUpFailed(l10n.authError),
+            message: l10n.emailAlreadyInUse,
             type: NotificationType.error,
           );
           break;
@@ -229,7 +229,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     const SizedBox(height: 10),
                     Text(
                       _step == 0
-                          ? l10n.usernameHint
+                          ? l10n.chooseUsername
                           : _step == 1
                               ? l10n.enterEmailAddress
                               : l10n.enterPassword,
@@ -391,6 +391,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
       return TextField(
         controller: _usernameController,
         autofocus: true,
+        autofillHints: const [AutofillHints.newUsername],
         textInputAction: TextInputAction.next,
         onSubmitted: (_) => _next(),
         onChanged: (_) {
@@ -404,6 +405,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
       return TextField(
         controller: _emailController,
         autofocus: true,
+        autofillHints: const [AutofillHints.email],
         keyboardType: TextInputType.emailAddress,
         textInputAction: TextInputAction.next,
         autocorrect: false,
@@ -418,6 +420,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
     return TextField(
       controller: _passwordController,
       autofocus: true,
+      autofillHints: const [AutofillHints.newPassword],
       obscureText: !_passwordVisible,
       autocorrect: false,
       enableSuggestions: false,
