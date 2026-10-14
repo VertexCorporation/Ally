@@ -1,9 +1,12 @@
-import 'package:flutter/material.dart';
-import '../l10n/app_localizations.dart';
+import 'package:ally/login/backend.dart';
+import 'package:ally/login/verify.dart';
+import 'package:ally/l10n/app_localizations.dart';
+import 'package:ally/notifications/introvert.dart';
+import 'package:ally/theme.dart';
+import 'package:email_validator/email_validator.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'onboard.dart';
-import '../main.dart' show isFirebaseInitialized;
-import '../widgets/notification.dart';
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class SignUpScreen extends StatefulWidget {
   const SignUpScreen({super.key});
@@ -12,633 +15,419 @@ class SignUpScreen extends StatefulWidget {
   State<SignUpScreen> createState() => _SignUpScreenState();
 }
 
-class _SignUpScreenState extends State<SignUpScreen> with TickerProviderStateMixin {
+class _SignUpScreenState extends State<SignUpScreen> {
+  final _usernameController = TextEditingController();
+  final _emailController = TextEditingController();
+  final _passwordController = TextEditingController();
+
+  int _step = 0;
   bool _isLoading = false;
-  String _currentStep = 'username'; // username, email, password
-  String _previousStep = 'username';
-  bool _isAnimating = false;
-  late AnimationController _slideOutController;
-  late Animation<Offset> _slideOutAnimation;
-  late AnimationController _slideInController;
-  late Animation<Offset> _slideInAnimation;
-
-  final TextEditingController _usernameController = TextEditingController();
-  final TextEditingController _emailController = TextEditingController();
-  final TextEditingController _passwordController = TextEditingController();
-
-  @override
-  void initState() {
-    super.initState();
-    
-    _slideOutController = AnimationController(
-      duration: const Duration(milliseconds: 600),
-      vsync: this,
-    );
-    
-    _slideOutAnimation = Tween<Offset>(
-      begin: Offset.zero,
-      end: const Offset(0, -1),
-    ).animate(CurvedAnimation(
-      parent: _slideOutController,
-      curve: Curves.easeInOutCubic,
-    ));
-    
-    _slideInController = AnimationController(
-      duration: const Duration(milliseconds: 600),
-      vsync: this,
-    );
-    
-    _slideInAnimation = Tween<Offset>(
-      begin: const Offset(0, 1),
-      end: Offset.zero,
-    ).animate(CurvedAnimation(
-      parent: _slideInController,
-      curve: Curves.easeInOutCubic,
-    ));
-  }
+  bool _passwordVisible = false;
+  String? _fieldError;
 
   @override
   void dispose() {
-    _slideOutController.dispose();
-    _slideInController.dispose();
     _usernameController.dispose();
     _emailController.dispose();
     _passwordController.dispose();
     super.dispose();
   }
 
-  void _onUsernameNext() {
-    if (_usernameController.text.isNotEmpty) {
-      setState(() {
-        _isAnimating = true;
-        _previousStep = _currentStep;
-        _currentStep = 'email';
-      });
-      _slideOutController.forward();
-      _slideInController.forward().then((_) {
-        setState(() {
-          _isAnimating = false;
-        });
-        _slideOutController.reset();
-        _slideInController.reset();
-      });
-    }
-  }
-
-  void _onEmailNext() {
-    if (_emailController.text.isNotEmpty) {
-      setState(() {
-        _isAnimating = true;
-        _previousStep = _currentStep;
-        _currentStep = 'password';
-      });
-      _slideOutController.forward();
-      _slideInController.forward().then((_) {
-        setState(() {
-          _isAnimating = false;
-        });
-        _slideOutController.reset();
-        _slideInController.reset();
-      });
-    }
-  }
-
-  void _onBack() {
-    String newStep;
-    if (_currentStep == 'password') {
-      newStep = 'email';
-    } else if (_currentStep == 'email') {
-      newStep = 'username';
-    } else {
-      Navigator.pop(context);
+  void _back() {
+    if (_isLoading) return;
+    if (_step == 0) {
+      Navigator.of(context).pop();
       return;
     }
-    
     setState(() {
-      _isAnimating = true;
-      _previousStep = _currentStep;
-      _currentStep = newStep;
-    });
-    
-    // Reverse animation - slide down
-    _slideOutAnimation = Tween<Offset>(
-      begin: Offset.zero,
-      end: const Offset(0, 1),
-    ).animate(CurvedAnimation(
-      parent: _slideOutController,
-      curve: Curves.easeInOutCubic,
-    ));
-    
-    _slideInAnimation = Tween<Offset>(
-      begin: const Offset(0, -1),
-      end: Offset.zero,
-    ).animate(CurvedAnimation(
-      parent: _slideInController,
-      curve: Curves.easeInOutCubic,
-    ));
-    
-    _slideOutController.forward();
-    _slideInController.forward().then((_) {
-      setState(() {
-        _isAnimating = false;
-      });
-      _slideOutController.reset();
-      _slideInController.reset();
-      
-      // Reset animations back to normal direction
-      _slideOutAnimation = Tween<Offset>(
-        begin: Offset.zero,
-        end: const Offset(0, -1),
-      ).animate(CurvedAnimation(
-        parent: _slideOutController,
-        curve: Curves.easeInOutCubic,
-      ));
-      
-      _slideInAnimation = Tween<Offset>(
-        begin: const Offset(0, 1),
-        end: Offset.zero,
-      ).animate(CurvedAnimation(
-        parent: _slideInController,
-        curve: Curves.easeInOutCubic,
-      ));
+      _step--;
+      _fieldError = null;
     });
   }
 
-  Future<void> _signUp() async {
+  void _next() {
+    final l10n = AppLocalizations.of(context)!;
+    FocusScope.of(context).unfocus();
+
+    if (_step == 0) {
+      if (_usernameController.text.trim().isEmpty) {
+        setState(() => _fieldError = l10n.usernameHint);
+        return;
+      }
+    } else if (_step == 1) {
+      final email = _emailController.text.trim();
+      if (!EmailValidator.validate(email)) {
+        setState(() => _fieldError = l10n.invalidEmail);
+        return;
+      }
+    } else {
+      _submit();
+      return;
+    }
+
+    setState(() {
+      _step++;
+      _fieldError = null;
+    });
+  }
+
+  Future<void> _submit() async {
+    if (_isLoading) return;
+
+    final l10n = AppLocalizations.of(context)!;
+    final username = _usernameController.text.trim();
+    final email = _emailController.text.trim();
+    final password = _passwordController.text;
+
+    if (password.length < 6) {
+      setState(() => _fieldError = l10n.weakPassword);
+      return;
+    }
+
+    final notifications = context.read<IntrovertNotificationService>();
     setState(() {
       _isLoading = true;
+      _fieldError = null;
     });
 
     try {
-      // If Firebase not initialized, skip auth
-      if (!isFirebaseInitialized) {
-        if (mounted) {
-          CustomNotification.show(
-            context,
-            message: AppLocalizations.of(context)!.firebaseNotConfiguredSignup,
-            backgroundColor: Colors.orange,
-            icon: Icons.warning,
-          );
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(builder: (context) => const OnboardingScreen()),
-          );
-        }
-        return;
-      }
-
-      //firebase account creation
-      final userCredential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
-        email: _emailController.text.trim(),
-        password: _passwordController.text.trim(),
+      final result = await LoginBackendService().registerWithEmail(
+        context: context,
+        notificationService: notifications,
+        username: username,
+        email: email,
+        password: password,
       );
 
-      await userCredential.user?.updateDisplayName(_usernameController.text.trim());
-      
-      if (mounted) {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => const OnboardingScreen()),
-        );
+      if (!mounted) return;
+
+      switch (result) {
+        case RegistrationSuccess():
+          final user = FirebaseAuth.instance.currentUser;
+          if (user == null) {
+            notifications.showNotification(
+              message: l10n.authError,
+              type: NotificationType.error,
+            );
+            return;
+          }
+
+          Navigator.of(context).pushReplacement(
+            MaterialPageRoute(
+              builder: (_) => EmailVerificationScreen(
+                email: user.email ?? email,
+                username: username,
+                userId: user.uid,
+              ),
+            ),
+          );
+          break;
+        case RegistrationUsernameTaken():
+          notifications.showNotification(
+            message: l10n.usernameTaken,
+            type: NotificationType.error,
+          );
+          break;
+        case RegistrationEmailInUse():
+          notifications.showNotification(
+            message: l10n.signUpFailed(l10n.authError),
+            type: NotificationType.error,
+          );
+          break;
+        case RegistrationWeakPassword():
+          setState(() => _fieldError = l10n.weakPassword);
+          break;
+        case RegistrationNetworkError():
+          notifications.showNotification(
+            message: l10n.noInternetConnection,
+            type: NotificationType.error,
+          );
+          break;
+        case RegistrationUnknownError():
+          notifications.showNotification(
+            message: l10n.authError,
+            type: NotificationType.error,
+          );
+          break;
       }
-    } catch (e) {
+    } catch (_) {
       if (mounted) {
-        CustomNotification.show(
-          context,
-          message: AppLocalizations.of(context)!.signUpFailed(e.toString()),
-          backgroundColor: Colors.red,
-          icon: Icons.error,
+        notifications.showNotification(
+          message: l10n.authError,
+          type: NotificationType.error,
         );
       }
     } finally {
-      if (mounted) {
-        setState(() {
-          _isLoading = false;
-        });
-      }
+      if (mounted) setState(() => _isLoading = false);
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final accent = AppColors.senaryColor;
+    final headings = <String>[
+      l10n.signUp,
+      l10n.enterEmailAddress,
+      l10n.enterPassword,
+    ];
+
     return PopScope(
-      canPop: _currentStep == 'username',
-      onPopInvokedWithResult: (bool didPop, dynamic) {
-        if (didPop) return;
-        
-        if (_currentStep != 'username') {
-          _onBack();
-        }
+      canPop: _step == 0 && !_isLoading,
+      onPopInvokedWithResult: (didPop, result) {
+        if (!didPop && !_isLoading) _back();
       },
       child: Scaffold(
+        backgroundColor: AppColors.background,
+        resizeToAvoidBottomInset: true,
         body: SafeArea(
-          child: Stack(
-            children: [
-              // Current/Previous screen sliding out
-              if (_isAnimating)
-                SlideTransition(
-                  position: _slideOutAnimation,
-                  child: _buildScreen(_previousStep),
-                ),
-              
-              // New screen sliding in
-              if (_isAnimating)
-                SlideTransition(
-                  position: _slideInAnimation,
-                  child: _buildScreen(_currentStep),
-                ),
-              
-              // Static screen when not animating
-              if (!_isAnimating)
-                _buildScreen(_currentStep),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildScreen(String step) {
-    switch (step) {
-      case 'email':
-        return _buildEmailInput();
-      case 'password':
-        return _buildPasswordInput();
-      default:
-        return _buildUsernameInput();
-    }
-  }
-
-  Widget _buildUsernameInput() {
-    return Container(
-      decoration: const BoxDecoration(
-        image: DecorationImage(
-          image: AssetImage('assets/images/background_welcome.png'),
-          fit: BoxFit.cover,
-          alignment: Alignment(0, -0.6),
-        ),
-      ),
-      child: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(32.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const SizedBox(height: 20),
-            
-            GestureDetector(
-              onTap: _onBack,
-              child: const Icon(
-                Icons.chevron_left,
-                color: Colors.black87,
-                size: 32,
-              ),
-            ),
-            
-            const SizedBox(height: 12),
-            
-            Text(
-              'Sign up',
-              style: TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-                color: Theme.of(context).textTheme.bodyLarge?.color,
-                letterSpacing: 1,
-              ),
-            ),
-            
-            const SizedBox(height: 8),
-            
-            Text(
-              'Choose your username',
-              style: TextStyle(
-                fontSize: 16,
-                color: Colors.grey[600],
-              ),
-            ),
-            
-            const SizedBox(height: 60),
-            
-            TextField(
-              controller: _usernameController,
-              keyboardType: TextInputType.text,
-              decoration: InputDecoration(
-                hintText: AppLocalizations.of(context)!.usernameHint,
-                prefixIcon: const Icon(Icons.person_outline),
-                filled: true,
-                fillColor: Theme.of(context).brightness == Brightness.dark
-                    ? Colors.grey[800]
-                    : Colors.white,
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(30),
-                  borderSide: BorderSide(
-                    color: Theme.of(context).brightness == Brightness.dark
-                        ? Colors.grey[600]!
-                        : Colors.black87,
-                    width: 1.5,
-                  ),
-                ),
-                enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(30),
-                  borderSide: BorderSide(color: Colors.grey[400]!, width: 1.5),
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(30),
-                  borderSide: BorderSide(
-                    color: Theme.of(context).brightness == Brightness.dark
-                        ? Colors.white
-                        : Colors.black87,
-                    width: 1.5,
-                  ),
-                ),
-                contentPadding: const EdgeInsets.symmetric(
-                  horizontal: 20,
-                  vertical: 18,
-                ),
-              ),
-            ),
-            
-            const SizedBox(height: 16),
-            
-            GestureDetector(
-              onTap: _onUsernameNext,
-              child: Container(
-                width: double.infinity,
-                padding: const EdgeInsets.symmetric(vertical: 18),
-                decoration: BoxDecoration(
-                  color: Theme.of(context).brightness == Brightness.dark
-                      ? const Color(0xFFE57373)
-                      : Colors.black87,
-                  borderRadius: BorderRadius.circular(30),
-                ),
-                child: Text(
-                  'Next',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                    letterSpacing: 0.5,
-                  ),
-                ),
-              ),
-            ),
-            
-            const SizedBox(height: 20),
-          ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildEmailInput() {
-    return Container(
-      decoration: const BoxDecoration(
-        image: DecorationImage(
-          image: AssetImage('assets/images/background_welcome.png'),
-          fit: BoxFit.cover,
-          alignment: Alignment(0, -0.6),
-        ),
-      ),
-      child: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(32.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const SizedBox(height: 20),
-            
-            GestureDetector(
-              onTap: _onBack,
-              child: const Icon(
-                Icons.chevron_left,
-                color: Colors.black87,
-                size: 32,
-              ),
-            ),
-            
-            const SizedBox(height: 12),
-            
-            Text(
-              'Sign up',
-              style: TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-                color: Theme.of(context).textTheme.bodyLarge?.color,
-                letterSpacing: 1,
-              ),
-            ),
-            
-            const SizedBox(height: 8),
-            
-            Text(
-              'Enter your email address',
-              style: TextStyle(
-                fontSize: 16,
-                color: Colors.grey[600],
-              ),
-            ),
-            
-            const SizedBox(height: 60),
-            
-            TextField(
-              controller: _emailController,
-              keyboardType: TextInputType.emailAddress,
-              decoration: InputDecoration(
-                hintText: AppLocalizations.of(context)!.emailHint,
-                prefixIcon: const Icon(Icons.email_outlined),
-                filled: true,
-                fillColor: Theme.of(context).brightness == Brightness.dark
-                    ? Colors.grey[800]
-                    : Colors.white,
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(30),
-                  borderSide: BorderSide(
-                    color: Theme.of(context).brightness == Brightness.dark
-                        ? Colors.grey[600]!
-                        : Colors.black87,
-                    width: 1.5,
-                  ),
-                ),
-                enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(30),
-                  borderSide: BorderSide(color: Colors.grey[400]!, width: 1.5),
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(30),
-                  borderSide: const BorderSide(color: Colors.black87, width: 1.5),
-                ),
-                contentPadding: const EdgeInsets.symmetric(
-                  horizontal: 20,
-                  vertical: 18,
-                ),
-              ),
-            ),
-            
-            const SizedBox(height: 16),
-            
-            GestureDetector(
-              onTap: _onEmailNext,
-              child: Container(
-                width: double.infinity,
-                padding: const EdgeInsets.symmetric(vertical: 18),
-                decoration: BoxDecoration(
-                  color: Theme.of(context).brightness == Brightness.dark
-                      ? const Color(0xFFE57373)
-                      : Colors.black87,
-                  borderRadius: BorderRadius.circular(30),
-                ),
-                child: Text(
-                  'Next',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                    letterSpacing: 0.5,
-                  ),
-                ),
-              ),
-            ),
-            
-            const SizedBox(height: 20),
-          ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildPasswordInput() {
-    return Container(
-      decoration: const BoxDecoration(
-        image: DecorationImage(
-          image: AssetImage('assets/images/background_password.png'),
-          fit: BoxFit.cover,
-          alignment: Alignment(0, -0.6),
-        ),
-      ),
-      child: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(32.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const SizedBox(height: 20),
-            
-            GestureDetector(
-              onTap: _onBack,
-              child: const Icon(
-                Icons.chevron_left,
-                color: Colors.black87,
-                size: 32,
-              ),
-            ),
-            
-            const SizedBox(height: 12),
-            
-            Text(
-              'Sign up',
-              style: TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-                color: Theme.of(context).textTheme.bodyLarge?.color,
-                letterSpacing: 1,
-              ),
-            ),
-            
-            const SizedBox(height: 8),
-            
-            Text(
-              'Create a password',
-              style: TextStyle(
-                fontSize: 16,
-                color: Colors.grey[600],
-              ),
-            ),
-            
-            const SizedBox(height: 60),
-            
-            TextField(
-              controller: _passwordController,
-              obscureText: true,
-              decoration: InputDecoration(
-                hintText: AppLocalizations.of(context)!.passwordHint,
-                prefixIcon: const Icon(Icons.lock_outline),
-                filled: true,
-                fillColor: Theme.of(context).brightness == Brightness.dark
-                    ? Colors.grey[800]
-                    : Colors.white,
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(30),
-                  borderSide: BorderSide(
-                    color: Theme.of(context).brightness == Brightness.dark
-                        ? Colors.grey[600]!
-                        : Colors.black87,
-                    width: 1.5,
-                  ),
-                ),
-                enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(30),
-                  borderSide: BorderSide(color: Colors.grey[400]!, width: 1.5),
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(30),
-                  borderSide: const BorderSide(color: Colors.black87, width: 1.5),
-                ),
-                contentPadding: const EdgeInsets.symmetric(
-                  horizontal: 20,
-                  vertical: 18,
-                ),
-              ),
-            ),
-            
-            const SizedBox(height: 16),
-            
-            GestureDetector(
-              onTap: _isLoading ? null : _signUp,
-              child: Container(
-                width: double.infinity,
-                padding: const EdgeInsets.symmetric(vertical: 18),
-                decoration: BoxDecoration(
-                  color: Theme.of(context).brightness == Brightness.dark
-                      ? const Color(0xFFE57373)
-                      : Colors.black87,
-                  borderRadius: BorderRadius.circular(30),
-                ),
-                child: _isLoading
-                    ? const SizedBox(
-                        height: 20,
-                        child: Center(
-                          child: SizedBox(
-                            width: 20,
-                            height: 20,
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2,
-                              valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+          child: Center(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 480),
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.fromLTRB(26, 18, 26, 28),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Align(
+                      alignment: Alignment.centerLeft,
+                      child: IconButton(
+                        onPressed: _isLoading ? null : _back,
+                        tooltip: MaterialLocalizations.of(context).backButtonTooltip,
+                        icon: Icon(
+                          Icons.arrow_back_rounded,
+                          color: AppColors.tertiaryColor,
+                        ),
+                        style: IconButton.styleFrom(
+                          backgroundColor: AppColors.secondaryColor,
+                          minimumSize: const Size(46, 46),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 22),
+                    Container(
+                      width: 58,
+                      height: 58,
+                      alignment: Alignment.center,
+                      decoration: BoxDecoration(
+                        color: accent.withValues(alpha: 0.12),
+                        borderRadius: BorderRadius.circular(19),
+                      ),
+                      child: Icon(Icons.favorite_rounded, color: accent, size: 30),
+                    ),
+                    const SizedBox(height: 24),
+                    Text(
+                      headings[_step],
+                      style: TextStyle(
+                        color: AppColors.tertiaryColor,
+                        fontSize: 30,
+                        height: 1.12,
+                        fontWeight: FontWeight.w800,
+                        letterSpacing: -0.6,
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    Text(
+                      _step == 0
+                          ? l10n.usernameHint
+                          : _step == 1
+                              ? l10n.enterEmailAddress
+                              : l10n.enterPassword,
+                      style: TextStyle(
+                        color: AppColors.tertiaryColor.withValues(alpha: 0.7),
+                        fontSize: 15,
+                        height: 1.4,
+                      ),
+                    ),
+                    const SizedBox(height: 22),
+                    Row(
+                      children: List.generate(3, (index) {
+                        final active = index <= _step;
+                        return Expanded(
+                          child: AnimatedContainer(
+                            duration: const Duration(milliseconds: 180),
+                            height: 4,
+                            margin: EdgeInsets.only(right: index == 2 ? 0 : 7),
+                            decoration: BoxDecoration(
+                              color: active
+                                  ? accent
+                                  : AppColors.border.withValues(alpha: 0.55),
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                          ),
+                        );
+                      }),
+                    ),
+                    const SizedBox(height: 30),
+                    AnimatedSwitcher(
+                      duration: const Duration(milliseconds: 220),
+                      switchInCurve: Curves.easeOutCubic,
+                      switchOutCurve: Curves.easeInCubic,
+                      transitionBuilder: (child, animation) => FadeTransition(
+                        opacity: animation,
+                        child: SlideTransition(
+                          position: Tween<Offset>(
+                            begin: const Offset(0.035, 0),
+                            end: Offset.zero,
+                          ).animate(animation),
+                          child: child,
+                        ),
+                      ),
+                      child: KeyedSubtree(
+                        key: ValueKey<int>(_step),
+                        child: _buildField(l10n),
+                      ),
+                    ),
+                    if (_fieldError != null) ...[
+                      const SizedBox(height: 10),
+                      Text(
+                        _fieldError!,
+                        style: TextStyle(
+                          color: AppColors.septenaryColor,
+                          fontSize: 13,
+                        ),
+                      ),
+                    ],
+                    const SizedBox(height: 22),
+                    SizedBox(
+                      height: 56,
+                      child: FilledButton(
+                        onPressed: _isLoading ? null : _next,
+                        style: FilledButton.styleFrom(
+                          backgroundColor: accent,
+                          foregroundColor: Colors.white,
+                          disabledBackgroundColor: accent.withValues(alpha: 0.55),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(17),
+                          ),
+                          textStyle: const TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                        child: _isLoading
+                            ? const SizedBox(
+                                width: 22,
+                                height: 22,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2.3,
+                                  color: Colors.white,
+                                ),
+                              )
+                            : Text(_step == 2 ? l10n.signUp : l10n.next),
+                      ),
+                    ),
+                    const SizedBox(height: 14),
+                    if (_step == 0)
+                      Center(
+                        child: TextButton(
+                          onPressed: _isLoading ? null : () => Navigator.of(context).pop(),
+                          child: Text(
+                            l10n.signIn,
+                            style: TextStyle(
+                              color: AppColors.tertiaryColor,
+                              fontWeight: FontWeight.w600,
                             ),
                           ),
                         ),
-                      )
-                    : Text(
-                        'Sign Up',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                          letterSpacing: 0.5,
-                        ),
                       ),
+                  ],
+                ),
               ),
             ),
-            
-            const SizedBox(height: 20),
-          ],
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildField(AppLocalizations l10n) {
+    final inputDecoration = InputDecoration(
+      filled: true,
+      fillColor: AppColors.secondaryColor,
+      prefixIcon: Icon(
+        _step == 0
+            ? Icons.person_outline_rounded
+            : _step == 1
+                ? Icons.mail_outline_rounded
+                : Icons.lock_outline_rounded,
+        color: AppColors.tertiaryColor.withValues(alpha: 0.7),
+      ),
+      suffixIcon: _step == 2
+          ? IconButton(
+              onPressed: () => setState(() => _passwordVisible = !_passwordVisible),
+              icon: Icon(
+                _passwordVisible
+                    ? Icons.visibility_outlined
+                    : Icons.visibility_off_outlined,
+                color: AppColors.tertiaryColor.withValues(alpha: 0.7),
+              ),
+            )
+          : null,
+      hintText: _step == 0
+          ? l10n.usernameHint
+          : _step == 1
+              ? l10n.emailHint
+              : l10n.passwordHint,
+      hintStyle: TextStyle(
+        color: AppColors.tertiaryColor.withValues(alpha: 0.5),
+      ),
+      contentPadding: const EdgeInsets.symmetric(horizontal: 18, vertical: 18),
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(17),
+        borderSide: BorderSide(color: AppColors.border),
+      ),
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(17),
+        borderSide: BorderSide(color: AppColors.border),
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(17),
+        borderSide: BorderSide(color: AppColors.senaryColor, width: 1.6),
+      ),
+    );
+
+    if (_step == 0) {
+      return TextField(
+        controller: _usernameController,
+        autofocus: true,
+        textInputAction: TextInputAction.next,
+        onSubmitted: (_) => _next(),
+        onChanged: (_) {
+          if (_fieldError != null) setState(() => _fieldError = null);
+        },
+        decoration: inputDecoration,
+        style: TextStyle(color: AppColors.tertiaryColor),
+      );
+    }
+    if (_step == 1) {
+      return TextField(
+        controller: _emailController,
+        autofocus: true,
+        keyboardType: TextInputType.emailAddress,
+        textInputAction: TextInputAction.next,
+        autocorrect: false,
+        onSubmitted: (_) => _next(),
+        onChanged: (_) {
+          if (_fieldError != null) setState(() => _fieldError = null);
+        },
+        decoration: inputDecoration,
+        style: TextStyle(color: AppColors.tertiaryColor),
+      );
+    }
+    return TextField(
+      controller: _passwordController,
+      autofocus: true,
+      obscureText: !_passwordVisible,
+      autocorrect: false,
+      enableSuggestions: false,
+      textInputAction: TextInputAction.done,
+      onSubmitted: (_) => _next(),
+      onChanged: (_) {
+        if (_fieldError != null) setState(() => _fieldError = null);
+      },
+      decoration: inputDecoration,
+      style: TextStyle(color: AppColors.tertiaryColor),
     );
   }
 }
