@@ -103,7 +103,7 @@ class LoginBackendService {
       final user = userCredential.user;
       if (user == null) throw FirebaseAuthException(code: 'user-not-found-after-signin');
 
-      await _handleSessionPersistence(email, password, rememberMe);
+      await _handleSessionPersistence(email, rememberMe);
       await user.reload();
       final freshUser = _auth.currentUser;
       if (freshUser == null) throw FirebaseAuthException(code: 'user-disappeared-after-reload');
@@ -483,7 +483,7 @@ class LoginBackendService {
     }
   }
 
-  Future<void> _handleSessionPersistence(String email, String password, bool rememberMe) async {
+  Future<void> _handleSessionPersistence(String email, bool rememberMe) async {
     if (rememberMe) {
       await _secureStorage.write(key: 'email', value: email);
       await _secureStorage.write(key: 'remember_me', value: 'true');
