@@ -136,7 +136,6 @@ class SleepForegroundHandler extends TaskHandler {
     } else if (!isInWindow && _isInSleepWindow) {
       _isInSleepWindow = false;
       _sleepStartTime = null;
-      _alarmDismissedToday = false;
       debugPrint('☀️ Exited sleep window');
     }
 
@@ -311,7 +310,6 @@ class SleepForegroundHandler extends TaskHandler {
   @override
   void onNotificationButtonPressed(String id) {
     if (id == 'stop_alarm') {
-      _alarmDismissedToday = true;
       _stopSmartAlarm();
     }
   }
