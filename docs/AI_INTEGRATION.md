@@ -4,7 +4,7 @@ This document describes the mobile-side contract for the private AI-lly Firebase
 
 ## Client service
 
-Use `AllyAiService` from `lib/services/ally_ai_service.dart`:
+Open the chat from the new **Ally AI** card on the home screen. The screen is implemented in `lib/screens/ally_ai_chat.dart` and calls `AllyAiService` from `lib/services/ally_ai_service.dart`.
 
 ```dart
 final ai = AllyAiService();
@@ -25,10 +25,10 @@ The service targets `europe-west1`, matching the Vertex Firebase Functions conve
 
 ## Backend prerequisite
 
-The client is only functional after the AI-lly backend PR has been reviewed and merged/deployed, the correct Firebase project is selected, `OPENROUTER_API_KEY` is set as a Firebase secret, and both required model parameters (`AI_GUEST_MODEL` and `AI_REGISTERED_MODEL`) are configured.
+The AI-lly backend has been merged, but the client will only work after that backend is deployed to the correct Firebase project, `OPENROUTER_API_KEY` is set as a Firebase secret, and both required model parameters (`AI_GUEST_MODEL` and `AI_REGISTERED_MODEL`) are configured.
 
 Do not point production users at an unconfigured backend. Model selection and data handling must be reviewed before sending personal or health-related information.
 
 ## Error handling
 
-`AllyAiException` exposes a stable code and safe, user-presentable message. UI code should show the message, retain the user's draft on failure, and avoid logging message content or provider responses. Localized UI strings should be added when the chat interface is implemented.
+`AllyAiException` exposes a stable code and safe, user-presentable message. UI code should show the message, retain the user's draft on failure, and avoid logging message content or provider responses. The chat screen currently provides Turkish and English UI copy, with English fallback for other locales. Chat messages are kept in memory only for the current screen and are not saved as conversation history by this client.
