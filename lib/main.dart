@@ -44,17 +44,18 @@ Future<void> main() async {
     FlutterForegroundTask.initCommunicationPort();
   }
 
-  await SleepTrackerService().loadSettings();
-
-  // 3. Load User Preferences (Theme & Language)
-  // This prevents the "white flash" by setting the theme before the app mounts.
-  final prefs = await SharedPreferences.getInstance();
-  final String savedTheme = prefs.getString('selectedTheme') ?? 'light';
-
-  // 4. Lock Orientation (Optional, recommended for health apps)
-  await SystemChrome.setPreferredOrientations([
-    DeviceOrientation.portraitUp,
+  // Independent startup tasks run together to reduce time-to-first-frame.
+  // Firebase is initialized first because app providers depend on it.
+  final startupResults = await Future.wait<Object?>([
+    SharedPreferences.getInstance(),
+    SleepTrackerService().loadSettings(),
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.portraitUp,
+    ]),
   ]);
+
+  final prefs = startupResults[0] as SharedPreferences;
+  final String savedTheme = prefs.getString('selectedTheme') ?? 'light';
 
   // 5. Run App with MultiProvider
   runApp(
