@@ -33,7 +33,7 @@ class AllyAiResponse {
     if (usage is Map) {
       final value = usage['remainingToday'];
       if (value is num && value.isFinite) {
-        remainingToday = value.toInt().clamp(0, 1000000);
+        remainingToday = value.toInt().clamp(0, 1000000).toInt();
       }
     }
 
