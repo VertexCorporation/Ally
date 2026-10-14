@@ -348,7 +348,7 @@ class _AllyAiChatScreenState extends State<AllyAiChatScreen> {
         16,
         10,
         16,
-        12 + MediaQuery.viewInsetsOf(context).bottom * 0,
+        12,
       ),
       decoration: BoxDecoration(
         color: theme.scaffoldBackgroundColor,
