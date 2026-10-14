@@ -96,6 +96,19 @@ class HealthProvider extends ChangeNotifier {
     final lastResetDate = resetKey == null ? null : prefs.getString(resetKey);
 
     if (lastResetDate != today) {
+      // Archive the previous day's final snapshot before resetting counters.
+      // Failure to reach Firestore must never block the local daily reset.
+      if (uid != null && lastResetDate != null) {
+        try {
+          await _recordsService.saveDailyHealthRecord(
+            lastResetDate,
+            _healthData.toJson(),
+          );
+        } catch (e) {
+          debugPrint('Unable to archive previous health day: $e');
+        }
+      }
+
       _healthData.currentSteps = 0;
       _healthData.waterGlasses = 0;
       _healthData.caloriesConsumed = 0;
