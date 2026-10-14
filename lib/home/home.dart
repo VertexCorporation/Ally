@@ -598,8 +598,8 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                   ),
                   _buildMetricCard(
                     AppLocalizations.of(context)!.water,
-                    UnitConverter.formatWater(
-                      healthData.waterGlasses,
+                    UnitConverter.formatWaterMl(
+                      healthData.waterMl,
                       provider.units,
                     ),
                     Icons.water_drop_rounded,
@@ -738,9 +738,10 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   Widget _buildWaterCard(String value, Color color, int delay) {
     return Consumer<HealthProvider>(
       builder: (context, healthProvider, child) {
-        final progress =
-            healthProvider.healthData.waterGlasses /
-            healthProvider.healthData.waterGoal;
+        final healthData = healthProvider.healthData;
+        final progress = healthData.waterGoalMl > 0
+            ? (healthData.waterMl / healthData.waterGoalMl).clamp(0.0, 1.0)
+            : 0.0;
 
         return FadeTransition(
           opacity: _fadeController,

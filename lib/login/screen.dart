@@ -74,9 +74,7 @@ class _LoginScreenContent extends StatelessWidget {
                   key: ValueKey(controller.currentStep),
                   opacity: 0.16,
                   child: Image.asset(
-                    controller.currentStep == LoginStep.passwordInput
-                        ? 'assets/images/background_signin.png'
-                        : 'assets/images/background_password.png',
+                    'assets/images/background_signin.png',
                     fit: BoxFit.cover,
                     alignment: Alignment.bottomCenter,
                   ),
@@ -210,7 +208,12 @@ class _MethodSelectionView extends StatelessWidget {
                           ),
                         ),
 
-                        SizedBox(height: constraints.maxHeight * 0.15),
+                        SizedBox(
+                          height: (constraints.maxHeight * 0.1).clamp(
+                            32.0,
+                            72.0,
+                          ),
+                        ),
 
                         // --- Butonlar ---
                         _AuthButton(
@@ -369,33 +372,9 @@ class _EmailInputView extends StatelessWidget {
 
                     const SizedBox(height: 16),
 
-                    Container(
-                      width: double.infinity,
-                      decoration: BoxDecoration(
-                        color: AppColors.senaryColor, // Tema vurgu rengi
-                        borderRadius: BorderRadius.circular(30),
-                      ),
-                      child: Material(
-                        color: Colors.transparent,
-                        child: InkWell(
-                          onTap: () => controller.goToPasswordStep(context),
-                          borderRadius: BorderRadius.circular(30),
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 18),
-                            child: Text(
-                              l10n.next, // "Next"
-                              textAlign: TextAlign.center,
-                              style: const TextStyle(
-                                color: Colors
-                                    .white, // Vurgu rengi üzerinde genelde beyaz okunur
-                                fontSize: 16,
-                                fontWeight: FontWeight.w600,
-                                letterSpacing: 0.5,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
+                    _PrimaryAuthButton(
+                      text: l10n.next,
+                      onPressed: () => controller.goToPasswordStep(context),
                     ),
 
                     const SizedBox(height: 20),
@@ -477,6 +456,12 @@ class _PasswordInputView extends StatelessWidget {
                       ),
                     ),
 
+                    const SizedBox(height: 16),
+
+                    _EmailAddressSummary(
+                      email: controller.emailController.text.trim(),
+                    ),
+
                     SizedBox(height: constraints.maxHeight * 0.1),
 
                     _ShakeableInput(
@@ -500,56 +485,10 @@ class _PasswordInputView extends StatelessWidget {
 
                     const SizedBox(height: 16),
 
-                    Container(
-                      width: double.infinity,
-                      decoration: BoxDecoration(
-                        color: AppColors
-                            .background, // Temanın arka plan rengi (outline stili için)
-                        borderRadius: BorderRadius.circular(30),
-                        border: Border.all(
-                          color: AppColors.tertiaryColor,
-                          width: 2,
-                        ), // Çerçeve
-                      ),
-                      child: Material(
-                        color: Colors.transparent,
-                        child: InkWell(
-                          onTap: isLoading
-                              ? null
-                              : () => controller.submitEmailLogin(context),
-                          borderRadius: BorderRadius.circular(30),
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 18),
-                            child: isLoading
-                                ? SizedBox(
-                                    height: 20,
-                                    child: Center(
-                                      child: SizedBox(
-                                        width: 20,
-                                        height: 20,
-                                        child: CircularProgressIndicator(
-                                          strokeWidth: 2,
-                                          valueColor:
-                                              AlwaysStoppedAnimation<Color>(
-                                                AppColors.tertiaryColor,
-                                              ),
-                                        ),
-                                      ),
-                                    ),
-                                  )
-                                : Text(
-                                    l10n.signIn, // "Sign In"
-                                    textAlign: TextAlign.center,
-                                    style: TextStyle(
-                                      color: AppColors.tertiaryColor,
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.w600,
-                                      letterSpacing: 0.5,
-                                    ),
-                                  ),
-                          ),
-                        ),
-                      ),
+                    _PrimaryAuthButton(
+                      text: l10n.signIn,
+                      isLoading: isLoading,
+                      onPressed: () => controller.submitEmailLogin(context),
                     ),
 
                     const SizedBox(height: 20),
@@ -566,6 +505,94 @@ class _PasswordInputView extends StatelessWidget {
 
 // --- YARDIMCI WIDGET'LAR ---
 
+class _PrimaryAuthButton extends StatelessWidget {
+  final String text;
+  final VoidCallback onPressed;
+  final bool isLoading;
+
+  const _PrimaryAuthButton({
+    required this.text,
+    required this.onPressed,
+    this.isLoading = false,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: double.infinity,
+      child: FilledButton(
+        onPressed: isLoading ? null : onPressed,
+        style: FilledButton.styleFrom(
+          backgroundColor: AppColors.senaryColor,
+          foregroundColor: Colors.white,
+          disabledBackgroundColor: AppColors.senaryColor.withValues(alpha: 0.7),
+          disabledForegroundColor: Colors.white,
+          minimumSize: const Size.fromHeight(56),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(18),
+          ),
+          textStyle: const TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.w600,
+            letterSpacing: 0.3,
+          ),
+        ),
+        child: isLoading
+            ? const SizedBox(
+                width: 22,
+                height: 22,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                  color: Colors.white,
+                ),
+              )
+            : Text(text),
+      ),
+    );
+  }
+}
+
+class _EmailAddressSummary extends StatelessWidget {
+  final String email;
+
+  const _EmailAddressSummary({required this.email});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      decoration: BoxDecoration(
+        color: AppColors.secondaryColor,
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: AppColors.border),
+      ),
+      child: Row(
+        children: [
+          Icon(
+            Icons.email_outlined,
+            size: 20,
+            color: AppColors.tertiaryColor.withValues(alpha: 0.7),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Text(
+              email,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                color: AppColors.tertiaryColor,
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
 class _AuthButton extends StatelessWidget {
   final String text;
   final IconData icon;
@@ -579,16 +606,16 @@ class _AuthButton extends StatelessWidget {
       width: double.infinity,
       decoration: BoxDecoration(
         color: AppColors.secondaryColor, // Buton arka planı
-        borderRadius: BorderRadius.circular(30),
-        border: Border.all(color: AppColors.border, width: 1),
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: AppColors.border),
       ),
       child: Material(
         color: Colors.transparent,
         child: InkWell(
           onTap: onTap,
-          borderRadius: BorderRadius.circular(30),
+          borderRadius: BorderRadius.circular(18),
           child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 18),
+            padding: const EdgeInsets.symmetric(vertical: 16),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [

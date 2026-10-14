@@ -28,7 +28,7 @@ class _WaterScreenState extends State<WaterScreen> {
   void _showGoalDialog() {
     final healthProvider = Provider.of<HealthProvider>(context, listen: false);
     final isImperial = healthProvider.units == 'imperial';
-    final currentGoalMl = healthProvider.healthData.waterGoal * 250;
+    final currentGoalMl = healthProvider.healthData.waterGoalMl;
 
     final displayGoal = isImperial
         ? UnitConverter.mlToOz(currentGoalMl).round()
@@ -220,14 +220,13 @@ class _WaterScreenState extends State<WaterScreen> {
 
     final healthProvider = Provider.of<HealthProvider>(context);
     final isImperial = healthProvider.units == 'imperial';
-    final glassesConsumed = healthProvider.healthData.waterGlasses;
-    final dailyGoal = healthProvider.healthData.waterGoal;
-    final mlConsumed = glassesConsumed * 250; // Each glass is 250ml
-    final mlGoal = dailyGoal * 250;
+    final mlConsumed = healthProvider.healthData.waterMl;
+    final mlGoal = healthProvider.healthData.waterGoalMl;
 
     final displayConsumed = isImperial ? UnitConverter.mlToOz(mlConsumed).round() : mlConsumed;
     final displayGoal = isImperial ? UnitConverter.mlToOz(mlGoal).round() : mlGoal;
     final unit = isImperial ? 'oz' : 'ml';
+    final progress = mlGoal > 0 ? (mlConsumed / mlGoal).clamp(0.0, 1.0) : 0.0;
 
     return Scaffold(
       backgroundColor: backgroundColor,
@@ -278,7 +277,7 @@ class _WaterScreenState extends State<WaterScreen> {
                         ClipRRect(
                           borderRadius: BorderRadius.circular(sw * 0.03),
                           child: LinearProgressIndicator(
-                            value: (glassesConsumed / dailyGoal).clamp(0.0, 1.0),
+                            value: progress,
                             minHeight: sh * 0.015,
                             backgroundColor: Colors.white70,
                             valueColor: const AlwaysStoppedAnimation<Color>(Colors.white),
@@ -288,24 +287,38 @@ class _WaterScreenState extends State<WaterScreen> {
                         Row(
                           crossAxisAlignment: CrossAxisAlignment.end,
                           children: [
-                            Text(
-                              '$displayConsumed',
-                              style: TextStyle(
-                                fontSize: sw * 0.16,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white,
-                                height: 1,
+                            Expanded(
+                              flex: 5,
+                              child: FittedBox(
+                                fit: BoxFit.scaleDown,
+                                alignment: Alignment.centerLeft,
+                                child: Text(
+                                  '$displayConsumed',
+                                  style: TextStyle(
+                                    fontSize: sw * 0.16,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white,
+                                    height: 1,
+                                  ),
+                                ),
                               ),
                             ),
                             SizedBox(width: sw * 0.03),
-                            Padding(
-                              padding: EdgeInsets.only(bottom: sh * 0.01),
-                              child: Text(
-                                AppLocalizations.of(context)!.ofValueUnit(displayGoal.toString(), unit),
-                                style: TextStyle(
-                                  fontSize: sw * 0.06,
-                                  color: Colors.white70,
-                                  fontWeight: FontWeight.w500,
+                            Expanded(
+                              flex: 4,
+                              child: Padding(
+                                padding: EdgeInsets.only(bottom: sh * 0.01),
+                                child: FittedBox(
+                                  fit: BoxFit.scaleDown,
+                                  alignment: Alignment.bottomLeft,
+                                  child: Text(
+                                    AppLocalizations.of(context)!.ofValueUnit(unit, displayGoal.toString()),
+                                    style: TextStyle(
+                                      fontSize: sw * 0.06,
+                                      color: Colors.white70,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
                                 ),
                               ),
                             ),

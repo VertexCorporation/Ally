@@ -45,8 +45,10 @@ class UnitConverter {
   }
 
   static String formatWater(int glasses, String units) {
-    // 1 glass = 250 ml
-    final ml = glasses * 250;
+    return formatWaterMl(glasses * 250, units);
+  }
+
+  static String formatWaterMl(int ml, String units) {
     if (units == 'imperial') {
       return '${mlToOz(ml).toStringAsFixed(0)} oz';
     }

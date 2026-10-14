@@ -331,9 +331,7 @@ class LoginController extends ChangeNotifier {
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
-          builder: (_) => EmailVerificationScreen(
-            email: user.email!,
-          ),
+          builder: (_) => EmailVerificationScreen(email: user.email!),
         ),
       );
       return;

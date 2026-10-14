@@ -19,7 +19,9 @@ class _HealthScoreScreenState extends State<HealthScoreScreen> {
     final healthScore = healthData.healthScore;
 
     // Calculate individual scores based on real data
-    final waterScore = ((healthData.waterGlasses / healthData.waterGoal) * 25).clamp(0, 25);
+    final waterScore = healthData.waterGoalMl > 0
+        ? ((healthData.waterMl / healthData.waterGoalMl) * 25).clamp(0, 25)
+        : 0.0;
     final exerciseScore = ((healthData.exerciseStreak / 7) * 25).clamp(0, 25);
     final sleepScore = ((healthData.sleepHours / healthData.sleepGoal) * 25).clamp(0, 25);
     final stepsScore = healthData.stepsGoal > 0

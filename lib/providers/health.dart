@@ -46,7 +46,7 @@ class HealthProvider extends ChangeNotifier {
 
     if (lastResetDate != today) {
       _healthData.currentSteps = 0;
-      _healthData.waterGlasses = 0;
+      _healthData.waterMl = 0;
       _healthData.caloriesConsumed = 0;
 
       await prefs.setString('last_reset_date', today);
@@ -132,22 +132,24 @@ class HealthProvider extends ChangeNotifier {
   
   // Water methods
   void updateWaterGlasses(int glasses) {
-    _healthData.waterGlasses = glasses;
+    _healthData.waterMl = glasses * 250;
     notifyListeners();
     _saveData();
   }
   
   void incrementWater() {
     if (_healthData.waterGlasses < _healthData.waterGoal) {
-      _healthData.waterGlasses++;
+      _healthData.waterMl += 250;
       notifyListeners();
       _saveData();
     }
   }
   
   void decrementWater() {
-    if (_healthData.waterGlasses > 0) {
-      _healthData.waterGlasses--;
+    if (_healthData.waterMl > 0) {
+      _healthData.waterMl = _healthData.waterMl > 250
+          ? _healthData.waterMl - 250
+          : 0;
       notifyListeners();
       _saveData();
     }
@@ -239,26 +241,26 @@ class HealthProvider extends ChangeNotifier {
   }
   
   void updateWaterGoal(int goal) {
-    _healthData.waterGoal = goal;
+    _healthData.waterGoalMl = goal * 250;
     notifyListeners();
     _saveData();
   }
 
   void addWaterMl(int ml) {
-    final glasses = (ml / 250).round();
-    _healthData.waterGlasses += glasses;
+    if (ml <= 0) return;
+    _healthData.waterMl += ml;
     notifyListeners();
     _saveData();
   }
 
   void updateWaterMl(int ml) {
-    _healthData.waterGlasses = (ml / 250).round();
+    _healthData.waterMl = ml < 0 ? 0 : ml;
     notifyListeners();
     _saveData();
   }
 
   void updateWaterGoalMl(int ml) {
-    _healthData.waterGoal = (ml / 250).round();
+    _healthData.waterGoalMl = ml;
     notifyListeners();
     _saveData();
   }

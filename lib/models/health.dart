@@ -1,7 +1,9 @@
 class HealthData {
   // Water
-  int waterGlasses;
-  int waterGoal;
+  int waterMl;
+  int waterGoalMl;
+  int get waterGlasses => (waterMl / 250).round();
+  int get waterGoal => (waterGoalMl / 250).round();
   
   // Exercises
   int exerciseStreak;
@@ -67,7 +69,9 @@ class HealthData {
     }
 
     // 2. Water (25%) - Hydration
-    double waterPercent = (waterGlasses / waterGoal).clamp(0.0, 1.0);
+    final waterPercent = waterGoalMl > 0
+        ? (waterMl / waterGoalMl).clamp(0.0, 1.0)
+        : 0.0;
     score += (waterPercent * 25).round();
 
     // 3. Sleep (25%) - Sleep quality
@@ -82,8 +86,10 @@ class HealthData {
   }
 
   HealthData({
-    this.waterGlasses = 0,
-    this.waterGoal = 8,
+    int waterGlasses = 0,
+    int waterGoal = 8,
+    int? waterMl,
+    int? waterGoalMl,
     this.exerciseStreak = 0,
     this.exerciseGoal = 30,
     this.lastExerciseDate,
@@ -102,12 +108,16 @@ class HealthData {
     List<Map<String, dynamic>>? mealLog,
     List<Map<String, dynamic>>? exerciseLog,
     List<Map<String, dynamic>>? weightHistory,
-  })  : mealLog = mealLog ?? [],
+  })  : waterMl = waterMl ?? waterGlasses * 250,
+        waterGoalMl = waterGoalMl ?? waterGoal * 250,
+        mealLog = mealLog ?? [],
         exerciseLog = exerciseLog ?? [],
         weightHistory = weightHistory ?? [];
 
   Map<String, dynamic> toJson() {
     return {
+      'waterMl': waterMl,
+      'waterGoalMl': waterGoalMl,
       'waterGlasses': waterGlasses,
       'waterGoal': waterGoal,
       'exerciseStreak': exerciseStreak,
@@ -133,8 +143,10 @@ class HealthData {
 
   factory HealthData.fromJson(Map<String, dynamic> json) {
     return HealthData(
-      waterGlasses: json['waterGlasses'] ?? 0,
-      waterGoal: json['waterGoal'] ?? 8,
+      waterMl: (json['waterMl'] as num?)?.round() ??
+          (((json['waterGlasses'] as num?)?.round() ?? 0) * 250),
+      waterGoalMl: (json['waterGoalMl'] as num?)?.round() ??
+          (((json['waterGoal'] as num?)?.round() ?? 8) * 250),
       exerciseStreak: json['exerciseStreak'] ?? 0,
       exerciseGoal: json['exerciseGoal'] ?? 30,
       lastExerciseDate: json['lastExerciseDate'] != null ? DateTime.parse(json['lastExerciseDate']) : null,

@@ -1,7 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter/foundation.dart';
+import 'package:provider/provider.dart';
+import '../home/home.dart';
 import '../l10n/app_localizations.dart';
 import '../login/screen.dart';
+import '../providers/health.dart';
+import 'onboard.dart';
 
 class WelcomeScreen extends StatefulWidget {
   const WelcomeScreen({super.key});
@@ -10,10 +15,11 @@ class WelcomeScreen extends StatefulWidget {
   State<WelcomeScreen> createState() => _WelcomeScreenState();
 }
 
-class _WelcomeScreenState extends State<WelcomeScreen> with SingleTickerProviderStateMixin {
+class _WelcomeScreenState extends State<WelcomeScreen>
+    with SingleTickerProviderStateMixin {
   late AnimationController _slideController;
   late Animation<Offset> _slideAnimation;
-  
+
   @override
   void initState() {
     super.initState();
@@ -21,13 +27,13 @@ class _WelcomeScreenState extends State<WelcomeScreen> with SingleTickerProvider
       duration: const Duration(milliseconds: 600),
       vsync: this,
     );
-    _slideAnimation = Tween<Offset>(
-      begin: Offset.zero,
-      end: const Offset(0, -1),
-    ).animate(CurvedAnimation(
-      parent: _slideController,
-      curve: Curves.easeInOutCubic,
-    ));
+    _slideAnimation =
+        Tween<Offset>(begin: Offset.zero, end: const Offset(0, -1)).animate(
+          CurvedAnimation(
+            parent: _slideController,
+            curve: Curves.easeInOutCubic,
+          ),
+        );
   }
 
   @override
@@ -38,25 +44,26 @@ class _WelcomeScreenState extends State<WelcomeScreen> with SingleTickerProvider
 
   void _navigateToLogin() {
     _slideController.forward();
-    
+
     Navigator.push(
       context,
       PageRouteBuilder(
-        pageBuilder: (context, animation, secondaryAnimation) => const LoginScreen(),
+        pageBuilder: (context, animation, secondaryAnimation) =>
+            const LoginScreen(),
         transitionsBuilder: (context, animation, secondaryAnimation, child) {
           // Slide up when going forward, slide down when going back
-          var slideAnimation = Tween<Offset>(
-            begin: const Offset(0.0, 1.0),
-            end: Offset.zero,
-          ).animate(CurvedAnimation(
-            parent: animation,
-            curve: Curves.easeInOutCubic,
-          ));
+          var slideAnimation =
+              Tween<Offset>(
+                begin: const Offset(0.0, 1.0),
+                end: Offset.zero,
+              ).animate(
+                CurvedAnimation(
+                  parent: animation,
+                  curve: Curves.easeInOutCubic,
+                ),
+              );
 
-          return SlideTransition(
-            position: slideAnimation,
-            child: child,
-          );
+          return SlideTransition(position: slideAnimation, child: child);
         },
         transitionDuration: const Duration(milliseconds: 600),
         reverseTransitionDuration: const Duration(milliseconds: 600),
@@ -65,6 +72,24 @@ class _WelcomeScreenState extends State<WelcomeScreen> with SingleTickerProvider
       // Reset welcome animation when returning
       _slideController.reverse();
     });
+  }
+
+  Future<void> _continueWithoutSignInForDebug() async {
+    if (!kDebugMode) return;
+
+    final isOnboardingCompleted = await context
+        .read<HealthProvider>()
+        .isOnboardingCompleted();
+    if (!mounted) return;
+
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(
+        builder: (_) => isOnboardingCompleted
+            ? const HomeScreen()
+            : const OnboardingScreen(),
+      ),
+    );
   }
 
   @override
@@ -107,9 +132,9 @@ class _WelcomeScreenState extends State<WelcomeScreen> with SingleTickerProvider
                         letterSpacing: 2,
                       ),
                     ),
-                    
+
                     const Spacer(flex: 4),
-                    
+
                     RichText(
                       text: TextSpan(
                         style: TextStyle(
@@ -118,20 +143,24 @@ class _WelcomeScreenState extends State<WelcomeScreen> with SingleTickerProvider
                           height: 1.3,
                         ),
                         children: [
-                          TextSpan(text: '${AppLocalizations.of(context)!.welcomeText1}\n'),
-                          TextSpan(text: '${AppLocalizations.of(context)!.welcomeText2} '),
+                          TextSpan(
+                            text:
+                                '${AppLocalizations.of(context)!.welcomeText1}\n',
+                          ),
+                          TextSpan(
+                            text:
+                                '${AppLocalizations.of(context)!.welcomeText2} ',
+                          ),
                           TextSpan(
                             text: AppLocalizations.of(context)!.welcomeText3,
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                            ),
+                            style: TextStyle(fontWeight: FontWeight.bold),
                           ),
                         ],
                       ),
                     ),
-                    
+
                     const SizedBox(height: 30),
-                  
+
                     GestureDetector(
                       onTap: _navigateToLogin,
                       child: Container(
@@ -154,7 +183,21 @@ class _WelcomeScreenState extends State<WelcomeScreen> with SingleTickerProvider
                         ),
                       ),
                     ),
-                    
+
+                    if (kDebugMode)
+                      Center(
+                        child: TextButton.icon(
+                          onPressed: _continueWithoutSignInForDebug,
+                          icon: const Icon(Icons.developer_mode),
+                          label: const Text(
+                            'Geliştirici: giriş yapmadan devam et',
+                          ),
+                          style: TextButton.styleFrom(
+                            foregroundColor: Colors.black87,
+                          ),
+                        ),
+                      ),
+
                     const SizedBox(height: 5),
                   ],
                 ),

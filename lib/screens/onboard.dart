@@ -569,7 +569,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> with TickerProvider
                             ),
                             decoration: InputDecoration(
                               border: InputBorder.none,
-                              hintText: AppLocalizations.of(context)!.ageHint,
+                              hintText: '5',
                               hintStyle: TextStyle(
                                 color: Colors.grey,
                                 fontWeight: FontWeight.bold,
@@ -600,7 +600,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> with TickerProvider
                             ),
                             decoration: InputDecoration(
                               border: InputBorder.none,
-                              hintText: AppLocalizations.of(context)!.heightFeetHint,
+                              hintText: '9',
                               hintStyle: TextStyle(
                                 color: Colors.grey,
                                 fontWeight: FontWeight.bold,
@@ -635,7 +635,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> with TickerProvider
                             ),
                             decoration: InputDecoration(
                               border: InputBorder.none,
-                              hintText: AppLocalizations.of(context)!.weightLbsHint,
+                              hintText: '170',
                               hintStyle: TextStyle(
                                 color: Colors.grey,
                                 fontWeight: FontWeight.bold,
@@ -712,6 +712,10 @@ class _OnboardingScreenState extends State<OnboardingScreen> with TickerProvider
                         child: TextField(
                           controller: _ageController,
                           keyboardType: TextInputType.number,
+                          inputFormatters: [
+                            FilteringTextInputFormatter.digitsOnly,
+                          ],
+                          maxLength: 3,
                           textAlign: TextAlign.center,
                           style: TextStyle(
                             fontSize: 56,
@@ -721,11 +725,12 @@ class _OnboardingScreenState extends State<OnboardingScreen> with TickerProvider
                           ),
                           decoration: InputDecoration(
                             border: InputBorder.none,
-                            hintText: AppLocalizations.of(context)!.calorieGoalHint,
+                            hintText: AppLocalizations.of(context)!.ageHint,
                             hintStyle: TextStyle(
                               color: Colors.grey,
                               fontWeight: FontWeight.bold,
                             ),
+                            counterText: '',
                           ),
                         ),
                       ),

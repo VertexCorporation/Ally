@@ -26,7 +26,7 @@ class _NutritionScreenState extends State<NutritionScreen> {
     final controller = TextEditingController(text: currentGoal.toString());
 
     // Dynamic Dimensions
-    final sw = MediaQuery.of(context).size.width;
+    final sw = MediaQuery.of(context).size.width.clamp(320.0, 440.0);
     final sh = MediaQuery.of(context).size.height;
 
     // Theme Colors
@@ -50,9 +50,15 @@ class _NutritionScreenState extends State<NutritionScreen> {
             borderRadius: BorderRadius.all(Radius.circular(sw * 0.06)),
             border: Border.all(color: AppColors.border, width: 1),
           ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
+          constraints: BoxConstraints(
+            maxWidth: 480,
+            maxHeight: (sh - MediaQuery.of(context).viewInsets.bottom - 32)
+                .clamp(240.0, sh),
+          ),
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
               SizedBox(height: sh * 0.025),
               Container(
                 padding: EdgeInsets.all(sw * 0.04),
@@ -184,6 +190,7 @@ class _NutritionScreenState extends State<NutritionScreen> {
               SizedBox(height: sh * 0.025),
             ],
           ),
+        ),
         ),
       ),
     );

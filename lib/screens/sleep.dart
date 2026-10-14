@@ -48,11 +48,11 @@ class _SleepScreenState extends State<SleepScreen> {
           final endMinute = prefs.getInt('sleep_end_minute') ?? 0;
           _sleepStart = TimeOfDay(hour: startHour, minute: startMinute);
           _sleepEnd = TimeOfDay(hour: endHour, minute: endMinute);
-          
+
           final alarmHour = prefs.getInt('alarm_hour') ?? endHour;
           final alarmMinute = prefs.getInt('alarm_minute') ?? endMinute;
           _alarmTime = TimeOfDay(hour: alarmHour, minute: alarmMinute);
-          
+
           _smartAlarmEnabled = prefs.getBool('alarm_enabled') ?? false;
           _smartAlarmDuration = prefs.getInt('alarm_minutes_before') ?? 30;
         }
@@ -75,7 +75,7 @@ class _SleepScreenState extends State<SleepScreen> {
 
   void _showSleepSetupDialog() {
     // Dynamic Dimensions
-    final sw = MediaQuery.of(context).size.width;
+    final sw = MediaQuery.of(context).size.width.clamp(320.0, 440.0);
     final sh = MediaQuery.of(context).size.height;
 
     // Theme Colors
@@ -94,84 +94,336 @@ class _SleepScreenState extends State<SleepScreen> {
         builder: (context, setStateModal) {
           return PopScope(
             canPop: false,
-        child: Container(
-          margin: EdgeInsets.all(sw * 0.04),
-          padding: EdgeInsets.all(sw * 0.06),
-          decoration: BoxDecoration(
-            color: backgroundColor,
-            borderRadius: BorderRadius.circular(sw * 0.06),
-            border: Border.all(color: AppColors.border, width: 1),
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Container(
-                padding: EdgeInsets.all(sw * 0.04),
-                decoration: BoxDecoration(
-                  color: _sleepColor.withValues(alpha: 0.15),
-                  shape: BoxShape.circle,
-                ),
-                child: Icon(Icons.bedtime_rounded, color: _sleepColor, size: sw * 0.08),
+            child: Container(
+              margin: EdgeInsets.all(sw * 0.04),
+              padding: EdgeInsets.all(sw * 0.06),
+              constraints: BoxConstraints(maxWidth: 480, maxHeight: sh * 0.85),
+              decoration: BoxDecoration(
+                color: backgroundColor,
+                borderRadius: BorderRadius.circular(sw * 0.06),
+                border: Border.all(color: AppColors.border, width: 1),
               ),
-              SizedBox(height: sh * 0.02),
-              Text(
-                AppLocalizations.of(context)!.automaticSleepTracking,
-                style: TextStyle(
-                  fontSize: sw * 0.05,
-                  fontWeight: FontWeight.bold,
-                  color: textColor,
-                ),
-              ),
-              SizedBox(height: sh * 0.01),
-              Text(
-                AppLocalizations.of(context)!.noSmartwatchNeeded,
-                style: TextStyle(
-                  fontSize: sw * 0.035,
-                  color: subTextColor,
-                ),
-                textAlign: TextAlign.center,
-              ),
-              SizedBox(height: sh * 0.03),
-              Container(
-                padding: EdgeInsets.all(sw * 0.04),
-                decoration: BoxDecoration(
-                  color: cardColor,
-                  borderRadius: BorderRadius.circular(sw * 0.04),
-                  boxShadow: [
-                    BoxShadow(
-                      color: textColor.withValues(alpha: 0.05),
-                      blurRadius: 10,
-                      offset: const Offset(0, 2),
-                    ),
-                  ],
-                ),
+              child: SingleChildScrollView(
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
                   children: [
-                    Text(
-                      AppLocalizations.of(context)!.whenDoYouUsuallySleep,
-                      style: TextStyle(
-                        fontSize: sw * 0.038,
-                        fontWeight: FontWeight.w600,
-                        color: textColor,
+                    Container(
+                      padding: EdgeInsets.all(sw * 0.04),
+                      decoration: BoxDecoration(
+                        color: _sleepColor.withValues(alpha: 0.15),
+                        shape: BoxShape.circle,
+                      ),
+                      child: Icon(
+                        Icons.bedtime_rounded,
+                        color: _sleepColor,
+                        size: sw * 0.08,
                       ),
                     ),
                     SizedBox(height: sh * 0.02),
+                    Text(
+                      AppLocalizations.of(context)!.automaticSleepTracking,
+                      style: TextStyle(
+                        fontSize: sw * 0.05,
+                        fontWeight: FontWeight.bold,
+                        color: textColor,
+                      ),
+                    ),
+                    SizedBox(height: sh * 0.01),
+                    Text(
+                      AppLocalizations.of(context)!.noSmartwatchNeeded,
+                      style: TextStyle(
+                        fontSize: sw * 0.035,
+                        color: subTextColor,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                    SizedBox(height: sh * 0.03),
+                    Container(
+                      padding: EdgeInsets.all(sw * 0.04),
+                      decoration: BoxDecoration(
+                        color: cardColor,
+                        borderRadius: BorderRadius.circular(sw * 0.04),
+                        boxShadow: [
+                          BoxShadow(
+                            color: textColor.withValues(alpha: 0.05),
+                            blurRadius: 10,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            AppLocalizations.of(context)!.whenDoYouUsuallySleep,
+                            style: TextStyle(
+                              fontSize: sw * 0.038,
+                              fontWeight: FontWeight.w600,
+                              color: textColor,
+                            ),
+                          ),
+                          SizedBox(height: sh * 0.02),
+                          Row(
+                            children: [
+                              Expanded(
+                                child: _buildTimePicker(
+                                  'Sleep Time',
+                                  _sleepStart,
+                                  (time) => setState(() => _sleepStart = time),
+                                ),
+                              ),
+                              SizedBox(width: sw * 0.04),
+                              Expanded(
+                                child: _buildTimePicker(
+                                  'Wake Time',
+                                  _sleepEnd,
+                                  (time) => setState(() => _sleepEnd = time),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                    SizedBox(height: sh * 0.02),
+                    SwitchListTile(
+                      title: Text(
+                        '⏰ Enable Alarm',
+                        style: TextStyle(
+                          color: textColor,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      subtitle: Text(
+                        'Get an alarm at a specific time',
+                        style: TextStyle(
+                          color: subTextColor,
+                          fontSize: sw * 0.03,
+                        ),
+                      ),
+                      value: _smartAlarmEnabled,
+                      onChanged: (val) {
+                        setState(() => _smartAlarmEnabled = val);
+                        setStateModal(() {});
+                      },
+                      activeThumbColor: _sleepColor,
+                      contentPadding: EdgeInsets.zero,
+                    ),
+                    if (_smartAlarmEnabled) ...[
+                      SizedBox(height: sh * 0.02),
+                      Container(
+                        padding: EdgeInsets.all(sw * 0.04),
+                        decoration: BoxDecoration(
+                          color: cardColor,
+                          borderRadius: BorderRadius.circular(sw * 0.04),
+                          border: Border.all(
+                            color: _sleepColor.withValues(alpha: 0.3),
+                          ),
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Alarm Settings',
+                              style: TextStyle(
+                                fontSize: sw * 0.038,
+                                fontWeight: FontWeight.w600,
+                                color: textColor,
+                              ),
+                            ),
+                            SizedBox(height: sh * 0.02),
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: _buildTimePicker(
+                                    'Target Time',
+                                    _alarmTime,
+                                    (time) {
+                                      setState(() => _alarmTime = time);
+                                      setStateModal(() {});
+                                    },
+                                  ),
+                                ),
+                                SizedBox(width: sw * 0.04),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        'Start Before',
+                                        style: TextStyle(
+                                          fontSize: sw * 0.03,
+                                          color: subTextColor,
+                                        ),
+                                      ),
+                                      SizedBox(height: sw * 0.01),
+                                      Container(
+                                        padding: EdgeInsets.symmetric(
+                                          horizontal: sw * 0.03,
+                                        ),
+                                        height:
+                                            sw *
+                                            0.14, // Matches the height of the time picker box roughly
+                                        decoration: BoxDecoration(
+                                          color: backgroundColor.withValues(
+                                            alpha: 0.5,
+                                          ),
+                                          borderRadius: BorderRadius.circular(
+                                            sw * 0.03,
+                                          ),
+                                          border: Border.all(
+                                            color: AppColors.border.withValues(
+                                              alpha: 0.5,
+                                            ),
+                                          ),
+                                        ),
+                                        child: DropdownButtonHideUnderline(
+                                          child: DropdownButton<int>(
+                                            value: _smartAlarmDuration,
+                                            isExpanded: true,
+                                            dropdownColor: backgroundColor,
+                                            style: TextStyle(
+                                              fontSize: sw * 0.045,
+                                              fontWeight: FontWeight.bold,
+                                              color: _sleepColor,
+                                            ),
+                                            items: [5, 10, 15, 20, 30, 45, 60]
+                                                .map(
+                                                  (val) =>
+                                                      DropdownMenuItem<int>(
+                                                        value: val,
+                                                        child: Text('$val min'),
+                                                      ),
+                                                )
+                                                .toList(),
+                                            onChanged: (val) {
+                                              if (val != null) {
+                                                setState(
+                                                  () =>
+                                                      _smartAlarmDuration = val,
+                                                );
+                                                setStateModal(() {});
+                                              }
+                                            },
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                    SizedBox(height: sh * 0.015),
                     Row(
                       children: [
                         Expanded(
-                          child: _buildTimePicker(
-                            'Sleep Time',
-                            _sleepStart,
-                                (time) => setState(() => _sleepStart = time),
+                          child: TextButton(
+                            onPressed: () async {
+                              final prefs =
+                                  await SharedPreferences.getInstance();
+                              await prefs.setBool('sleep_setup_done', true);
+
+                              // DÜZELTME BURADA: context.mounted kontrolü
+                              if (!context.mounted) return;
+                              Navigator.pop(context);
+                            },
+                            style: TextButton.styleFrom(
+                              padding: EdgeInsets.symmetric(
+                                vertical: sh * 0.02,
+                              ),
+                            ),
+                            child: Text(
+                              'Skip',
+                              style: TextStyle(
+                                fontSize: sw * 0.04,
+                                color: subTextColor,
+                              ),
+                            ),
                           ),
                         ),
-                        SizedBox(width: sw * 0.04),
+                        SizedBox(width: sw * 0.03),
                         Expanded(
-                          child: _buildTimePicker(
-                            'Wake Time',
-                            _sleepEnd,
-                                (time) => setState(() => _sleepEnd = time),
+                          child: ElevatedButton(
+                            onPressed: isLoading
+                                ? null
+                                : () async {
+                                    setStateModal(() {
+                                      isLoading = true;
+                                    });
+                                    // 1. Asenkron işlemler
+                                    final prefs =
+                                        await SharedPreferences.getInstance();
+                                    await prefs.setBool(
+                                      'sleep_setup_done',
+                                      true,
+                                    );
+                                    await prefs.setBool(
+                                      'alarm_enabled',
+                                      _smartAlarmEnabled,
+                                    );
+                                    await prefs.setInt(
+                                      'alarm_hour',
+                                      _alarmTime.hour,
+                                    );
+                                    await prefs.setInt(
+                                      'alarm_minute',
+                                      _alarmTime.minute,
+                                    );
+                                    await prefs.setInt(
+                                      'alarm_minutes_before',
+                                      _smartAlarmDuration,
+                                    );
+                                    await _sleepService.startTracking(
+                                      _sleepStart,
+                                      _sleepEnd,
+                                    );
+
+                                    // 2. DÜZELTME BURADA: context.mounted kontrolü
+                                    if (!context.mounted) return;
+
+                                    // 3. Context kullanımı güvenli
+                                    Navigator.pop(context);
+                                    context
+                                        .read<IntrovertNotificationService>()
+                                        .showNotification(
+                                          message: 'Automatic tracking enabled',
+                                          type: NotificationType.success,
+                                        );
+                                  },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: _sleepColor,
+                              padding: EdgeInsets.symmetric(
+                                vertical: sh * 0.02,
+                              ),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(sw * 0.03),
+                              ),
+                              elevation: 0,
+                            ),
+                            child: isLoading
+                                ? const SizedBox(
+                                    height: 20,
+                                    width: 20,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                      valueColor: AlwaysStoppedAnimation<Color>(
+                                        Colors.white,
+                                      ),
+                                    ),
+                                  )
+                                : Text(
+                                    AppLocalizations.of(context)!.startTracking,
+                                    style: TextStyle(
+                                      fontSize: sw * 0.04,
+                                      fontWeight: FontWeight.w600,
+                                      color: Colors.white,
+                                    ),
+                                  ),
                           ),
                         ),
                       ],
@@ -179,201 +431,18 @@ class _SleepScreenState extends State<SleepScreen> {
                   ],
                 ),
               ),
-              SizedBox(height: sh * 0.02),
-              SwitchListTile(
-                title: Text(
-                  '⏰ Enable Alarm',
-                  style: TextStyle(color: textColor, fontWeight: FontWeight.bold),
-                ),
-                subtitle: Text(
-                  'Get an alarm at a specific time',
-                  style: TextStyle(color: subTextColor, fontSize: sw * 0.03),
-                ),
-                value: _smartAlarmEnabled,
-                onChanged: (val) {
-                  setState(() => _smartAlarmEnabled = val);
-                  setStateModal(() {});
-                },
-                activeThumbColor: _sleepColor,
-                contentPadding: EdgeInsets.zero,
-              ),
-              if (_smartAlarmEnabled) ...[
-                SizedBox(height: sh * 0.02),
-                Container(
-                  padding: EdgeInsets.all(sw * 0.04),
-                  decoration: BoxDecoration(
-                    color: cardColor,
-                    borderRadius: BorderRadius.circular(sw * 0.04),
-                    border: Border.all(color: _sleepColor.withValues(alpha: 0.3)),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Alarm Settings',
-                        style: TextStyle(
-                          fontSize: sw * 0.038,
-                          fontWeight: FontWeight.w600,
-                          color: textColor,
-                        ),
-                      ),
-                      SizedBox(height: sh * 0.02),
-                      Row(
-                        children: [
-                          Expanded(
-                            child: _buildTimePicker(
-                              'Target Time',
-                              _alarmTime,
-                              (time) {
-                                setState(() => _alarmTime = time);
-                                setStateModal(() {});
-                              },
-                            ),
-                          ),
-                          SizedBox(width: sw * 0.04),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  'Start Before',
-                                  style: TextStyle(
-                                    fontSize: sw * 0.03,
-                                    color: subTextColor,
-                                  ),
-                                ),
-                                SizedBox(height: sw * 0.01),
-                                Container(
-                                  padding: EdgeInsets.symmetric(horizontal: sw * 0.03),
-                                  height: sw * 0.14, // Matches the height of the time picker box roughly
-                                  decoration: BoxDecoration(
-                                    color: backgroundColor.withValues(alpha: 0.5),
-                                    borderRadius: BorderRadius.circular(sw * 0.03),
-                                    border: Border.all(color: AppColors.border.withValues(alpha: 0.5)),
-                                  ),
-                                  child: DropdownButtonHideUnderline(
-                                    child: DropdownButton<int>(
-                                      value: _smartAlarmDuration,
-                                      isExpanded: true,
-                                      dropdownColor: backgroundColor,
-                                      style: TextStyle(
-                                        fontSize: sw * 0.045,
-                                        fontWeight: FontWeight.bold,
-                                        color: _sleepColor,
-                                      ),
-                                      items: [5, 10, 15, 20, 30, 45, 60]
-                                          .map((val) => DropdownMenuItem<int>(
-                                                value: val,
-                                                child: Text('$val min'),
-                                              ))
-                                          .toList(),
-                                      onChanged: (val) {
-                                        if (val != null) {
-                                          setState(() => _smartAlarmDuration = val);
-                                          setStateModal(() {});
-                                        }
-                                      },
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-              SizedBox(height: sh * 0.015),
-              Row(
-                children: [
-                  Expanded(
-                    child: TextButton(
-                      onPressed: () async {
-                        final prefs = await SharedPreferences.getInstance();
-                        await prefs.setBool('sleep_setup_done', true);
-
-                        // DÜZELTME BURADA: context.mounted kontrolü
-                        if (!context.mounted) return;
-                        Navigator.pop(context);
-                      },
-                      style: TextButton.styleFrom(
-                        padding: EdgeInsets.symmetric(vertical: sh * 0.02),
-                      ),
-                      child: Text(
-                        'Skip',
-                        style: TextStyle(
-                          fontSize: sw * 0.04,
-                          color: subTextColor,
-                        ),
-                      ),
-                    ),
-                  ),
-                  SizedBox(width: sw * 0.03),
-                  Expanded(
-                    child: ElevatedButton(
-                      onPressed: isLoading ? null : () async {
-                        setStateModal(() {
-                          isLoading = true;
-                        });
-                        // 1. Asenkron işlemler
-                        final prefs = await SharedPreferences.getInstance();
-                        await prefs.setBool('sleep_setup_done', true);
-                        await prefs.setBool('alarm_enabled', _smartAlarmEnabled);
-                        await prefs.setInt('alarm_hour', _alarmTime.hour);
-                        await prefs.setInt('alarm_minute', _alarmTime.minute);
-                        await prefs.setInt('alarm_minutes_before', _smartAlarmDuration);
-                        await _sleepService.startTracking(_sleepStart, _sleepEnd);
-
-                        // 2. DÜZELTME BURADA: context.mounted kontrolü
-                        if (!context.mounted) return;
-
-                        // 3. Context kullanımı güvenli
-                        Navigator.pop(context);
-                        context.read<IntrovertNotificationService>().showNotification(
-                          message: 'Automatic tracking enabled',
-                          type: NotificationType.success,
-                        );
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: _sleepColor,
-                        padding: EdgeInsets.symmetric(vertical: sh * 0.02),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(sw * 0.03),
-                        ),
-                        elevation: 0,
-                      ),
-                      child: isLoading
-                          ? const SizedBox(
-                              height: 20,
-                              width: 20,
-                              child: CircularProgressIndicator(
-                                strokeWidth: 2,
-                                valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                              ),
-                            )
-                          : Text(
-                              AppLocalizations.of(context)!.startTracking,
-                              style: TextStyle(
-                                fontSize: sw * 0.04,
-                                fontWeight: FontWeight.w600,
-                                color: Colors.white,
-                              ),
-                            ),
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ),
-      );
-    }),
+            ),
+          );
+        },
+      ),
     );
   }
 
-  Widget _buildTimePicker(String label, TimeOfDay time, Function(TimeOfDay) onChanged) {
+  Widget _buildTimePicker(
+    String label,
+    TimeOfDay time,
+    Function(TimeOfDay) onChanged,
+  ) {
     // Dynamic Dimensions
     final sw = MediaQuery.of(context).size.width;
     final backgroundColor = AppColors.background;
@@ -392,7 +461,9 @@ class _SleepScreenState extends State<SleepScreen> {
       child: Container(
         padding: EdgeInsets.all(sw * 0.03),
         decoration: BoxDecoration(
-          color: backgroundColor.withValues(alpha: 0.5), // Slight difference from card
+          color: backgroundColor.withValues(
+            alpha: 0.5,
+          ), // Slight difference from card
           borderRadius: BorderRadius.circular(sw * 0.03),
           border: Border.all(color: AppColors.border.withValues(alpha: 0.5)),
         ),
@@ -400,10 +471,7 @@ class _SleepScreenState extends State<SleepScreen> {
           children: [
             Text(
               label,
-              style: TextStyle(
-                fontSize: sw * 0.03,
-                color: subTextColor,
-              ),
+              style: TextStyle(fontSize: sw * 0.03, color: subTextColor),
             ),
             SizedBox(height: sw * 0.01),
             Text(
@@ -447,10 +515,17 @@ class _SleepScreenState extends State<SleepScreen> {
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: Icon(Icons.chevron_left_rounded, color: textColor, size: sw * 0.08),
+          icon: Icon(
+            Icons.chevron_left_rounded,
+            color: textColor,
+            size: sw * 0.08,
+          ),
           onPressed: () => Navigator.pop(context),
         ),
-        title: Text(AppLocalizations.of(context)!.sleep, style: TextStyle(color: textColor, fontWeight: FontWeight.bold)),
+        title: Text(
+          AppLocalizations.of(context)!.sleep,
+          style: TextStyle(color: textColor, fontWeight: FontWeight.bold),
+        ),
         actions: [
           IconButton(
             icon: Icon(Icons.settings, color: textColor),
@@ -462,7 +537,10 @@ class _SleepScreenState extends State<SleepScreen> {
         child: SingleChildScrollView(
           physics: const BouncingScrollPhysics(),
           child: Padding(
-            padding: EdgeInsets.symmetric(horizontal: paddingH, vertical: paddingV),
+            padding: EdgeInsets.symmetric(
+              horizontal: paddingH,
+              vertical: paddingV,
+            ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -477,10 +555,10 @@ class _SleepScreenState extends State<SleepScreen> {
                         borderRadius: BorderRadius.circular(sw * 0.06),
                         boxShadow: [
                           BoxShadow(
-                              color: _sleepColor.withValues(alpha: 0.3),
-                              blurRadius: 20,
-                              offset: const Offset(0, 10)
-                          )
+                            color: _sleepColor.withValues(alpha: 0.3),
+                            blurRadius: 20,
+                            offset: const Offset(0, 10),
+                          ),
                         ],
                       ),
                       child: Column(
@@ -501,7 +579,9 @@ class _SleepScreenState extends State<SleepScreen> {
                               value: hoursSlept / goalHours,
                               minHeight: sh * 0.015,
                               backgroundColor: Colors.white70,
-                              valueColor: const AlwaysStoppedAnimation<Color>(Colors.white),
+                              valueColor: const AlwaysStoppedAnimation<Color>(
+                                Colors.white,
+                              ),
                             ),
                           ),
                           SizedBox(height: sh * 0.02),
@@ -521,7 +601,9 @@ class _SleepScreenState extends State<SleepScreen> {
                               Padding(
                                 padding: EdgeInsets.only(bottom: sh * 0.01),
                                 child: Text(
-                                  AppLocalizations.of(context)!.ofHoursGoal(goalHours.toStringAsFixed(0)),
+                                  AppLocalizations.of(
+                                    context,
+                                  )!.ofHoursGoal(goalHours.toStringAsFixed(0)),
                                   style: TextStyle(
                                     fontSize: sw * 0.06,
                                     color: Colors.white70,
@@ -541,7 +623,11 @@ class _SleepScreenState extends State<SleepScreen> {
                 SizedBox(height: sh * 0.03),
                 Text(
                   AppLocalizations.of(context)!.sleepSegments,
-                  style: TextStyle(fontSize: sw * 0.045, fontWeight: FontWeight.bold, color: textColor),
+                  style: TextStyle(
+                    fontSize: sw * 0.045,
+                    fontWeight: FontWeight.bold,
+                    color: textColor,
+                  ),
                 ),
                 SizedBox(height: sh * 0.02),
                 _buildSleepSegmentsList(),
@@ -715,10 +801,7 @@ class _SleepScreenState extends State<SleepScreen> {
                 SizedBox(height: sh * 0.01),
                 Text(
                   AppLocalizations.of(context)!.sleepTrackingWillStartTonight,
-                  style: TextStyle(
-                    fontSize: sw * 0.035,
-                    color: subTextColor,
-                  ),
+                  style: TextStyle(fontSize: sw * 0.035, color: subTextColor),
                 ),
               ],
             ),
@@ -748,7 +831,9 @@ class _SleepScreenState extends State<SleepScreen> {
               final minutes = duration % 60;
 
               return Container(
-                margin: EdgeInsets.only(bottom: index < segments.length - 1 ? sh * 0.015 : 0),
+                margin: EdgeInsets.only(
+                  bottom: index < segments.length - 1 ? sh * 0.015 : 0,
+                ),
                 padding: EdgeInsets.all(sw * 0.04),
                 decoration: BoxDecoration(
                   color: isActive
@@ -756,9 +841,7 @@ class _SleepScreenState extends State<SleepScreen> {
                       : backgroundColor,
                   borderRadius: BorderRadius.circular(sw * 0.04),
                   border: Border.all(
-                    color: isActive
-                        ? _sleepColor
-                        : Colors.transparent,
+                    color: isActive ? _sleepColor : Colors.transparent,
                     width: 2,
                   ),
                 ),
@@ -784,13 +867,13 @@ class _SleepScreenState extends State<SleepScreen> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            isActive ? 'Currently Sleeping' : 'Sleep Segment ${index + 1}',
+                            isActive
+                                ? 'Currently Sleeping'
+                                : 'Sleep Segment ${index + 1}',
                             style: TextStyle(
                               fontSize: sw * 0.04,
                               fontWeight: FontWeight.bold,
-                              color: isActive
-                                  ? _sleepColor
-                                  : textColor,
+                              color: isActive ? _sleepColor : textColor,
                             ),
                           ),
                           SizedBox(height: sh * 0.005),
@@ -805,13 +888,13 @@ class _SleepScreenState extends State<SleepScreen> {
                       ),
                     ),
                     Text(
-                      AppLocalizations.of(context)!.hoursMinutes(hours, minutes),
+                      AppLocalizations.of(
+                        context,
+                      )!.hoursMinutes(hours, minutes),
                       style: TextStyle(
                         fontSize: sw * 0.045,
                         fontWeight: FontWeight.bold,
-                        color: isActive
-                            ? _sleepColor
-                            : subTextColor,
+                        color: isActive ? _sleepColor : subTextColor,
                       ),
                     ),
                   ],

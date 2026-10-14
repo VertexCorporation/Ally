@@ -212,9 +212,9 @@ class _ActivityScreenState extends State<ActivityScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   // Header
-                  Row(
-                    children: [
-                      Container(
+                  LayoutBuilder(
+                    builder: (context, constraints) {
+                      final avatar = Container(
                         padding: const EdgeInsets.all(3),
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
@@ -228,44 +228,71 @@ class _ActivityScreenState extends State<ActivityScreen> {
                           ),
                           child: Icon(Icons.person, size: sw * 0.06, color: accentColor),
                         ),
-                      ),
-                      SizedBox(width: sw * 0.03),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            AppLocalizations.of(context)!.activity,
-                            style: TextStyle(fontSize: sw * 0.03, color: subTextColor),
-                          ),
-                          Text(
-                            AppLocalizations.of(context)!.helloAnonymous,
-                            style: TextStyle(
-                                fontSize: sw * 0.045,
-                                fontWeight: FontWeight.bold,
-                                color: textColor
-                            ),
-                          ),
-                        ],
-                      ),
-                      const Spacer(),
-                      Container(
+                      );
+                      final greeting = Text(
+                        AppLocalizations.of(context)!.helloAnonymous,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          fontSize: sw * 0.045,
+                          fontWeight: FontWeight.bold,
+                          color: textColor,
+                        ),
+                      );
+                      final notification = Container(
                         decoration: BoxDecoration(
                           color: cardColor,
                           borderRadius: BorderRadius.circular(sw * 0.03),
                           boxShadow: [
                             BoxShadow(
-                                color: textColor.withValues(alpha: 0.05),
-                                blurRadius: 10,
-                                offset: const Offset(0, 2)
-                            )
+                              color: textColor.withValues(alpha: 0.05),
+                              blurRadius: 10,
+                              offset: const Offset(0, 2),
+                            ),
                           ],
                         ),
                         child: IconButton(
-                            icon: Icon(Icons.notifications_rounded, color: textColor),
-                            onPressed: () {}
+                          icon: Icon(Icons.notifications_rounded, color: textColor),
+                          onPressed: () {},
                         ),
-                      ),
-                    ],
+                      );
+
+                      if (constraints.maxWidth < 180) {
+                        return FittedBox(
+                          fit: BoxFit.scaleDown,
+                          alignment: Alignment.centerLeft,
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              avatar,
+                              SizedBox(width: sw * 0.03),
+                              greeting,
+                              notification,
+                            ],
+                          ),
+                        );
+                      }
+
+                      return Row(
+                        children: [
+                          avatar,
+                          SizedBox(width: sw * 0.03),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  AppLocalizations.of(context)!.activity,
+                                  style: TextStyle(fontSize: sw * 0.03, color: subTextColor),
+                                ),
+                                greeting,
+                              ],
+                            ),
+                          ),
+                          notification,
+                        ],
+                      );
+                    },
                   ),
                   SizedBox(height: sh * 0.04),
 

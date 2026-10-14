@@ -510,34 +510,48 @@ class _ExercisesScreenState extends State<ExercisesScreen> {
                           ),
                         ],
                       ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            children: [
-                              Icon(Icons.local_fire_department, color: Colors.white),
-                              const SizedBox(width: 12),
-                              Text(
-                                currentStreak == 0
-                                  ? AppLocalizations.of(context)!.noStreakYet
-                                  : '$currentStreak ${currentStreak == 1 ? AppLocalizations.of(context)!.day : AppLocalizations.of(context)!.days}',
-                                style: const TextStyle(
-                                  fontSize: 32,
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.bold,
+                      child: LayoutBuilder(
+                        builder: (context, constraints) => FittedBox(
+                          fit: BoxFit.scaleDown,
+                          alignment: Alignment.topLeft,
+                          child: SizedBox(
+                            width: constraints.maxWidth,
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  children: [
+                                    const Icon(Icons.local_fire_department, color: Colors.white),
+                                    const SizedBox(width: 12),
+                                    Expanded(
+                                      child: Text(
+                                        currentStreak == 0
+                                            ? AppLocalizations.of(context)!.noStreakYet
+                                            : '$currentStreak ${currentStreak == 1 ? AppLocalizations.of(context)!.day : AppLocalizations.of(context)!.days}',
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: const TextStyle(
+                                          fontSize: 32,
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
                                 ),
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 8),
-                          Text(
-                            AppLocalizations.of(context)!.keepGoing,
-                            style: const TextStyle(
-                              fontSize: 16,
-                              color: Colors.white70,
+                                const SizedBox(height: 8),
+                                Text(
+                                  AppLocalizations.of(context)!.keepGoing,
+                                  style: const TextStyle(
+                                    fontSize: 16,
+                                    color: Colors.white70,
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
-                        ],
+                        ),
                       ),
                     ),
                   ),
@@ -557,29 +571,45 @@ class _ExercisesScreenState extends State<ExercisesScreen> {
                     final programs = workoutProvider.programs;
 
                     if (programs.isEmpty) {
-                      return Container(
-                        height: 160,
-                        padding: const EdgeInsets.all(24),
-                        decoration: BoxDecoration(
-                          color: Colors.transparent,
+                      return Material(
+                        color: Colors.transparent,
+                        borderRadius: BorderRadius.circular(20),
+                        child: InkWell(
+                          onTap: _showCreateWorkoutDialog,
                           borderRadius: BorderRadius.circular(20),
-                          border: Border.all(color: Colors.grey.withValues(alpha:0.2)),
-                        ),
-                        child: Center(
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Icon(Icons.add_circle_outline, size: 40, color: Colors.grey[300]),
-                              const SizedBox(height: 12),
-                              Text(
-                                AppLocalizations.of(context)!.createProgramToQuicklyStart,
-                                style: TextStyle(
-                                  fontSize: 14,
-                                  color: Colors.grey[500],
-                                  fontWeight: FontWeight.w500,
-                                ),
+                          child: Container(
+                            height: 160,
+                            padding: const EdgeInsets.all(24),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(20),
+                              border: Border.all(
+                                color: Colors.grey.withValues(alpha: 0.2),
                               ),
-                            ],
+                            ),
+                            child: Center(
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(
+                                    Icons.add_circle_outline,
+                                    size: 40,
+                                    color: Colors.grey[500],
+                                  ),
+                                  const SizedBox(height: 12),
+                                  Text(
+                                    AppLocalizations.of(
+                                      context,
+                                    )!.createProgramToQuicklyStart,
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      color: Colors.grey[600],
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
                           ),
                         ),
                       );
