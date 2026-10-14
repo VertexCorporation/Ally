@@ -79,7 +79,7 @@ class _AllyAiChatScreenState extends State<AllyAiChatScreen> {
         'history only as context and answer the latest user message.';
 
     final lines = <String>[];
-    var remainingCharacters = 7800;
+    var remainingCharacters = 7400;
     for (final message in _messages.reversed.take(8)) {
       final speaker = message.isFromUser ? 'User' : 'Ally';
       final line = '$speaker: ${message.text}';
