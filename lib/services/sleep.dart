@@ -21,7 +21,6 @@ class SleepForegroundHandler extends TaskHandler {
 
   AudioPlayer? _audioPlayer;
   bool _isAlarmPlaying = false;
-  bool _alarmDismissedToday = false;
 
   @override
   Future<void> onStart(DateTime timestamp, TaskStarter starter) async {
@@ -131,7 +130,6 @@ class SleepForegroundHandler extends TaskHandler {
 
     if (isInWindow && !_isInSleepWindow) {
       _isInSleepWindow = true;
-      _alarmDismissedToday = false;
       debugPrint('🌙 Entered sleep window at ${now.hour}:${now.minute}');
       await Future.delayed(const Duration(minutes: 2));
       await _checkInactivity();
@@ -173,39 +171,6 @@ class SleepForegroundHandler extends TaskHandler {
         ],
       );
       debugPrint('⏰ Alarm started at volume $volume');
-    }
-  }
-
-  Future<void> _handleSmartAlarm(int minutesToWakeUp, [int smartAlarmDuration = 30]) async {
-    debugPrint('⏰ _handleSmartAlarm called with minutesToWakeUp: $minutesToWakeUp');
-    
-    if (_audioPlayer == null) {
-      debugPrint('❌ Audio player is null!');
-      return;
-    }
-    
-    // Volume goes from 0.03 (at max mins) to 1.0 (at 1 min)
-    double volume = (smartAlarmDuration - minutesToWakeUp + 1) / smartAlarmDuration.toDouble();
-    if (volume > 1.0) volume = 1.0;
-    if (volume < 0.0) volume = 0.0;
-
-    if (!_isAlarmPlaying) {
-      debugPrint('⏰ Smart Alarm started at volume $volume');
-      _isAlarmPlaying = true;
-      await _audioPlayer!.setReleaseMode(ReleaseMode.loop);
-      await _audioPlayer!.setVolume(volume);
-      await _audioPlayer!.play(AssetSource('audio/alarm.mp3'));
-      
-      FlutterForegroundTask.updateService(
-        notificationTitle: '⏰ Smart Alarm',
-        notificationText: 'Waking you up gently... Tap Stop to dismiss.',
-        notificationButtons: [
-          const NotificationButton(id: 'stop_alarm', text: 'Stop'),
-        ],
-      );
-    } else {
-      debugPrint('⏰ Smart Alarm volume updated to $volume');
-      await _audioPlayer!.setVolume(volume);
     }
   }
 
@@ -329,7 +294,6 @@ class SleepForegroundHandler extends TaskHandler {
   @override
   void onNotificationPressed() {
     if (_isAlarmPlaying) {
-      _alarmDismissedToday = true;
       _stopSmartAlarm();
     }
     // Open app when notification is tapped
