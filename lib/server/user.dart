@@ -35,8 +35,9 @@ class UserProvider with ChangeNotifier {
   /// Checks if the current user is in 'Guest/Anonymous' mode.
   /// Returns true ONLY if the accountType is explicitly 'anonymous'.
   bool get isAnonymous {
-    if (_userData == null) return false;
-    return _userData!['accountType'] == 'anonymous';
+    // Firebase Auth is authoritative even before the guest profile arrives.
+    if (_auth.currentUser?.isAnonymous == true) return true;
+    return _userData?['accountType'] == 'anonymous';
   }
 
   /// Returns true if the user has any active, non-free subscription tier.
@@ -227,6 +228,7 @@ class UserProvider with ChangeNotifier {
   /// Loads user data from the SharedPreferences cache, if it exists.
   Future<void> _loadCachedUserData(String uid) async {
     final prefs = await SharedPreferences.getInstance();
+    if (_currentUid != uid) return;
     final jsonString = prefs.getString('cached_user_data_$uid');
     if (jsonString != null) {
       try {
