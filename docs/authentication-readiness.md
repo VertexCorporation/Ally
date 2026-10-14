@@ -20,7 +20,8 @@ Use this checklist before calling the current authentication flows production-re
 - [ ] Registration handles email-already-in-use and weak-password responses.
 - [ ] Username availability failures are distinguishable from a username that is already taken.
 - [ ] Verification email can be resent within the configured limit.
-- [ ] Verify the product decision for continuing before email verification. If unverified accounts may continue, make sure privileged actions are still protected by backend rules.
+- [ ] Confirm unverified email/password accounts stay on the verification screen until verified.
+- [ ] Confirm users can choose a separate anonymous guest account from the verification screen; guest access must not inherit the unverified account's privileges or data.
 - [ ] Password reset flow is available and tested before public release.
 
 ## Google, Apple, and anonymous sign-in
