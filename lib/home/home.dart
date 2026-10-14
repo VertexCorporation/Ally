@@ -20,6 +20,7 @@ import '../screens/achievements.dart';
 import '../screens/settings.dart';
 import '../screens/account.dart';
 import '../screens/premium.dart';
+import '../screens/ally_ai_chat.dart';
 import '../widgets/notification.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -554,6 +555,8 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
           ),
         ),
 
+        SliverToBoxAdapter(child: _buildAiAssistantCard()),
+
         const SliverToBoxAdapter(child: SizedBox(height: 20)),
 
         SliverPadding(
@@ -633,6 +636,82 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
 
         const SliverToBoxAdapter(child: SizedBox(height: 100)),
       ],
+    );
+  }
+
+  Widget _buildAiAssistantCard() {
+    final isTurkish =
+        Localizations.localeOf(context).languageCode.toLowerCase() == 'tr';
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20),
+      child: Material(
+        color: const Color(0xFF4BAADF),
+        borderRadius: BorderRadius.circular(20),
+        child: InkWell(
+          borderRadius: BorderRadius.circular(20),
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) => const AllyAiChatScreen(),
+              ),
+            );
+          },
+          child: Padding(
+            padding: const EdgeInsets.all(18),
+            child: Row(
+              children: [
+                Container(
+                  width: 48,
+                  height: 48,
+                  decoration: BoxDecoration(
+                    color: Colors.white.withValues(alpha: 0.2),
+                    borderRadius: BorderRadius.circular(15),
+                  ),
+                  child: const Icon(
+                    Icons.auto_awesome_rounded,
+                    color: Colors.white,
+                    size: 27,
+                  ),
+                ),
+                const SizedBox(width: 14),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Ally AI',
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 17,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        isTurkish
+                            ? 'İyi yaşam hakkında sorularını sor'
+                            : 'Ask questions about your wellbeing',
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 13,
+                          height: 1.3,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const Icon(
+                  Icons.arrow_forward_ios_rounded,
+                  color: Colors.white,
+                  size: 18,
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
     );
   }
 
