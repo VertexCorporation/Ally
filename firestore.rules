@@ -2,16 +2,32 @@ rules_version = '2';
 
 service cloud.firestore {
   match /databases/{database}/documents {
-    // Every record is private to the authenticated UID that owns it.
-    // Server/Admin SDK operations in the private AI backend bypass these rules
-    // and must implement their own authorization checks.
+    function isOwner(userId) {
+      return request.auth != null && request.auth.uid == userId;
+    }
+
+    // Clients may manage their own profile, but never grant themselves
+    // subscription/admin privileges. Trusted backend code owns those fields.
     match /users/{userId} {
-      allow read, create, update, delete: if request.auth != null
-        && request.auth.uid == userId;
+      allow read: if isOwner(userId);
+      allow create: if isOwner(userId)
+        && !request.resource.data.keys().hasAny([
+          'hasCortexSubscription',
+          'subscriptionExpiresAt',
+          'role',
+          'isAdmin'
+        ]);
+      allow update: if isOwner(userId)
+        && !request.resource.data.diff(resource.data).affectedKeys().hasAny([
+          'hasCortexSubscription',
+          'subscriptionExpiresAt',
+          'role',
+          'isAdmin'
+        ]);
+      allow delete: if isOwner(userId);
 
       match /{document=**} {
-        allow read, create, update, delete: if request.auth != null
-          && request.auth.uid == userId;
+        allow read, create, update, delete: if isOwner(userId);
       }
     }
   }
