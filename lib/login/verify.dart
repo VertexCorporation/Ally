@@ -13,6 +13,8 @@ import 'package:provider/provider.dart';
 import 'package:ally/l10n/app_localizations.dart';
 import 'package:ally/theme.dart';
 import 'package:ally/notifications/introvert.dart';
+import 'package:ally/login/backend.dart';
+import 'package:ally/screens/onboard.dart';
 
 import '../screen.dart';
 
@@ -143,27 +145,37 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
     await _navigateToMainScreen();
   }
 
-  Future<void> _continueWithoutVerification() async {
+  Future<void> _continueAsGuest() async {
     if (_isContinuing) return;
     setState(() => _isContinuing = true);
     _cancelTimers();
 
     try {
-      await _saveRememberMeState();
+      // Guest access is a separate Firebase anonymous account, not a bypass
+      // that grants an unverified email account full access.
+      final result = await LoginBackendService().signInAnonymously(
+        context: context,
+        notificationService: _notificationService,
+      );
 
-      if (mounted) {
-        Navigator.of(context).pushReplacement(
+      if (!mounted) return;
+      if (result is AnonymousSignInSuccess) {
+        Navigator.of(context).pushAndRemoveUntil(
           PageRouteBuilder(
-            pageBuilder: (_, __, ___) => const MainScreen(),
+            pageBuilder: (_, __, ___) => const OnboardingScreen(),
             transitionsBuilder: (_, animation, __, child) => FadeTransition(opacity: animation, child: child),
           ),
+          (_) => false,
         );
+      } else {
+        setState(() => _isContinuing = false);
+        _startTimers();
       }
     } catch (e) {
       if (mounted) {
         _notificationService.showNotification(
-            message: AppLocalizations.of(context)!.authFailed,
-            type: NotificationType.error
+          message: AppLocalizations.of(context)!.authFailed,
+          type: NotificationType.error,
         );
         setState(() => _isContinuing = false);
         _startTimers();
@@ -325,7 +337,7 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
 
                         // Continue Button (Ghost/Text Button)
                         TextButton(
-                          onPressed: _isContinuing ? null : _continueWithoutVerification,
+                          onPressed: _isContinuing ? null : _continueAsGuest,
                           style: TextButton.styleFrom(
                             padding: EdgeInsets.symmetric(vertical: 12 * scale, horizontal: 16 * scale),
                           ),
@@ -339,7 +351,7 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
                             ),
                           )
                               : Text(
-                            AppLocalizations.of(context)!.verificationScreenContinueWithoutVerification,
+                            AppLocalizations.of(context)!.continueAsAnonymous,
                             style: TextStyle(
                               fontSize: 14 * scale,
                               fontWeight: FontWeight.w600,
