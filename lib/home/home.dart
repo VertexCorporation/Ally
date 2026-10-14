@@ -188,6 +188,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                           if (status.isGranted) {
                             final pedometerService = PedometerService();
                             await pedometerService.startNativeService();
+                            if (!context.mounted) return;
 
                             CustomNotification.show(
                               context,
