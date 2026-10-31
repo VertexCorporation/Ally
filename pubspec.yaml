@@ -96,8 +96,10 @@ flutter:
     - assets/audio/
 
 flutter_native_splash:
-  color: "#FFFFFF"
+  color: "#F8F9FA"
+  color_dark: "#0F0F10"
   image: assets/images/logo.png
+  image_dark: assets/images/logo.png
   android: true
   ios: true
   web: true
