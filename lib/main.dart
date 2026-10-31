@@ -49,7 +49,7 @@ Future<void> main() async {
   // 3. Load User Preferences (Theme & Language)
   // This prevents the "white flash" by setting the theme before the app mounts.
   final prefs = await SharedPreferences.getInstance();
-  final String savedTheme = prefs.getString('selectedTheme') ?? 'light';
+  final String savedTheme = prefs.getString('selectedTheme') ?? 'dark';
 
   // 4. Lock Orientation (Optional, recommended for health apps)
   await SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);

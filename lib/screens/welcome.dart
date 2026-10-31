@@ -110,15 +110,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(AllyRadius.sm),
-                      child: Image.asset(
-                        'assets/images/logo.png',
-                        width: 32,
-                        height: 32,
-                        fit: BoxFit.cover,
-                      ),
-                    ),
+                    const AllyMark(size: 32),
                     const SizedBox(width: AllySpacing.md),
                     Text(
                       l10n.ally,

@@ -11,30 +11,32 @@
 
 import 'package:flutter/material.dart';
 
-/// Monochrome foundation tokens, light variant.
+/// Monochrome foundation tokens, light variant — matched to the
+/// vertexishere.com design system.
 abstract final class VertexLightColors {
-  static const Color background = Color(0xFFF8F9FA);
-  static const Color surface = Color(0xFFFFFFFF);
-  static const Color elevatedSurface = Color(0xFFFFFFFF);
-  static const Color hoverSurface = Color(0xFFEFF1F3);
-  static const Color textPrimary = Color(0xFF17191D);
-  static const Color textSecondary = Color(0xFF59616C);
-  static const Color textMuted = Color(0xFF707782);
-  static const Color border = Color(0xFFE3E5E8);
-  static const Color borderStrong = Color(0xFFD4D7DB);
+  static const Color background = Color(0xFFFAFAF9);
+  static const Color surface = Color(0xFFF1F1EE);
+  static const Color elevatedSurface = Color(0xFFFAFAF9);
+  static const Color hoverSurface = Color(0xFFEAEAE6);
+  static const Color textPrimary = Color(0xFF1A1B1E);
+  static const Color textSecondary = Color(0xFF6B6E76);
+  static const Color textMuted = Color(0xFF9A9DA4);
+  static const Color border = Color(0xFFE3E3DF);
+  static const Color borderStrong = Color(0xFFD2D2CE);
 }
 
-/// Monochrome foundation tokens, dark variant.
+/// Monochrome foundation tokens, dark variant — matched to the
+/// vertexishere.com design system.
 abstract final class VertexDarkColors {
-  static const Color background = Color(0xFF0F0F10);
-  static const Color surface = Color(0xFF17171A);
-  static const Color elevatedSurface = Color(0xFF202024);
-  static const Color hoverSurface = Color(0xFF26262B);
-  static const Color textPrimary = Color(0xFFF5F5F7);
-  static const Color textSecondary = Color(0xFFB0B0B6);
-  static const Color textMuted = Color(0xFF8A8A90);
-  static const Color border = Color(0xFF2A2A2F);
-  static const Color borderStrong = Color(0xFF3B3B41);
+  static const Color background = Color(0xFF0E1013);
+  static const Color surface = Color(0xFF15171B);
+  static const Color elevatedSurface = Color(0xFF1B1E23);
+  static const Color hoverSurface = Color(0xFF1B1E23);
+  static const Color textPrimary = Color(0xFFEDEEEF);
+  static const Color textSecondary = Color(0xFF8A8D96);
+  static const Color textMuted = Color(0xFF5F626A);
+  static const Color border = Color(0xFF262932);
+  static const Color borderStrong = Color(0xFF31353D);
 }
 
 /// Semantic status colors, shared by both themes and always distinguishable.

@@ -3943,8 +3943,80 @@ abstract class AppLocalizations {
   /// No description provided for @allyAiTagline.
   ///
   /// In en, this message translates to:
-  /// **'Ask anything about your health'**
+  /// **'Health insights on demand'**
   String get allyAiTagline;
+
+  /// No description provided for @aiConsentTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Enable health insights'**
+  String get aiConsentTitle;
+
+  /// No description provided for @aiConsentBody.
+  ///
+  /// In en, this message translates to:
+  /// **'To generate insights, a compact summary of your local data (steps, water, sleep duration, calories, weight entries) is sent to Vertex\'s AI-lly backend on Firebase and processed by the configured AI model. Nothing runs in the background — insights are created only when you request them. Outputs are informational and not medical advice.'**
+  String get aiConsentBody;
+
+  /// No description provided for @aiConsentAccept.
+  ///
+  /// In en, this message translates to:
+  /// **'Enable insights'**
+  String get aiConsentAccept;
+
+  /// No description provided for @aiConsentDecline.
+  ///
+  /// In en, this message translates to:
+  /// **'Not now'**
+  String get aiConsentDecline;
+
+  /// No description provided for @aiInsightActivity.
+  ///
+  /// In en, this message translates to:
+  /// **'Activity insight'**
+  String get aiInsightActivity;
+
+  /// No description provided for @aiInsightSleep.
+  ///
+  /// In en, this message translates to:
+  /// **'Sleep insight'**
+  String get aiInsightSleep;
+
+  /// No description provided for @aiInsightOverview.
+  ///
+  /// In en, this message translates to:
+  /// **'Daily overview'**
+  String get aiInsightOverview;
+
+  /// No description provided for @aiRequestLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Custom request'**
+  String get aiRequestLabel;
+
+  /// No description provided for @aiInputHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Ask about your data'**
+  String get aiInputHint;
+
+  /// No description provided for @aiNotMedicalAdvice.
+  ///
+  /// In en, this message translates to:
+  /// **'Insights are informational — not medical advice.'**
+  String get aiNotMedicalAdvice;
+
+  /// No description provided for @aiProcessing.
+  ///
+  /// In en, this message translates to:
+  /// **'Analyzing data…'**
+  String get aiProcessing;
+
+  /// No description provided for @aiModelMeta.
+  ///
+  /// In en, this message translates to:
+  /// **'model {model} · {remaining} requests left today'**
+  String aiModelMeta(String model, int remaining);
 
   /// No description provided for @aiWelcome.
   ///

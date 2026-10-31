@@ -2061,7 +2061,46 @@ class AppLocalizationsAr extends AppLocalizations {
   String get allyAi => 'Ally AI';
 
   @override
-  String get allyAiTagline => 'اسأل عن أي شيء يتعلق بصحتك';
+  String get allyAiTagline => 'رؤى صحية عند الطلب';
+
+  @override
+  String get aiConsentTitle => 'تفعيل الرؤى الصحية';
+
+  @override
+  String get aiConsentBody =>
+      'لإنشاء الرؤى، يُرسل ملخص مضغوط من بياناتك المحلية (الخطوات، الماء، مدة النوم، السعرات، سجلات الوزن) إلى خادم AI-lly التابع لـ Vertex على Firebase وتعالجه نموذج الذكاء الاصطناعي المُعد. لا شيء يعمل في الخلفية — تُنشأ الرؤى عند طلبها فقط. النتائج للمعلومات فقط وليست نصيحة طبية.';
+
+  @override
+  String get aiConsentAccept => 'تفعيل';
+
+  @override
+  String get aiConsentDecline => 'ليس الآن';
+
+  @override
+  String get aiInsightActivity => 'رؤية النشاط';
+
+  @override
+  String get aiInsightSleep => 'رؤية النوم';
+
+  @override
+  String get aiInsightOverview => 'نظرة يومية';
+
+  @override
+  String get aiRequestLabel => 'طلب مخصص';
+
+  @override
+  String get aiInputHint => 'اسأل عن بياناتك';
+
+  @override
+  String get aiNotMedicalAdvice => 'الرؤى للمعلومات وليست نصيحة طبية.';
+
+  @override
+  String get aiProcessing => 'جارٍ تحليل البيانات…';
+
+  @override
+  String aiModelMeta(String model, int remaining) {
+    return 'النموذج $model · $remaining طلبات متبقية اليوم';
+  }
 
   @override
   String get aiWelcome =>

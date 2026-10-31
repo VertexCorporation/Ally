@@ -2035,7 +2035,46 @@ class AppLocalizationsZh extends AppLocalizations {
   String get allyAi => 'Ally AI';
 
   @override
-  String get allyAiTagline => '关于健康的一切都可以问';
+  String get allyAiTagline => '按需提供健康洞察';
+
+  @override
+  String get aiConsentTitle => '启用健康洞察';
+
+  @override
+  String get aiConsentBody =>
+      '生成洞察时，您本地数据的简要摘要（步数、饮水、睡眠时长、卡路里、体重记录）会发送至 Firebase 上的 Vertex AI-lly 后端，并由所配置的 AI 模型处理。后台不会运行任何任务——洞察仅在您请求时生成。结果仅供参考，不构成医疗建议。';
+
+  @override
+  String get aiConsentAccept => '启用';
+
+  @override
+  String get aiConsentDecline => '暂不';
+
+  @override
+  String get aiInsightActivity => '活动洞察';
+
+  @override
+  String get aiInsightSleep => '睡眠洞察';
+
+  @override
+  String get aiInsightOverview => '每日概览';
+
+  @override
+  String get aiRequestLabel => '自定义请求';
+
+  @override
+  String get aiInputHint => '询问你的数据';
+
+  @override
+  String get aiNotMedicalAdvice => '洞察仅供参考，不构成医疗建议。';
+
+  @override
+  String get aiProcessing => '正在分析数据…';
+
+  @override
+  String aiModelMeta(String model, int remaining) {
+    return '模型 $model · 今日剩余 $remaining 次请求';
+  }
 
   @override
   String get aiWelcome => '你好！我是 Ally AI。关于你的健康和习惯，尽管问我。';

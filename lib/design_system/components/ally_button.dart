@@ -4,6 +4,7 @@
 // ─────────────────────────────────────────────────────────────────────────────
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import '../tokens/dimensions.dart';
 import '../tokens/spacing.dart';
@@ -40,6 +41,12 @@ class AllyButton extends StatelessWidget {
   final bool small;
 
   bool get _isDisabled => onPressed == null || isLoading;
+
+  /// Subtle, consistent press feedback across every button in the app.
+  void _handleTap() {
+    HapticFeedback.lightImpact();
+    onPressed!();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -122,17 +129,17 @@ class AllyButton extends StatelessWidget {
     final Widget button = switch (kind) {
       AllyButtonKind.ghost => TextButton(
         style: style,
-        onPressed: _isDisabled ? null : onPressed,
+        onPressed: _isDisabled ? null : _handleTap,
         child: labelWidget,
       ),
       AllyButtonKind.secondary => OutlinedButton(
         style: style,
-        onPressed: _isDisabled ? null : onPressed,
+        onPressed: _isDisabled ? null : _handleTap,
         child: labelWidget,
       ),
       _ => ElevatedButton(
         style: style,
-        onPressed: _isDisabled ? null : onPressed,
+        onPressed: _isDisabled ? null : _handleTap,
         child: labelWidget,
       ),
     };

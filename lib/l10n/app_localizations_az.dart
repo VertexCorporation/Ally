@@ -2070,7 +2070,47 @@ class AppLocalizationsAz extends AppLocalizations {
   String get allyAi => 'Ally AI';
 
   @override
-  String get allyAiTagline => 'Sağlamlığınla bağlı hər şeyi soruş';
+  String get allyAiTagline => 'Sorğu əsasında sağlamlıq içgörüləri';
+
+  @override
+  String get aiConsentTitle => 'Sağlamlıq içgörülərini aktivləşdir';
+
+  @override
+  String get aiConsentBody =>
+      'İçgörü yaratmaq üçün yerli məlumatlarınızın qısa xülasəsi (addımlar, su, yuxu müddəti, kalori, çəki qeydləri) Firebase-dəki Vertex AI-lly backend-inə göndərilir və konfiqurasiya edilmiş AI modeli tərəfindən emal olunur. Fonda heç nə işləmir — içgörülər yalnız sorğu zamanı yaradılır. Nəticələr məlumatvericidir, tibbi məsləhət deyil.';
+
+  @override
+  String get aiConsentAccept => 'Aktivləşdir';
+
+  @override
+  String get aiConsentDecline => 'İndi yox';
+
+  @override
+  String get aiInsightActivity => 'Fəaliyyət içgörüsü';
+
+  @override
+  String get aiInsightSleep => 'Yuxu içgörüsü';
+
+  @override
+  String get aiInsightOverview => 'Günlük icmal';
+
+  @override
+  String get aiRequestLabel => 'Fərdi sorğu';
+
+  @override
+  String get aiInputHint => 'Məlumatların haqqında soruş';
+
+  @override
+  String get aiNotMedicalAdvice =>
+      'İçgörülər məlumatvericidir — tibbi məsləhət deyil.';
+
+  @override
+  String get aiProcessing => 'Məlumatlar təhlil olunur…';
+
+  @override
+  String aiModelMeta(String model, int remaining) {
+    return 'model $model · bu gün $remaining sorğu qalıb';
+  }
 
   @override
   String get aiWelcome =>

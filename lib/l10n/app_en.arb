@@ -656,7 +656,19 @@
   "noSleepData": "No sleep recorded yet",
   "sleepGoalHint": "Goal: {hours} h",
   "allyAi": "Ally AI",
-  "allyAiTagline": "Ask anything about your health",
+  "allyAiTagline": "Health insights on demand",
+  "aiConsentTitle": "Enable health insights",
+  "aiConsentBody": "To generate insights, a compact summary of your local data (steps, water, sleep duration, calories, weight entries) is sent to Vertex's AI-lly backend on Firebase and processed by the configured AI model. Nothing runs in the background — insights are created only when you request them. Outputs are informational and not medical advice.",
+  "aiConsentAccept": "Enable insights",
+  "aiConsentDecline": "Not now",
+  "aiInsightActivity": "Activity insight",
+  "aiInsightSleep": "Sleep insight",
+  "aiInsightOverview": "Daily overview",
+  "aiRequestLabel": "Custom request",
+  "aiInputHint": "Ask about your data",
+  "aiNotMedicalAdvice": "Insights are informational — not medical advice.",
+  "aiProcessing": "Analyzing data…",
+  "aiModelMeta": "model {model} · {remaining} requests left today",
   "aiWelcome": "Hi! I'm Ally AI. Ask me anything about your health and habits.",
   "aiMessageHint": "Message Ally AI",
   "aiSend": "Send",
@@ -682,5 +694,11 @@
   "@hello": { "placeholders": { "name": { "type": "String" } } },
   "@sleepGoalHint": { "placeholders": { "hours": { "type": "String" } } },
   "@minutesShort": { "placeholders": { "count": { "type": "String" } } },
-  "@aiGuestLimitHint": { "placeholders": { "remaining": { "type": "int" } } }
+  "@aiGuestLimitHint": { "placeholders": { "remaining": { "type": "int" } } },
+  "@aiModelMeta": {
+    "placeholders": {
+      "model": { "type": "String" },
+      "remaining": { "type": "int" }
+    }
+  }
 }

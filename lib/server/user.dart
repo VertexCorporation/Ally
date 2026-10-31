@@ -31,7 +31,9 @@ class UserProvider with ChangeNotifier {
       _auth = FirebaseAuth.instance;
       _firestore = FirebaseFirestore.instance;
     } catch (e) {
-      debugPrint('[UserProvider] Firebase unavailable — running in local mode.');
+      debugPrint(
+        '[UserProvider] Firebase unavailable — running in local mode.',
+      );
     }
   }
 

@@ -2067,7 +2067,47 @@ class AppLocalizationsEn extends AppLocalizations {
   String get allyAi => 'Ally AI';
 
   @override
-  String get allyAiTagline => 'Ask anything about your health';
+  String get allyAiTagline => 'Health insights on demand';
+
+  @override
+  String get aiConsentTitle => 'Enable health insights';
+
+  @override
+  String get aiConsentBody =>
+      'To generate insights, a compact summary of your local data (steps, water, sleep duration, calories, weight entries) is sent to Vertex\'s AI-lly backend on Firebase and processed by the configured AI model. Nothing runs in the background — insights are created only when you request them. Outputs are informational and not medical advice.';
+
+  @override
+  String get aiConsentAccept => 'Enable insights';
+
+  @override
+  String get aiConsentDecline => 'Not now';
+
+  @override
+  String get aiInsightActivity => 'Activity insight';
+
+  @override
+  String get aiInsightSleep => 'Sleep insight';
+
+  @override
+  String get aiInsightOverview => 'Daily overview';
+
+  @override
+  String get aiRequestLabel => 'Custom request';
+
+  @override
+  String get aiInputHint => 'Ask about your data';
+
+  @override
+  String get aiNotMedicalAdvice =>
+      'Insights are informational — not medical advice.';
+
+  @override
+  String get aiProcessing => 'Analyzing data…';
+
+  @override
+  String aiModelMeta(String model, int remaining) {
+    return 'model $model · $remaining requests left today';
+  }
 
   @override
   String get aiWelcome =>

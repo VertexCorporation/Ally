@@ -77,7 +77,7 @@ abstract final class AllyTypography {
     Color? color,
     FontWeight weight = FontWeight.w400,
     double height = 1.45,
-  }) => GoogleFonts.inter(
+  }) => GoogleFonts.ubuntu(
     fontSize: size,
     fontWeight: weight,
     color: color,
@@ -90,7 +90,7 @@ abstract final class AllyTypography {
     Color? color,
     FontWeight weight = FontWeight.w600,
     double letterSpacing = 0.1,
-  }) => GoogleFonts.inter(
+  }) => GoogleFonts.ubuntu(
     fontSize: size,
     fontWeight: weight,
     color: color,
@@ -102,7 +102,7 @@ abstract final class AllyTypography {
     double size = 12,
     Color? color,
     FontWeight weight = FontWeight.w500,
-  }) => GoogleFonts.inter(
+  }) => GoogleFonts.ubuntu(
     fontSize: size,
     fontWeight: weight,
     color: color,

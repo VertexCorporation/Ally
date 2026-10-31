@@ -100,49 +100,53 @@ class _LoginScreenContent extends StatelessWidget {
               ),
             ),
             SafeArea(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  const _BrandBar(),
-                  Container(
-                    height: 1,
-                    color: Theme.of(context).colorScheme.outlineVariant,
-                  ),
-                  Expanded(
-                    child: LayoutBuilder(
-                      builder: (context, constraints) {
-                        return AnimatedSwitcher(
-                          duration: const Duration(milliseconds: 350),
-                          transitionBuilder:
-                              (Widget child, Animation<double> animation) {
-                                final offsetAnimation =
-                                    Tween<Offset>(
-                                      begin: const Offset(0.0, 0.06),
-                                      end: Offset.zero,
-                                    ).animate(
-                                      CurvedAnimation(
-                                        parent: animation,
-                                        curve: Curves.easeOutCubic,
+              child: LayoutBuilder(
+                builder: (context, layoutConstraints) {
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      const _BrandBar(),
+                      Container(
+                        height: 1,
+                        color: Theme.of(context).colorScheme.outlineVariant,
+                      ),
+                      Expanded(
+                        child: LayoutBuilder(
+                          builder: (context, innerConstraints) {
+                            return AnimatedSwitcher(
+                              duration: const Duration(milliseconds: 350),
+                              transitionBuilder:
+                                  (Widget child, Animation<double> animation) {
+                                    final offsetAnimation =
+                                        Tween<Offset>(
+                                          begin: const Offset(0.0, 0.06),
+                                          end: Offset.zero,
+                                        ).animate(
+                                          CurvedAnimation(
+                                            parent: animation,
+                                            curve: Curves.easeOutCubic,
+                                          ),
+                                        );
+                                    return FadeTransition(
+                                      opacity: animation,
+                                      child: SlideTransition(
+                                        position: offsetAnimation,
+                                        child: child,
                                       ),
                                     );
-                                return FadeTransition(
-                                  opacity: animation,
-                                  child: SlideTransition(
-                                    position: offsetAnimation,
-                                    child: child,
-                                  ),
-                                );
-                              },
-                          child: _buildStepView(
-                            controller.currentStep,
-                            constraints,
-                            contentWidth,
-                          ),
-                        );
-                      },
-                    ),
-                  ),
-                ],
+                                  },
+                              child: _buildStepView(
+                                controller.currentStep,
+                                innerConstraints,
+                                contentWidth,
+                              ),
+                            );
+                          },
+                        ),
+                      ),
+                    ],
+                  );
+                },
               ),
             ),
           ],
@@ -198,15 +202,7 @@ class _BrandBar extends StatelessWidget {
       ),
       child: Row(
         children: [
-          ClipRRect(
-            borderRadius: BorderRadius.circular(AllyRadius.sm),
-            child: Image.asset(
-              'assets/images/logo.png',
-              width: 26,
-              height: 26,
-              fit: BoxFit.cover,
-            ),
-          ),
+          const AllyMark(size: 26),
           const SizedBox(width: AllySpacing.md),
           Text(
             l10n.ally,

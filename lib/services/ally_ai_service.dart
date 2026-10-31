@@ -1,5 +1,19 @@
+// ally_ai_service.dart
+//
+// © 2026 Vertex Corporation
+// ─────────────────────────────────────────────────────────────────────────────
+// Client for the private AI-lly Firebase callable function.
+//
+// Provider keys, model selection, subscription checks, and usage limits stay
+// on the server. Never send a UID, tier, or model choice as client authority.
+//
+// The service is resilient to a missing Firebase app (offline / local dev
+// sessions): construction never throws, and requests fail with a typed
+// [AllyAiException] instead of a platform error.
+
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 
 /// A validated response from the AI-lly backend.
 class AllyAiResponse {
@@ -56,20 +70,31 @@ class AllyAiException implements Exception {
   String toString() => 'AllyAiException($code): $message';
 }
 
-/// Client for the private AI-lly Firebase callable function.
-///
-/// Provider keys, model selection, subscription checks, and usage limits stay
-/// on the server. Never send a UID, tier, or model choice as client authority.
 class AllyAiService {
   AllyAiService({FirebaseFunctions? functions, FirebaseAuth? auth})
-    : _functions =
-          functions ?? FirebaseFunctions.instanceFor(region: 'europe-west1'),
-      _auth = auth ?? FirebaseAuth.instance;
+    : _functions = functions,
+      _auth = auth;
 
-  final FirebaseFunctions _functions;
-  final FirebaseAuth _auth;
+  FirebaseFunctions? _functions;
+  FirebaseAuth? _auth;
+
+  bool get _backendReady => _functions != null && _auth != null;
+
+  /// Lazily resolves the Firebase handles so construction stays side-effect
+  /// free (important for tests and Firebase-less sessions).
+  void _ensureBackend() {
+    if (_backendReady) return;
+    try {
+      _functions ??= FirebaseFunctions.instanceFor(region: 'europe-west1');
+      _auth ??= FirebaseAuth.instance;
+    } catch (e) {
+      debugPrint('[AllyAiService] Firebase unavailable: $e');
+    }
+  }
 
   Future<AllyAiResponse> generateResponse(String message) async {
+    _ensureBackend();
+
     final normalizedMessage = message.trim();
 
     if (normalizedMessage.isEmpty) {
@@ -88,7 +113,7 @@ class AllyAiService {
 
     // The callable function derives the user identity from Firebase Auth.
     // Do not silently sign users in here, because that would alter app auth flow.
-    if (_auth.currentUser == null) {
+    if (!_backendReady || _auth!.currentUser == null) {
       throw const AllyAiException(
         code: 'unauthenticated',
         message: 'Sign in or continue as a guest to use Ally AI.',
@@ -96,7 +121,7 @@ class AllyAiService {
     }
 
     try {
-      final callable = _functions.httpsCallable(
+      final callable = _functions!.httpsCallable(
         'generateAIResponse',
         options: HttpsCallableOptions(timeout: const Duration(seconds: 55)),
       );
@@ -129,7 +154,9 @@ class AllyAiService {
       case 'resource-exhausted':
         return 'You have reached today’s AI request limit. Please try again later.';
       case 'failed-precondition':
-        return 'Ally AI is not configured yet.';
+        // Server model policy (designated "Caveman" model) is not unblocked
+        // yet — surfaced honestly instead of pretending the AI works.
+        return 'AI insights are not available in this build yet.';
       case 'deadline-exceeded':
       case 'unavailable':
         return 'Ally AI is temporarily unavailable. Please try again.';
@@ -137,4 +164,40 @@ class AllyAiService {
         return 'Something went wrong while contacting Ally AI. Please try again.';
     }
   }
+}
+
+/// Kinds of structured insight the insights surface can request.
+enum AllyInsightKind { activity, sleep, overview }
+
+/// Request templates enforcing the non-conversational product policy
+/// (docs/AI_INTEGRATION.md). The model is instructed to never greet, never
+/// ask questions, and never give medical advice — outputs stay terse bullets.
+abstract final class AllyAiPrompts {
+  static const String _contract =
+      'You are a health-data summarizer inside the Ally app. Output 2-4 short '
+      'bullet lines starting with "• ". Be factual and terse. Never greet, '
+      'never ask questions, never address the user directly. No diagnoses, no '
+      'medical advice; if data is missing or zero, say so plainly.';
+
+  /// Builds the full callable payload for an insight request.
+  static String buildInsightRequest(
+    AllyInsightKind kind,
+    Map<String, Object?> data,
+  ) {
+    final flat = data.entries.map((e) => '${e.key}=${e.value}').join('; ');
+    final task = switch (kind) {
+      AllyInsightKind.activity =>
+        "Task: summarize today's activity versus the user's own goals.",
+      AllyInsightKind.sleep =>
+        'Task: summarize the most recent recorded sleep.',
+      AllyInsightKind.overview =>
+        'Task: give a compact daily overview across all metrics.',
+    };
+    return '$_contract\n$task\nData: $flat';
+  }
+
+  /// Wraps a user-initiated custom query with the same contract so free-form
+  /// requests also produce terse, non-conversational output.
+  static String buildCustomRequest(String userQuery) =>
+      '$_contract\nTask: answer the question about the logged data.\nQuestion: ${userQuery.trim()}';
 }

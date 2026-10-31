@@ -584,15 +584,7 @@ class _SettingsScreenState extends State<SettingsScreen>
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              ClipRRect(
-                borderRadius: BorderRadius.circular(AllyRadius.sm),
-                child: Image.asset(
-                  'assets/images/logo.png',
-                  width: 40,
-                  height: 40,
-                  fit: BoxFit.cover,
-                ),
-              ),
+              const AllyMark(size: 40),
               const SizedBox(width: AllySpacing.md),
               Text(
                 l10n.ally,

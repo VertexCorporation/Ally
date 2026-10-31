@@ -2091,7 +2091,47 @@ class AppLocalizationsFr extends AppLocalizations {
   String get allyAi => 'Ally AI';
 
   @override
-  String get allyAiTagline => 'Posez toutes vos questions santé';
+  String get allyAiTagline => 'Analyses santé à la demande';
+
+  @override
+  String get aiConsentTitle => 'Activer les analyses santé';
+
+  @override
+  String get aiConsentBody =>
+      'Pour générer des analyses, un résumé compact de vos données locales (pas, eau, durée de sommeil, calories, entrées de poids) est envoyé au backend AI-lly de Vertex sur Firebase et traité par le modèle IA configuré. Rien ne s\'exécute en arrière-plan : les analyses sont créées uniquement à votre demande. Les résultats sont informatifs et ne constituent pas un avis médical.';
+
+  @override
+  String get aiConsentAccept => 'Activer';
+
+  @override
+  String get aiConsentDecline => 'Pas maintenant';
+
+  @override
+  String get aiInsightActivity => 'Analyse d\'activité';
+
+  @override
+  String get aiInsightSleep => 'Analyse du sommeil';
+
+  @override
+  String get aiInsightOverview => 'Aperçu du jour';
+
+  @override
+  String get aiRequestLabel => 'Requête personnalisée';
+
+  @override
+  String get aiInputHint => 'Interrogez vos données';
+
+  @override
+  String get aiNotMedicalAdvice =>
+      'Les analyses sont informatives — pas un avis médical.';
+
+  @override
+  String get aiProcessing => 'Analyse des données…';
+
+  @override
+  String aiModelMeta(String model, int remaining) {
+    return 'modèle $model · $remaining requêtes restantes aujourd\'hui';
+  }
 
   @override
   String get aiWelcome =>

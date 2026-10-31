@@ -195,6 +195,7 @@ class _OnboardingScreenState extends State<OnboardingScreen>
       ),
       body: SafeArea(
         child: Stack(
+          fit: StackFit.expand,
           children: [
             // Previous screen sliding out
             if (_isAnimating)

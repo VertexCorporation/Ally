@@ -2074,7 +2074,47 @@ class AppLocalizationsHi extends AppLocalizations {
   String get allyAi => 'Ally AI';
 
   @override
-  String get allyAiTagline => 'अपनी सेहत के बारे में कुछ भी पूछें';
+  String get allyAiTagline => 'माँग पर स्वास्थ्य इनसाइट';
+
+  @override
+  String get aiConsentTitle => 'हेल्थ इनसाइट सक्षम करें';
+
+  @override
+  String get aiConsentBody =>
+      'इनसाइट बनाने के लिए आपके स्थानीय डेटा (कदम, पानी, नींद की अवधि, कैलोरी, वज़न प्रविष्टियों) का संक्षिप्त सार Firebase पर Vertex के AI-lly बैकएंड को भेजा जाता है और कॉन्फ़िगर किए गए AI मॉडल द्वारा संसाधित होता है। पृष्ठभूमि में कुछ भी नहीं चलता — इनसाइट केवल अनुरोध पर बनते हैं। परिणाम केवल जानकारी हेतु हैं, चिकित्सकीय सलाह नहीं।';
+
+  @override
+  String get aiConsentAccept => 'सक्षम करें';
+
+  @override
+  String get aiConsentDecline => 'अभी नहीं';
+
+  @override
+  String get aiInsightActivity => 'गतिविधि इनसाइट';
+
+  @override
+  String get aiInsightSleep => 'नींद इनसाइट';
+
+  @override
+  String get aiInsightOverview => 'दैनिक सारांश';
+
+  @override
+  String get aiRequestLabel => 'कस्टम अनुरोध';
+
+  @override
+  String get aiInputHint => 'अपने डेटा के बारे में पूछें';
+
+  @override
+  String get aiNotMedicalAdvice =>
+      'इनसाइट केवल जानकारी हेतु हैं — चिकित्सकीय सलाह नहीं।';
+
+  @override
+  String get aiProcessing => 'डेटा का विश्लेषण…';
+
+  @override
+  String aiModelMeta(String model, int remaining) {
+    return 'मॉडल $model · आज $remaining अनुरोध शेष';
+  }
 
   @override
   String get aiWelcome =>

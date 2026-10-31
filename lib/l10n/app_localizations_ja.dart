@@ -2050,7 +2050,46 @@ class AppLocalizationsJa extends AppLocalizations {
   String get allyAi => 'Ally AI';
 
   @override
-  String get allyAiTagline => '健康について何でも聞いてください';
+  String get allyAiTagline => 'リクエストに応じたヘルスインサイト';
+
+  @override
+  String get aiConsentTitle => 'ヘルスインサイトを有効にする';
+
+  @override
+  String get aiConsentBody =>
+      'インサイトを生成する際、ローカルデータの要約（歩数、水分、睡眠時間、カロリー、体重記録）をVertexのFirebase上AI-llyバックエンドへ送信し、設定されたAIモデルが処理します。バックグラウンド処理は行われず、インサイトはリクエスト時のみ生成されます。出力は情報提供であり医療的助言ではありません。';
+
+  @override
+  String get aiConsentAccept => '有効にする';
+
+  @override
+  String get aiConsentDecline => '今はしない';
+
+  @override
+  String get aiInsightActivity => 'アクティビティ分析';
+
+  @override
+  String get aiInsightSleep => '睡眠分析';
+
+  @override
+  String get aiInsightOverview => 'デイリー概要';
+
+  @override
+  String get aiRequestLabel => 'カスタムリクエスト';
+
+  @override
+  String get aiInputHint => 'データについて質問';
+
+  @override
+  String get aiNotMedicalAdvice => 'インサイトは情報提供であり医療的助言ではありません。';
+
+  @override
+  String get aiProcessing => 'データを解析中…';
+
+  @override
+  String aiModelMeta(String model, int remaining) {
+    return 'モデル $model · 本日残り$remaining回';
+  }
 
   @override
   String get aiWelcome => 'こんにちは！Ally AIです。健康や習慣について何でも聞いてください。';

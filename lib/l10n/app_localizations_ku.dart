@@ -2073,7 +2073,47 @@ class AppLocalizationsKu extends AppLocalizations {
   String get allyAi => 'Ally AI';
 
   @override
-  String get allyAiTagline => 'Li ser tenduristiya xwe her tiştî bipirse';
+  String get allyAiTagline => 'Li ser daxwaz têgihiştinên tenduristiyê';
+
+  @override
+  String get aiConsentTitle => 'Têgihiştinên tenduristiyê çalak bike';
+
+  @override
+  String get aiConsentBody =>
+      'Ji bo afirandina têgihiştinan, kurtahiyek ji daneyên xwe yên herêmî (gav, av, dema xew, kalorî, tomarkirinên giranî) ji navenda AI-lly a Vertex li Firebase re tê şandin û ji hêla modela AI ya mîhengkirî ve tê pêvajokirin. Di paşiya de tişt nagere — têgihiştin tenê dema ku hûn dixwazin tên çêkirin. Encam ji bo agahdariyê ne, ne şêwirmendiya bijîjkî ne.';
+
+  @override
+  String get aiConsentAccept => 'Çalak bike';
+
+  @override
+  String get aiConsentDecline => 'Niha ne';
+
+  @override
+  String get aiInsightActivity => 'Têgihiştina çalakiyê';
+
+  @override
+  String get aiInsightSleep => 'Têgihiştina xewê';
+
+  @override
+  String get aiInsightOverview => 'Kurteya rojane';
+
+  @override
+  String get aiRequestLabel => 'Daxwaza taybet';
+
+  @override
+  String get aiInputHint => 'Li ser daneyên xwe bipirse';
+
+  @override
+  String get aiNotMedicalAdvice =>
+      'Têgihiştin ji bo agahdariyê ne — ne şêwirmendiya bijîjkî ne.';
+
+  @override
+  String get aiProcessing => 'Daneyên tê analîzkirin…';
+
+  @override
+  String aiModelMeta(String model, int remaining) {
+    return 'model $model · îro $remaining daxwaz mane';
+  }
 
   @override
   String get aiWelcome =>

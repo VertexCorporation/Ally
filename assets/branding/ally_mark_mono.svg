@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" width="96" height="96" role="img" aria-label="Ally">
+  <!--
+    Ally brand mark — Vertex Corporation.
+    A geometric letter "A" whose crossbar is an ECG pulse; the apex is the
+    vertex point. Monochrome variant (inherits currentColor).
+  -->
+  <g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M26 82 L48 14 L70 82" stroke-width="8"/>
+    <path d="M33.8 58 L44 58 L49 44 L54 68 L57 58 L62.2 58" stroke-width="7"/>
+  </g>
+</svg>

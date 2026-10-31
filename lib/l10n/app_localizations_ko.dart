@@ -2052,7 +2052,46 @@ class AppLocalizationsKo extends AppLocalizations {
   String get allyAi => 'Ally AI';
 
   @override
-  String get allyAiTagline => '건강에 대해 무엇이든 물어보세요';
+  String get allyAiTagline => '요청 시 제공되는 건강 인사이트';
+
+  @override
+  String get aiConsentTitle => '건강 인사이트 사용';
+
+  @override
+  String get aiConsentBody =>
+      '인사이트를 생성하기 위해 로컬 데이터 요약(걸음 수, 물, 수면 시간, 칼로리, 체중 기록)이 Firebase의 Vertex AI-lly 백엔드로 전송되고 구성된 AI 모델이 처리합니다. 백그라운드에서는 아무 것도 실행되지 않으며 인사이트는 요청할 때만 생성됩니다. 결과는 정보 제공용이며 의학적 조언이 아닙니다.';
+
+  @override
+  String get aiConsentAccept => '사용';
+
+  @override
+  String get aiConsentDecline => '나중에';
+
+  @override
+  String get aiInsightActivity => '활동 인사이트';
+
+  @override
+  String get aiInsightSleep => '수면 인사이트';
+
+  @override
+  String get aiInsightOverview => '일일 개요';
+
+  @override
+  String get aiRequestLabel => '맞춤 요청';
+
+  @override
+  String get aiInputHint => '데이터에 대해 물어보세요';
+
+  @override
+  String get aiNotMedicalAdvice => '인사이트는 정보 제공용이며 의학적 조언이 아닙니다.';
+
+  @override
+  String get aiProcessing => '데이터 분석 중…';
+
+  @override
+  String aiModelMeta(String model, int remaining) {
+    return '모델 $model · 오늘 $remaining회 남음';
+  }
 
   @override
   String get aiWelcome => '안녕하세요! Ally AI입니다. 건강과 습관에 대해 무엇이든 물어보세요.';

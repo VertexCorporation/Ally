@@ -14,6 +14,7 @@
 // fully theme-aware and uses the shared design system components.
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 
@@ -25,7 +26,7 @@ import '../screens/activity.dart';
 import '../screens/account.dart';
 import '../screens/exercises.dart';
 import '../screens/heartbeat.dart';
-import '../screens/ally_ai_chat.dart';
+import '../screens/ally_ai_insights.dart';
 import '../screens/nutrition.dart';
 import '../screens/pedometer.dart';
 import '../screens/premium.dart';
@@ -222,6 +223,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   }
 
   void _toggleMenu() {
+    HapticFeedback.selectionClick();
     setState(() {
       _isMenuExpanded = !_isMenuExpanded;
       if (_isMenuExpanded) {
@@ -233,6 +235,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   }
 
   void _onNavDestinationSelected(int index) {
+    HapticFeedback.selectionClick();
     setState(() {
       _previousIndex = _selectedIndex;
       _selectedIndex = index;
@@ -619,7 +622,16 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
               width: double.infinity,
               padding: const EdgeInsets.all(AllySpacing.xxl),
               decoration: BoxDecoration(
-                color: scheme.onSurface,
+                // Subtle obsidian depth: the ink panel darkens a touch toward
+                // the baseline instead of sitting perfectly flat.
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    scheme.onSurface,
+                    Color.lerp(scheme.onSurface, scheme.surface, 0.12)!,
+                  ],
+                ),
                 borderRadius: AllyRadius.lgAll,
               ),
               child: Column(
@@ -935,7 +947,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         0,
       ),
       child: AllyCard(
-        onTap: () => _openScreen(const AllyAiChatScreen()),
+        onTap: () => _openScreen(const AllyAiInsightsScreen()),
         child: Row(
           children: [
             Container(

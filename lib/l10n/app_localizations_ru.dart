@@ -2070,7 +2070,47 @@ class AppLocalizationsRu extends AppLocalizations {
   String get allyAi => 'Ally AI';
 
   @override
-  String get allyAiTagline => 'Спросите о чём угодно о здоровье';
+  String get allyAiTagline => 'Аналитика здоровья по запросу';
+
+  @override
+  String get aiConsentTitle => 'Включить аналитику здоровья';
+
+  @override
+  String get aiConsentBody =>
+      'Для создания аналитики краткая сводка ваших локальных данных (шаги, вода, длительность сна, калории, записи веса) отправляется на бэкенд AI-lly Vertex в Firebase и обрабатывается настроенной ИИ-моделью. В фоне ничего не выполняется — аналитика создаётся только по запросу. Результаты носят информационный характер и не являются медицинской консультацией.';
+
+  @override
+  String get aiConsentAccept => 'Включить';
+
+  @override
+  String get aiConsentDecline => 'Не сейчас';
+
+  @override
+  String get aiInsightActivity => 'Аналитика активности';
+
+  @override
+  String get aiInsightSleep => 'Аналитика сна';
+
+  @override
+  String get aiInsightOverview => 'Обзор дня';
+
+  @override
+  String get aiRequestLabel => 'Свой запрос';
+
+  @override
+  String get aiInputHint => 'Спросите о своих данных';
+
+  @override
+  String get aiNotMedicalAdvice =>
+      'Аналитика носит информационный характер, это не медицинская консультация.';
+
+  @override
+  String get aiProcessing => 'Анализ данных…';
+
+  @override
+  String aiModelMeta(String model, int remaining) {
+    return 'модель $model · осталось запросов сегодня: $remaining';
+  }
 
   @override
   String get aiWelcome =>

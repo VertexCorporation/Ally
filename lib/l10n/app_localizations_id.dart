@@ -2078,7 +2078,47 @@ class AppLocalizationsId extends AppLocalizations {
   String get allyAi => 'Ally AI';
 
   @override
-  String get allyAiTagline => 'Tanyakan apa saja tentang kesehatanmu';
+  String get allyAiTagline => 'Wawasan kesehatan sesuai permintaan';
+
+  @override
+  String get aiConsentTitle => 'Aktifkan wawasan kesehatan';
+
+  @override
+  String get aiConsentBody =>
+      'Untuk menghasilkan wawasan, ringkasan ringkas data lokal Anda (langkah, air, durasi tidur, kalori, catatan berat) dikirim ke backend AI-lly Vertex di Firebase dan diproses oleh model AI yang dikonfigurasi. Tidak ada yang berjalan di latar belakang — wawasan hanya dibuat saat Anda memintanya. Hasil bersifat informatif, bukan nasihat medis.';
+
+  @override
+  String get aiConsentAccept => 'Aktifkan';
+
+  @override
+  String get aiConsentDecline => 'Nanti';
+
+  @override
+  String get aiInsightActivity => 'Wawasan aktivitas';
+
+  @override
+  String get aiInsightSleep => 'Wawasan tidur';
+
+  @override
+  String get aiInsightOverview => 'Ringkasan harian';
+
+  @override
+  String get aiRequestLabel => 'Permintaan khusus';
+
+  @override
+  String get aiInputHint => 'Tanyakan tentang datamu';
+
+  @override
+  String get aiNotMedicalAdvice =>
+      'Wawasan bersifat informatif — bukan nasihat medis.';
+
+  @override
+  String get aiProcessing => 'Menganalisis data…';
+
+  @override
+  String aiModelMeta(String model, int remaining) {
+    return 'model $model · sisa $remaining permintaan hari ini';
+  }
 
   @override
   String get aiWelcome =>

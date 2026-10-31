@@ -6,6 +6,7 @@
 // use the semantic success color for loss and error tone for gain — always
 // paired with a sign, never color alone.
 
+import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -172,6 +173,22 @@ class _WeightScreenState extends State<WeightScreen> {
               // ── History ──────────────────────────────────────────────────
               AllySectionHeader(title: l10n.weightHistory),
               const SizedBox(height: AllySpacing.lg),
+
+              // Trend of the recorded entries (real data only, ≥2 points).
+              if (healthData.weightHistory.length >= 2) ...[
+                AllyCard(
+                  padding: const EdgeInsets.all(AllySpacing.lg),
+                  child: SizedBox(
+                    height: 150,
+                    child: _WeightTrendChart(
+                      entries: healthData.weightHistory,
+                      accent: weightColor,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: AllySpacing.md),
+              ],
+
               Expanded(
                 child: healthData.weightHistory.isEmpty
                     ? AllyEmptyState(
@@ -283,6 +300,72 @@ class _WeightScreenState extends State<WeightScreen> {
           ),
         ),
       ),
+    );
+  }
+}
+
+/// Smooth line chart over the recorded weight entries (oldest → newest).
+class _WeightTrendChart extends StatelessWidget {
+  final List<Map<String, dynamic>> entries;
+  final Color accent;
+
+  const _WeightTrendChart({required this.entries, required this.accent});
+
+  @override
+  Widget build(BuildContext context) {
+    final ThemeData theme = Theme.of(context);
+    final ColorScheme scheme = theme.colorScheme;
+
+    // Entries are stored newest-first; charts read oldest → newest.
+    final List<double> values = [
+      for (final entry in entries.reversed) entry['weight'] as double,
+    ];
+
+    final double minY = values.reduce((a, b) => a < b ? a : b);
+    final double maxY = values.reduce((a, b) => a > b ? a : b);
+    final double pad = ((maxY - minY) * 0.2).clamp(0.5, 4.0);
+
+    return LineChart(
+      LineChartData(
+        minY: minY - pad,
+        maxY: maxY + pad,
+        lineTouchData: const LineTouchData(enabled: true),
+        gridData: FlGridData(
+          show: true,
+          drawVerticalLine: false,
+          horizontalInterval: (maxY - minY) / 2 <= 0 ? 1 : (maxY - minY) / 2,
+          getDrawingHorizontalLine: (value) =>
+              FlLine(color: scheme.outlineVariant, strokeWidth: 1),
+        ),
+        titlesData: const FlTitlesData(show: false),
+        borderData: FlBorderData(show: false),
+        lineBarsData: [
+          LineChartBarData(
+            spots: [
+              for (int i = 0; i < values.length; i++)
+                FlSpot(i.toDouble(), values[i]),
+            ],
+            isCurved: true,
+            curveSmoothness: 0.25,
+            barWidth: 2.2,
+            color: accent,
+            dotData: const FlDotData(show: false),
+            belowBarData: BarAreaData(
+              show: true,
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [
+                  accent.withValues(alpha: 0.10),
+                  accent.withValues(alpha: 0.0),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+      duration: const Duration(milliseconds: 350),
+      curve: Curves.easeOutCubic,
     );
   }
 }

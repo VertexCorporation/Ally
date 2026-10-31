@@ -18,6 +18,7 @@ export 'tokens/spacing.dart';
 export 'tokens/typography.dart';
 
 export 'components/ally_app_bar.dart';
+export 'components/ally_brand.dart';
 export 'components/ally_bottom_sheet.dart';
 export 'components/ally_button.dart';
 export 'components/ally_card.dart';
