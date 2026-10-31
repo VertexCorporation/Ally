@@ -36,7 +36,7 @@ Future<void> main() async {
     debugPrint('Firebase initialization failed: $e');
     // App continues running in "Offline Mode" if Firebase fails
     isFirebaseInitialized = false;
-  } 
+  }
 
   // 2. Initialize Critical Services
   // Foreground task / Android background service APIs are not supported on web.
@@ -52,9 +52,7 @@ Future<void> main() async {
   final String savedTheme = prefs.getString('selectedTheme') ?? 'light';
 
   // 4. Lock Orientation (Optional, recommended for health apps)
-  await SystemChrome.setPreferredOrientations([
-    DeviceOrientation.portraitUp,
-  ]);
+  await SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
 
   // 5. Run App with MultiProvider
   runApp(
@@ -77,31 +75,28 @@ Future<void> main() async {
 
         // Notification Service (Introvert)
         Provider<IntrovertNotificationService>(
-          create: (_) => IntrovertNotificationService(navigatorKey: navigatorKey),
+          create: (_) =>
+              IntrovertNotificationService(navigatorKey: navigatorKey),
         ),
 
         // External Notification Service (Extrovert)
         Provider<ExtrovertNotificationService>(
-          create: (_) => ExtrovertNotificationService(navigatorKey: navigatorKey),
+          create: (_) =>
+              ExtrovertNotificationService(navigatorKey: navigatorKey),
         ),
       ],
       // Doğrudan yükleme yerine Firebase durumunu garanti eden güvenli sarmalayıcı
-      child: FirebaseSafeWrapper(
-        navigatorKey: navigatorKey,
-      ),
+      child: FirebaseSafeWrapper(navigatorKey: navigatorKey),
     ),
   );
 }
 
-/// Firebase servislerinin asenkron başlatılma boşluğunda Provider'ların 
+/// Firebase servislerinin asenkron başlatılma boşluğunda Provider'ların
 /// çökmesini engelleyen güvenli ara katman widget'ı.
 class FirebaseSafeWrapper extends StatelessWidget {
   final GlobalKey<NavigatorState> navigatorKey;
 
-  const FirebaseSafeWrapper({
-    super.key,
-    required this.navigatorKey,
-  });
+  const FirebaseSafeWrapper({super.key, required this.navigatorKey});
 
   Future<FirebaseApp> _initializeFirebase() async {
     final app = await Firebase.initializeApp(
@@ -113,7 +108,7 @@ class FirebaseSafeWrapper extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Eğer Firebase zaten main içinde saniyeler içinde başarıyla bağlandıysa 
+    // Eğer Firebase zaten main içinde saniyeler içinde başarıyla bağlandıysa
     // doğrudan uygulamayı çökmeden başlatır.
     if (isFirebaseInitialized) {
       return Ally(
@@ -122,7 +117,7 @@ class FirebaseSafeWrapper extends StatelessWidget {
       );
     }
 
-    // Eğer bir aksilik olduysa ve asenkron bekleme henüz bitmediyse, 
+    // Eğer bir aksilik olduysa ve asenkron bekleme henüz bitmediyse,
     // kısa bir süre güvenli bir şekilde arka planda asenkron süreci bekler.
     return FutureBuilder(
       future: _initializeFirebase(),
@@ -130,11 +125,7 @@ class FirebaseSafeWrapper extends StatelessWidget {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const MaterialApp(
             debugShowCheckedModeBanner: false,
-            home: Scaffold(
-              body: Center(
-                child: CircularProgressIndicator(),
-              ),
-            ),
+            home: Scaffold(body: Center(child: CircularProgressIndicator())),
           );
         }
 

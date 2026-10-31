@@ -1,5 +1,17 @@
 // theme.dart
+//
+// © 2026 Vertex Corporation
+// ─────────────────────────────────────────────────────────────────────────────
+// Theme state + compatibility layer.
+//
+// The visual truth lives in `design_system/`. This file keeps:
+//   • [ThemeProvider] — persisted theme selection (light / dark / system and
+//     the pre-existing custom themes), unchanged public API.
+//   • [AppColors] — the legacy static accessor used across older code. For the
+//     Vertex themes it now resolves to the centralized design tokens instead
+//     of hardcoding its own palette.
 
+import 'package:ally/design_system/design_system.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -25,21 +37,20 @@ class ThemeProvider extends ChangeNotifier {
     await prefs.setString('selectedTheme', theme);
   }
 
+  /// Resolves the platform brightness for `system` mode.
+  Brightness get platformBrightness =>
+      WidgetsBinding.instance.platformDispatcher.platformBrightness;
+
   // It's a side effect, not a state change that affects the UI tree.
   void updateSystemUIOverlayStyle() {
-    final themeColors = AppColors.getThemeColors(_currentTheme);
-
     SystemChrome.setSystemUIOverlayStyle(
-      SystemUiOverlayStyle(
-        systemNavigationBarColor: themeColors.navigationBarColor,
-        statusBarColor: themeColors.statusBarColor,
-        systemNavigationBarIconBrightness: themeColors.navigationBarIconBrightness,
-        statusBarIconBrightness: themeColors.statusBarIconBrightness,
-      ),
+      AppTheme.overlayStyleFor(_currentTheme, platformBrightness),
     );
   }
 }
 
+/// Per-theme raw palette record. Legacy custom themes keep their original
+/// palettes; the Vertex themes are described by the design tokens.
 class ThemeColors {
   final Color primaryColor;
   final Color secondaryColor;
@@ -76,38 +87,9 @@ class ThemeColors {
 class AppColors {
   static String currentTheme = '';
 
-  static Map<String, ThemeColors> get themeDefinitions {
+  /// Legacy custom themes are preserved verbatim.
+  static Map<String, ThemeColors> get legacyThemeDefinitions {
     return {
-      'light': ThemeColors(
-        primaryColor: Colors.white,
-        secondaryColor: const Color(0xFFF3F3F3),
-        tertiaryColor: const Color(0xFF535353),
-        quaternaryColor: const Color(0xFFEBEBEB),
-        quinaryColor: const Color(0xA8000000),
-        senaryColor: const Color(0xFF0D62FE),
-        septenaryColor: const Color(0xFFFA2626),
-        background: const Color(0xFFFFFFFF),
-        border: const Color(0xFFBFBFBF),
-        navigationBarColor: Colors.white,
-        statusBarColor: Colors.transparent,
-        navigationBarIconBrightness: Brightness.dark,
-        statusBarIconBrightness: Brightness.dark,
-      ),
-      'dark': ThemeColors(
-        primaryColor: Colors.black,
-        secondaryColor: const Color(0xFF181818),
-        tertiaryColor: const Color(0xFF8F8F8F),
-        quaternaryColor: const Color(0xFF141414),
-        quinaryColor: Colors.white70,
-        senaryColor: const Color(0xFF0D31FE),
-        septenaryColor: const Color(0xFFD32F2F),
-        background: const Color(0xFF090909),
-        border: const Color(0xFF303030),
-        navigationBarColor: const Color(0xFF090909),
-        statusBarColor: const Color(0xFF090909),
-        navigationBarIconBrightness: Brightness.light,
-        statusBarIconBrightness: Brightness.light,
-      ),
       'love': ThemeColors(
         primaryColor: Colors.white,
         secondaryColor: const Color(0xFFFFC8D6),
@@ -201,8 +183,68 @@ class AppColors {
     };
   }
 
+  /// All theme definitions, with light/dark mapped to the Vertex tokens.
+  static Map<String, ThemeColors> get themeDefinitions {
+    final bool dark = resolveBrightness() == Brightness.dark;
+
+    return {
+      'light': _vertexColors(Brightness.light),
+      'dark': _vertexColors(Brightness.dark),
+      // `system` resolves to the active platform brightness.
+      'system': _vertexColors(dark ? Brightness.dark : Brightness.light),
+      ...legacyThemeDefinitions,
+    };
+  }
+
+  static ThemeColors _vertexColors(Brightness brightness) {
+    final bool isDark = brightness == Brightness.dark;
+    if (isDark) {
+      return ThemeColors(
+        primaryColor: Colors.black,
+        secondaryColor: VertexDarkColors.surface,
+        tertiaryColor: VertexDarkColors.textSecondary,
+        quaternaryColor: VertexDarkColors.elevatedSurface,
+        quinaryColor: VertexDarkColors.textMuted,
+        senaryColor: AllySemanticColors.info,
+        septenaryColor: AllySemanticColors.error,
+        background: VertexDarkColors.background,
+        border: VertexDarkColors.border,
+        navigationBarColor: VertexDarkColors.background,
+        statusBarColor: Colors.transparent,
+        navigationBarIconBrightness: Brightness.light,
+        statusBarIconBrightness: Brightness.light,
+      );
+    }
+    return ThemeColors(
+      primaryColor: Colors.white,
+      secondaryColor: VertexLightColors.surface,
+      tertiaryColor: VertexLightColors.textSecondary,
+      quaternaryColor: VertexLightColors.elevatedSurface,
+      quinaryColor: VertexLightColors.textMuted,
+      senaryColor: AllySemanticColors.info,
+      septenaryColor: AllySemanticColors.error,
+      background: VertexLightColors.background,
+      border: VertexLightColors.border,
+      navigationBarColor: VertexLightColors.background,
+      statusBarColor: Colors.transparent,
+      navigationBarIconBrightness: Brightness.dark,
+      statusBarIconBrightness: Brightness.dark,
+    );
+  }
+
+  /// Effective brightness of [currentTheme] ('system' follows the platform).
+  static Brightness resolveBrightness() {
+    final Brightness platform =
+        WidgetsBinding.instance.platformDispatcher.platformBrightness;
+    if (currentTheme == AppTheme.system) return platform;
+    return AppTheme.resolveBrightness(currentTheme, platform);
+  }
+
   static ThemeColors getThemeColors(String theme) {
-    return themeDefinitions[theme] ?? themeDefinitions['light']!;
+    if (theme == AppTheme.system) {
+      return _vertexColors(resolveBrightness());
+    }
+    return themeDefinitions[theme] ?? _vertexColors(Brightness.light);
   }
 
   static Map<String, dynamic> getSystemUIOverlayStyleForTheme(String theme) {
@@ -216,37 +258,17 @@ class AppColors {
   }
 
   static Color get primaryColor => getThemeColors(currentTheme).primaryColor;
-  static Color get secondaryColor => getThemeColors(currentTheme).secondaryColor;
+  static Color get secondaryColor =>
+      getThemeColors(currentTheme).secondaryColor;
   static Color get tertiaryColor => getThemeColors(currentTheme).tertiaryColor;
-  static Color get quaternaryColor => getThemeColors(currentTheme).quaternaryColor;
+  static Color get quaternaryColor =>
+      getThemeColors(currentTheme).quaternaryColor;
   static Color get quinaryColor => getThemeColors(currentTheme).quinaryColor;
   static Color get senaryColor => getThemeColors(currentTheme).senaryColor;
-  static Color get septenaryColor => getThemeColors(currentTheme).septenaryColor;
+  static Color get septenaryColor =>
+      getThemeColors(currentTheme).septenaryColor;
   static Color get background => getThemeColors(currentTheme).background;
   static Color get border => getThemeColors(currentTheme).border;
-
-  static Map<String, Map<String, dynamic>> get overlayStyles {
-    return themeDefinitions.map((key, value) => MapEntry(
-      key,
-      {
-        'navigationBarColor': value.navigationBarColor,
-        'statusBarColor': value.statusBarColor,
-        'navigationBarIconBrightness': value.navigationBarIconBrightness,
-        'statusBarIconBrightness': value.statusBarIconBrightness,
-      },
-    ));
-  }
-
-  static List<Color> get animatedBorderGradientColors => [
-    Colors.red,
-    Colors.orange,
-    Colors.yellow,
-    Colors.green,
-    Colors.blue,
-    Colors.indigo,
-    Colors.purple,
-    Colors.red,
-  ];
 
   static Color darken(Color color, double amount) {
     final luminance = color.computeLuminance();
@@ -255,7 +277,4 @@ class AppColors {
     final targetColor = Color.lerp(Colors.white, Colors.black, blendFactor)!;
     return Color.lerp(color, targetColor, amount)!;
   }
-
-  static Color get shimmerBase => darken(background, 0.1);
-  static Color get shimmerHighlight => darken(background, 0.02);
 }

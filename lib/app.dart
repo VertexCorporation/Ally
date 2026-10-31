@@ -1,57 +1,56 @@
 // app.dart
 //
+// © 2026 Vertex Corporation
+// ─────────────────────────────────────────────────────────────────────────────
 // Root application widget and shared app-level utilities.
 //
-// - Cortex: wraps [MaterialApp] with theming, localization, and navigator key.
-// - InvertedColor: small color utility extension used across the app.
+// - Ally: wraps [MaterialApp] with the design-system theme, localization and
+//   the global [navigatorKey]. Listens to platform brightness changes so the
+//   `system` theme option follows the OS live.
+// - InvertedColor: color utility extension (re-exported from the design
+//   system for backward compatibility).
 // - kUnsupportedMaterialLocales: locales with incomplete Material translations.
 
-import 'package:ally/theme.dart';
+import 'package:ally/design_system/design_system.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:provider/provider.dart';
 
 import 'l10n/app_localizations.dart';
 import 'language.dart';
+import 'theme.dart';
+
+export 'design_system/extensions/color_invert.dart';
 
 /// Root application widget. Wraps [MaterialApp] with localization, theming,
 /// and the global [navigatorKey].
-class Ally extends StatelessWidget {
-  const Ally ({
-    super.key,
-    required this.navigatorKey,
-    this.startupScreen,
-  });
+class Ally extends StatefulWidget {
+  const Ally({super.key, required this.navigatorKey, this.startupScreen});
 
   final GlobalKey<NavigatorState> navigatorKey;
   final Widget? startupScreen;
 
-  ThemeData _buildTheme(String currentTheme) {
-    final bool isDark = currentTheme == 'dark';
-    final ThemeData baseTheme = isDark ? ThemeData.dark() : ThemeData.light();
+  @override
+  State<Ally> createState() => _AllyState();
+}
 
-    return baseTheme.copyWith(
-      primaryColor: AppColors.background,
-      scaffoldBackgroundColor: AppColors.background,
-      colorScheme: baseTheme.colorScheme.copyWith(
-        primary: AppColors.primaryColor.inverted,
-        onPrimary: AppColors.primaryColor,
-        secondary: AppColors.border,
-        onSecondary: AppColors.quaternaryColor,
-        surface: AppColors.background,
-        onSurface: AppColors.border,
-        error: AppColors.septenaryColor,
-      ),
-      textSelectionTheme: TextSelectionThemeData(
-        cursorColor: AppColors.primaryColor.inverted,
-        selectionColor: AppColors.quaternaryColor,
-      ),
-      inputDecorationTheme: InputDecorationTheme(
-        focusColor: AppColors.primaryColor.inverted,
-        hintStyle: TextStyle(color: AppColors.tertiaryColor),
-        labelStyle: TextStyle(color: AppColors.tertiaryColor),
-      ),
-    );
+class _AllyState extends State<Ally> with WidgetsBindingObserver {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangePlatformBrightness() {
+    // Rebuild so a persisted `system` theme follows the OS immediately.
+    if (mounted) setState(() {});
   }
 
   @override
@@ -59,9 +58,15 @@ class Ally extends StatelessWidget {
     final ThemeProvider themeProvider = Provider.of<ThemeProvider>(context);
     final LocaleProvider localeProvider = Provider.of<LocaleProvider>(context);
 
+    final Brightness platformBrightness =
+        WidgetsBinding.instance.platformDispatcher.platformBrightness;
+
     return MaterialApp(
-      navigatorKey: navigatorKey,
-      theme: _buildTheme(themeProvider.currentTheme),
+      navigatorKey: widget.navigatorKey,
+      theme: AppTheme.build(
+        themeName: themeProvider.currentTheme,
+        platformBrightness: platformBrightness,
+      ),
       builder: (BuildContext context, Widget? child) {
         try {
           themeProvider.updateSystemUIOverlayStyle();
@@ -78,31 +83,15 @@ class Ally extends StatelessWidget {
       ],
       localeResolutionCallback:
           (Locale? locale, Iterable<Locale> supportedLocales) {
-        final Locale chosenLocale = localeProvider.locale;
-        if (kUnsupportedMaterialLocales.contains(chosenLocale.languageCode)) {
-          return const Locale('en');
-        }
-        return chosenLocale;
-      },
-      home: startupScreen,
-    );
-  }
-}
-
-/// Helper extension to make color inversion cleaner and reusable.
-extension InvertedColor on Color {
-  /// Returns the inverted version of this color.
-  Color get inverted {
-    final int a = (this.a * 255).round();
-    final int r = (this.r * 255).round();
-    final int g = (this.g * 255).round();
-    final int b = (this.b * 255).round();
-
-    return Color.fromARGB(
-      a,
-      255 - r,
-      255 - g,
-      255 - b,
+            final Locale chosenLocale = localeProvider.locale;
+            if (kUnsupportedMaterialLocales.contains(
+              chosenLocale.languageCode,
+            )) {
+              return const Locale('en');
+            }
+            return chosenLocale;
+          },
+      home: widget.startupScreen,
     );
   }
 }

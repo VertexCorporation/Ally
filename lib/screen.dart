@@ -1,8 +1,16 @@
+// screen.dart
+//
+// © 2026 Vertex Corporation
+// ─────────────────────────────────────────────────────────────────────────────
+// Startup router: checks onboarding completion and lands on Home or Welcome.
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../providers/health.dart';
+
+import 'design_system/design_system.dart';
 import 'home/home.dart';
-import '../screens/welcome.dart';
+import 'providers/health.dart';
+import 'screens/welcome.dart';
 
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
@@ -26,7 +34,8 @@ class _MainScreenState extends State<MainScreen> {
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
-          builder: (context) => isCompleted ? const HomeScreen() : const WelcomeScreen(),
+          builder: (context) =>
+              isCompleted ? const HomeScreen() : const WelcomeScreen(),
         ),
       );
     }
@@ -36,11 +45,7 @@ class _MainScreenState extends State<MainScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-      body: const Center(
-        child: CircularProgressIndicator(
-          valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF667EEA)),
-        ),
-      ),
+      body: AllyLoading.spinner(),
     );
   }
 }
