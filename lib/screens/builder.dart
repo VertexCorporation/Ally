@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../design_system/tokens/colors.dart';
 import 'package:provider/provider.dart';
 import '../models/exercise.dart';
 import '../models/program.dart';
@@ -29,15 +30,21 @@ class _WorkoutBuilderScreenState extends State<WorkoutBuilderScreen> {
     if (widget.program != null) {
       _nameController.text = widget.program!.name;
       for (var programExercise in widget.program!.exercises) {
-        final exercise = ExerciseLibrary.getExerciseById(programExercise.exerciseId);
+        final exercise = ExerciseLibrary.getExerciseById(
+          programExercise.exerciseId,
+        );
         if (exercise != null) {
           _selectedExercises.add({
             'exercise': exercise,
-            'sets': programExercise.sets.map((set) => {
-              'reps': set.reps,
-              'weight': set.weight,
-              'rest': set.restSeconds,
-            }).toList(),
+            'sets': programExercise.sets
+                .map(
+                  (set) => {
+                    'reps': set.reps,
+                    'weight': set.weight,
+                    'rest': set.restSeconds,
+                  },
+                )
+                .toList(),
           });
         }
       }
@@ -73,22 +80,32 @@ class _WorkoutBuilderScreenState extends State<WorkoutBuilderScreen> {
               Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFE57373).withValues(alpha:0.15),
+                  color: AllyUniversalAccents.exercise.withValues(alpha: 0.15),
                   shape: BoxShape.circle,
                 ),
-                child: const Icon(Icons.search, color: Color(0xFFE57373), size: 32),
+                child: const Icon(
+                  Icons.search,
+                  color: AllyUniversalAccents.exercise,
+                  size: 32,
+                ),
               ),
               const SizedBox(height: 16),
               Text(
                 l10n.selectExercise,
-                style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                style: const TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
               const SizedBox(height: 24),
 
               Expanded(
                 child: ListView(
                   children: ExerciseLibrary.exercises
-                      .map((exercise) => _buildExerciseOption(dialogContext, exercise))
+                      .map(
+                        (exercise) =>
+                            _buildExerciseOption(dialogContext, exercise),
+                      )
                       .toList(),
                 ),
               ),
@@ -112,7 +129,11 @@ class _WorkoutBuilderScreenState extends State<WorkoutBuilderScreen> {
           color: Theme.of(context).cardColor,
           borderRadius: BorderRadius.circular(16),
           boxShadow: const [
-            BoxShadow(color: Colors.black12, blurRadius: 5, offset: Offset(0, 1)),
+            BoxShadow(
+              color: Colors.black12,
+              blurRadius: 5,
+              offset: Offset(0, 1),
+            ),
           ],
         ),
         child: Row(
@@ -120,10 +141,14 @@ class _WorkoutBuilderScreenState extends State<WorkoutBuilderScreen> {
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: const Color(0xFFE57373).withValues(alpha:0.15),
+                color: AllyUniversalAccents.exercise.withValues(alpha: 0.15),
                 borderRadius: BorderRadius.circular(12),
               ),
-              child: Icon(exercise.icon, color: const Color(0xFFE57373), size: 24),
+              child: Icon(
+                exercise.icon,
+                color: AllyUniversalAccents.exercise,
+                size: 24,
+              ),
             ),
             const SizedBox(width: 16),
             Expanded(
@@ -132,24 +157,38 @@ class _WorkoutBuilderScreenState extends State<WorkoutBuilderScreen> {
                 children: [
                   Text(
                     exercise.name,
-                    style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                   const SizedBox(height: 4),
                   if (exercise.equipment != null)
                     Row(
                       children: [
-                        const Icon(Icons.fitness_center, size: 12, color: Colors.grey),
+                        const Icon(
+                          Icons.fitness_center,
+                          size: 12,
+                          color: Colors.grey,
+                        ),
                         const SizedBox(width: 4),
                         Text(
                           exercise.equipment!,
-                          style: const TextStyle(fontSize: 12, color: Colors.grey),
+                          style: const TextStyle(
+                            fontSize: 12,
+                            color: Colors.grey,
+                          ),
                         ),
                       ],
                     ),
                 ],
               ),
             ),
-            const Icon(Icons.add_circle, color: Color(0xFFE57373), size: 24),
+            const Icon(
+              Icons.add_circle,
+              color: AllyUniversalAccents.exercise,
+              size: 24,
+            ),
           ],
         ),
       ),
@@ -187,7 +226,12 @@ class _WorkoutBuilderScreenState extends State<WorkoutBuilderScreen> {
     });
   }
 
-  void _updateSet(int exerciseIndex, int setIndex, String field, dynamic value) {
+  void _updateSet(
+    int exerciseIndex,
+    int setIndex,
+    String field,
+    dynamic value,
+  ) {
     setState(() {
       _selectedExercises[exerciseIndex]['sets'][setIndex][field] = value;
     });
@@ -221,15 +265,24 @@ class _WorkoutBuilderScreenState extends State<WorkoutBuilderScreen> {
                 Container(
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                    color: const Color(0xFFE57373).withValues(alpha:0.15),
+                    color: AllyUniversalAccents.exercise.withValues(
+                      alpha: 0.15,
+                    ),
                     shape: BoxShape.circle,
                   ),
-                  child: const Icon(Icons.save_rounded, color: Color(0xFFE57373), size: 32),
+                  child: const Icon(
+                    Icons.save_rounded,
+                    color: AllyUniversalAccents.exercise,
+                    size: 32,
+                  ),
                 ),
                 const SizedBox(height: 16),
                 Text(
                   widget.program != null ? 'Update Program' : 'Save Program',
-                  style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                  style: const TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
                 const SizedBox(height: 24),
                 TextField(
@@ -243,7 +296,10 @@ class _WorkoutBuilderScreenState extends State<WorkoutBuilderScreen> {
                       borderRadius: BorderRadius.circular(16),
                       borderSide: BorderSide.none,
                     ),
-                    contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                    contentPadding: const EdgeInsets.symmetric(
+                      horizontal: 20,
+                      vertical: 16,
+                    ),
                   ),
                 ),
                 const SizedBox(height: 24),
@@ -279,7 +335,10 @@ class _WorkoutBuilderScreenState extends State<WorkoutBuilderScreen> {
                           if (name.isEmpty) return;
 
                           final program = WorkoutProgram(
-                            id: widget.program?.id ?? DateTime.now().millisecondsSinceEpoch.toString(),
+                            id:
+                                widget.program?.id ??
+                                DateTime.now().millisecondsSinceEpoch
+                                    .toString(),
                             name: name,
                             exercises: _selectedExercises.map((ex) {
                               return ProgramExercise(
@@ -293,18 +352,24 @@ class _WorkoutBuilderScreenState extends State<WorkoutBuilderScreen> {
                                 }).toList(),
                               );
                             }).toList(),
-                            createdAt: widget.program?.createdAt ?? DateTime.now(),
+                            createdAt:
+                                widget.program?.createdAt ?? DateTime.now(),
                           );
 
-                          final workoutProvider = Provider.of<WorkoutProvider>(context, listen: false);
+                          final workoutProvider = Provider.of<WorkoutProvider>(
+                            context,
+                            listen: false,
+                          );
 
                           if (mounted) {
                             Navigator.pop(dialogContext); // Close dialog
                             Navigator.pop(context); // Close builder
                             CustomNotification.show(
                               context,
-                              message: widget.program != null ? l10n.programUpdated(name) : l10n.programSaved(name),
-                              backgroundColor: const Color(0xFF4CAF50),
+                              message: widget.program != null
+                                  ? l10n.programUpdated(name)
+                                  : l10n.programSaved(name),
+                              backgroundColor: AllyUniversalAccents.done,
                               icon: Icons.check_circle,
                             );
 
@@ -314,7 +379,7 @@ class _WorkoutBuilderScreenState extends State<WorkoutBuilderScreen> {
                         child: Container(
                           padding: const EdgeInsets.all(16),
                           decoration: BoxDecoration(
-                            color: const Color(0xFFE57373),
+                            color: AllyUniversalAccents.exercise,
                             borderRadius: BorderRadius.circular(16),
                           ),
                           child: Text(
@@ -344,7 +409,7 @@ class _WorkoutBuilderScreenState extends State<WorkoutBuilderScreen> {
     final l10n = AppLocalizations.of(context)!;
     final totalSets = _selectedExercises.fold<int>(
       0,
-          (sum, ex) => sum + (ex['sets'] as List).length,
+      (sum, ex) => sum + (ex['sets'] as List).length,
     );
 
     return Scaffold(
@@ -357,8 +422,13 @@ class _WorkoutBuilderScreenState extends State<WorkoutBuilderScreen> {
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
-          widget.program != null ? AppLocalizations.of(context)!.editProgram : AppLocalizations.of(context)!.workoutBuilder,
-          style: TextStyle(color: Theme.of(context).textTheme.bodyLarge?.color, fontWeight: FontWeight.bold),
+          widget.program != null
+              ? AppLocalizations.of(context)!.editProgram
+              : AppLocalizations.of(context)!.workoutBuilder,
+          style: TextStyle(
+            color: Theme.of(context).textTheme.bodyLarge?.color,
+            fontWeight: FontWeight.bold,
+          ),
         ),
         actions: [
           if (_selectedExercises.isNotEmpty)
@@ -367,7 +437,7 @@ class _WorkoutBuilderScreenState extends State<WorkoutBuilderScreen> {
               child: Text(
                 l10n.save,
                 style: const TextStyle(
-                  color: Color(0xFFE57373),
+                  color: AllyUniversalAccents.exercise,
                   fontWeight: FontWeight.bold,
                   fontSize: 16,
                 ),
@@ -401,10 +471,7 @@ class _WorkoutBuilderScreenState extends State<WorkoutBuilderScreen> {
                       const SizedBox(height: 8),
                       Text(
                         l10n.tapPlusButton,
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: Colors.grey[400],
-                        ),
+                        style: TextStyle(fontSize: 14, color: Colors.grey[400]),
                       ),
                     ],
                   ),
@@ -427,7 +494,7 @@ class _WorkoutBuilderScreenState extends State<WorkoutBuilderScreen> {
                         borderRadius: BorderRadius.circular(20),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.black.withValues(alpha:0.05),
+                            color: Colors.black.withValues(alpha: 0.05),
                             blurRadius: 10,
                             offset: const Offset(0, 4),
                           ),
@@ -444,15 +511,21 @@ class _WorkoutBuilderScreenState extends State<WorkoutBuilderScreen> {
                                 Container(
                                   padding: const EdgeInsets.all(12),
                                   decoration: BoxDecoration(
-                                    color: const Color(0xFFE57373).withValues(alpha:0.15),
+                                    color: AllyUniversalAccents.exercise
+                                        .withValues(alpha: 0.15),
                                     borderRadius: BorderRadius.circular(12),
                                   ),
-                                  child: Icon(exercise.icon, color: const Color(0xFFE57373), size: 24),
+                                  child: Icon(
+                                    exercise.icon,
+                                    color: AllyUniversalAccents.exercise,
+                                    size: 24,
+                                  ),
                                 ),
                                 const SizedBox(width: 12),
                                 Expanded(
                                   child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
                                       Text(
                                         exercise.name,
@@ -473,10 +546,15 @@ class _WorkoutBuilderScreenState extends State<WorkoutBuilderScreen> {
                                   ),
                                 ),
                                 IconButton(
-                                  icon: const Icon(Icons.delete_outline, color: Colors.red),
+                                  icon: const Icon(
+                                    Icons.delete_outline,
+                                    color: Colors.red,
+                                  ),
                                   onPressed: () {
                                     setState(() {
-                                      _selectedExercises.removeAt(exerciseIndex);
+                                      _selectedExercises.removeAt(
+                                        exerciseIndex,
+                                      );
                                     });
                                   },
                                 ),
@@ -488,12 +566,22 @@ class _WorkoutBuilderScreenState extends State<WorkoutBuilderScreen> {
 
                           // Sets Header
                           Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 16,
+                              vertical: 12,
+                            ),
                             child: Row(
                               children: [
                                 const SizedBox(width: 40),
                                 Expanded(
-                                  child: Text(l10n.reps, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.grey)),
+                                  child: Text(
+                                    l10n.reps,
+                                    style: const TextStyle(
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.grey,
+                                    ),
+                                  ),
                                 ),
                                 Expanded(
                                   child: Consumer<HealthProvider>(
@@ -502,13 +590,24 @@ class _WorkoutBuilderScreenState extends State<WorkoutBuilderScreen> {
                                         exercise.isUnilateral
                                             ? '${l10n.weight} (2x)'
                                             : '${l10n.weight} (${healthProvider.units == 'imperial' ? 'lbs' : 'kg'})',
-                                        style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.grey),
+                                        style: const TextStyle(
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.grey,
+                                        ),
                                       );
                                     },
                                   ),
                                 ),
                                 Expanded(
-                                  child: Text(l10n.rest, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.grey)),
+                                  child: Text(
+                                    l10n.rest,
+                                    style: const TextStyle(
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.grey,
+                                    ),
+                                  ),
                                 ),
                                 const SizedBox(width: 40),
                               ],
@@ -519,14 +618,18 @@ class _WorkoutBuilderScreenState extends State<WorkoutBuilderScreen> {
                           ...List.generate(sets.length, (setIndex) {
                             final set = sets[setIndex];
                             return Padding(
-                              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 16,
+                                vertical: 8,
+                              ),
                               child: Row(
                                 children: [
                                   Container(
                                     width: 32,
                                     height: 32,
                                     decoration: BoxDecoration(
-                                      color: const Color(0xFFE57373).withValues(alpha:0.15),
+                                      color: AllyUniversalAccents.exercise
+                                          .withValues(alpha: 0.15),
                                       borderRadius: BorderRadius.circular(8),
                                     ),
                                     child: Center(
@@ -534,7 +637,7 @@ class _WorkoutBuilderScreenState extends State<WorkoutBuilderScreen> {
                                         '${setIndex + 1}',
                                         style: const TextStyle(
                                           fontWeight: FontWeight.bold,
-                                          color: Color(0xFFE57373),
+                                          color: AllyUniversalAccents.exercise,
                                         ),
                                       ),
                                     ),
@@ -543,7 +646,12 @@ class _WorkoutBuilderScreenState extends State<WorkoutBuilderScreen> {
                                   Expanded(
                                     child: _buildNumberInput(
                                       value: set['reps'],
-                                      onChanged: (val) => _updateSet(exerciseIndex, setIndex, 'reps', val),
+                                      onChanged: (val) => _updateSet(
+                                        exerciseIndex,
+                                        setIndex,
+                                        'reps',
+                                        val,
+                                      ),
                                     ),
                                   ),
                                   const SizedBox(width: 8),
@@ -551,21 +659,35 @@ class _WorkoutBuilderScreenState extends State<WorkoutBuilderScreen> {
                                     child: _buildNumberInput(
                                       value: set['weight'],
                                       isDecimal: true,
-                                      onChanged: (val) => _updateSet(exerciseIndex, setIndex, 'weight', val),
+                                      onChanged: (val) => _updateSet(
+                                        exerciseIndex,
+                                        setIndex,
+                                        'weight',
+                                        val,
+                                      ),
                                     ),
                                   ),
                                   const SizedBox(width: 8),
                                   Expanded(
                                     child: _buildNumberInput(
                                       value: set['rest'],
-                                      onChanged: (val) => _updateSet(exerciseIndex, setIndex, 'rest', val),
+                                      onChanged: (val) => _updateSet(
+                                        exerciseIndex,
+                                        setIndex,
+                                        'rest',
+                                        val,
+                                      ),
                                     ),
                                   ),
                                   const SizedBox(width: 8),
                                   IconButton(
-                                    icon: const Icon(Icons.remove_circle_outline, size: 20),
+                                    icon: const Icon(
+                                      Icons.remove_circle_outline,
+                                      size: 20,
+                                    ),
                                     color: Colors.red,
-                                    onPressed: () => _removeSet(exerciseIndex, setIndex),
+                                    onPressed: () =>
+                                        _removeSet(exerciseIndex, setIndex),
                                   ),
                                 ],
                               ),
@@ -582,9 +704,14 @@ class _WorkoutBuilderScreenState extends State<WorkoutBuilderScreen> {
                                 icon: const Icon(Icons.add, size: 20),
                                 label: Text(l10n.addSet),
                                 style: OutlinedButton.styleFrom(
-                                  foregroundColor: const Color(0xFFE57373),
-                                  side: const BorderSide(color: Color(0xFFE57373)),
-                                  padding: const EdgeInsets.symmetric(vertical: 12),
+                                  foregroundColor:
+                                      AllyUniversalAccents.exercise,
+                                  side: const BorderSide(
+                                    color: AllyUniversalAccents.exercise,
+                                  ),
+                                  padding: const EdgeInsets.symmetric(
+                                    vertical: 12,
+                                  ),
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(12),
                                   ),
@@ -606,7 +733,7 @@ class _WorkoutBuilderScreenState extends State<WorkoutBuilderScreen> {
                 color: Theme.of(context).cardColor,
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withValues(alpha:0.1),
+                    color: Colors.black.withValues(alpha: 0.1),
                     blurRadius: 10,
                     offset: const Offset(0, -2),
                   ),
@@ -628,12 +755,15 @@ class _WorkoutBuilderScreenState extends State<WorkoutBuilderScreen> {
                                 style: const TextStyle(
                                   fontSize: 24,
                                   fontWeight: FontWeight.bold,
-                                  color: Color(0xFFE57373),
+                                  color: AllyUniversalAccents.exercise,
                                 ),
                               ),
                               const Text(
                                 'Exercises',
-                                style: TextStyle(fontSize: 12, color: Colors.grey),
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  color: Colors.grey,
+                                ),
                               ),
                             ],
                           ),
@@ -644,12 +774,15 @@ class _WorkoutBuilderScreenState extends State<WorkoutBuilderScreen> {
                                 style: const TextStyle(
                                   fontSize: 24,
                                   fontWeight: FontWeight.bold,
-                                  color: Color(0xFF64B5F6),
+                                  color: AllyUniversalAccents.rest,
                                 ),
                               ),
                               const Text(
                                 'Sets',
-                                style: TextStyle(fontSize: 12, color: Colors.grey),
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  color: Colors.grey,
+                                ),
                               ),
                             ],
                           ),
@@ -661,9 +794,15 @@ class _WorkoutBuilderScreenState extends State<WorkoutBuilderScreen> {
                     child: ElevatedButton.icon(
                       onPressed: _showExercisePicker,
                       icon: const Icon(Icons.add, size: 24),
-                      label: Text(l10n.addExercise, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                      label: Text(
+                        l10n.addExercise,
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFFE57373),
+                        backgroundColor: AllyUniversalAccents.exercise,
                         foregroundColor: Colors.white,
                         padding: const EdgeInsets.symmetric(vertical: 16),
                         shape: RoundedRectangleBorder(
@@ -695,7 +834,7 @@ class _WorkoutBuilderScreenState extends State<WorkoutBuilderScreen> {
       decoration: BoxDecoration(
         color: Theme.of(context).brightness == Brightness.dark
             ? Colors.grey[800]
-            : const Color(0xFFF5F1EB),
+            : AllyUniversalAccents.rest,
         borderRadius: BorderRadius.circular(8),
       ),
       child: TextField(

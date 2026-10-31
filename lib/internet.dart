@@ -27,7 +27,6 @@ class InternetProvider with ChangeNotifier {
         notifyListeners();
       }
     });
-
   }
 
   /// --- NEW METHOD ---
@@ -71,7 +70,9 @@ class InternetService {
 
         // Only log significant changes to keep logs clean
         if (kDebugMode) {
-          debugPrint("[Connectivity] Status changed to: ${connected ? 'ONLINE' : 'OFFLINE'}");
+          debugPrint(
+            "[Connectivity] Status changed to: ${connected ? 'ONLINE' : 'OFFLINE'}",
+          );
         }
       }
     });

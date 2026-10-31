@@ -1,19 +1,22 @@
-// lib/login/verify.dart
+// login/verify.dart
+//
+// © 2026 Vertex Corporation
+// ─────────────────────────────────────────────────────────────────────────────
+// Email verification interstitial. Verification polling, resend, remember-me
+// persistence and navigation are preserved from the original implementation.
 
 import 'dart:async';
 import 'dart:developer' as dev;
-import 'dart:math' as math;
 
+import 'package:ally/design_system/design_system.dart';
+import 'package:ally/l10n/app_localizations.dart';
+import 'package:ally/notifications/introvert.dart';
+import 'package:ally/screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:provider/provider.dart';
 
-import 'package:ally/l10n/app_localizations.dart';
-import 'package:ally/theme.dart';
-import 'package:ally/notifications/introvert.dart';
-
-import '../screen.dart';
 import 'screen.dart';
 
 class EmailVerificationScreen extends StatefulWidget {
@@ -170,8 +173,6 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
 
   Future<void> _navigateToMainScreen() async {
     await _saveRememberMeState();
-    // Add purchase reconciliation logic here if needed:
-    // await reconcileAndSyncPurchases();
 
     if (mounted) {
       Navigator.of(context).pushReplacement(
@@ -188,17 +189,10 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // DYNAMIC SCALING
-    final size = MediaQuery.of(context).size;
-
-    // Base Reference Width (iPhone 14 approx: ~390px)
-    double scale = size.width / 390.0;
-
-    // Cap scale for Tablets to prevent UI from becoming too huge
-    if (size.width > 600) {
-      scale = 1.0 + (size.width - 600) * 0.0001;
-    }
-    scale = scale.clamp(0.85, 1.3);
+    final l10n = AppLocalizations.of(context)!;
+    final ThemeData theme = Theme.of(context);
+    final ColorScheme scheme = theme.colorScheme;
+    final AllySemanticPalette semantics = context.allySemantics;
 
     return PopScope(
       canPop: false,
@@ -206,118 +200,72 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
         if (!didPop) _returnToLogin();
       },
       child: Scaffold(
-        backgroundColor: AppColors.background,
         body: SafeArea(
           child: Center(
             child: ConstrainedBox(
-              constraints: BoxConstraints(maxWidth: 450 * scale),
+              constraints: const BoxConstraints(maxWidth: 450),
               child: Padding(
-                padding: EdgeInsets.symmetric(horizontal: 32.0 * scale),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: AllySpacing.xxl,
+                ),
                 child: Column(
                   children: [
                     const Spacer(flex: 2),
 
                     // 1. HEADER ICON
-                    _VerificationIcon(scale: scale),
+                    _VerificationIcon(
+                      color: _isVerified
+                          ? semantics.success
+                          : scheme.onSurfaceVariant,
+                      icon: _isVerified
+                          ? Icons.mark_email_read_outlined
+                          : Icons.mark_email_unread_outlined,
+                    ),
 
                     const Spacer(flex: 2),
 
                     // 2. BODY TEXT
-                    _VerificationBody(email: widget.email, scale: scale),
+                    _VerificationBody(email: widget.email),
 
                     const Spacer(flex: 2),
 
                     // 3. ACTIONS
-                    if (!_isVerified)
-                      Column(
-                        children: [
-                          // Resend Button
-                          SizedBox(
-                            width: double.infinity,
-                            child: ElevatedButton(
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: AppColors.senaryColor,
-                                foregroundColor: Colors.white,
-                                padding: EdgeInsets.symmetric(
-                                  vertical: 18 * scale,
-                                ),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(
-                                    30 * scale,
-                                  ),
-                                ),
-                                elevation: 0,
-                              ),
-                              onPressed: _isResendLoading
-                                  ? null
-                                  : _resendVerificationEmail,
-                              child: _isResendLoading
-                                  ? SizedBox(
-                                      height: 20 * scale,
-                                      width: 20 * scale,
-                                      child: const CircularProgressIndicator(
-                                        strokeWidth: 2,
-                                        valueColor:
-                                            AlwaysStoppedAnimation<Color>(
-                                              Colors.white,
-                                            ),
-                                      ),
-                                    )
-                                  : Text(
-                                      AppLocalizations.of(context)!.resendCode,
-                                      style: TextStyle(
-                                        fontSize: 16 * scale,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                            ),
+                    if (!_isVerified) ...[
+                      AllyButton(
+                        label: l10n.resendCode,
+                        isLoading: _isResendLoading,
+                        onPressed: _isResendLoading
+                            ? null
+                            : _resendVerificationEmail,
+                      ),
+                      const SizedBox(height: AllySpacing.md),
+                      AllyButton(
+                        label: l10n.backToLogin,
+                        kind: AllyButtonKind.ghost,
+                        onPressed: _returnToLogin,
+                      ),
+                      const SizedBox(height: AllySpacing.xl),
+
+                      // Warning Text
+                      Padding(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: AllySpacing.lg,
+                        ),
+                        child: Text(
+                          l10n.pleaseCheckYourEmail,
+                          textAlign: TextAlign.center,
+                          style: AllyTypography.caption(
+                            color: scheme.onSurfaceVariant,
                           ),
-
-                          SizedBox(height: 16 * scale),
-
-                          TextButton(
-                            onPressed: _returnToLogin,
-                            style: TextButton.styleFrom(
-                              padding: EdgeInsets.symmetric(
-                                vertical: 12 * scale,
-                                horizontal: 16 * scale,
-                              ),
-                            ),
-                            child: Text(
-                              AppLocalizations.of(context)!.backToLogin,
-                              style: TextStyle(
-                                fontSize: 14 * scale,
-                                fontWeight: FontWeight.w600,
-                                color: AppColors.tertiaryColor.withValues(
-                                  alpha: 0.8,
-                                ),
-                              ),
-                            ),
-                          ),
-
-                          SizedBox(height: 20 * scale),
-
-                          // Warning Text
-                          Padding(
-                            padding: EdgeInsets.symmetric(
-                              horizontal: 16.0 * scale,
-                            ),
-                            child: Text(
-                              AppLocalizations.of(
-                                context,
-                              )!.pleaseCheckYourEmail,
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                fontSize: 12 * scale,
-                                color: AppColors.tertiaryColor.withValues(
-                                  alpha: 0.5,
-                                ),
-                                height: 1.5,
-                              ),
-                            ),
-                          ),
-
-                        ],
+                        ),
+                      ),
+                    ] else
+                      Text(
+                        l10n.linkSent,
+                        style: AllyTypography.label(
+                          size: 14,
+                          color: semantics.success,
+                        ),
                       ),
 
                     const Spacer(flex: 1),
@@ -335,34 +283,32 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
 // --- EXTRACTED UI WIDGETS ---
 
 class _VerificationIcon extends StatelessWidget {
-  final double scale;
+  final Color color;
+  final IconData icon;
 
-  const _VerificationIcon({required this.scale});
+  const _VerificationIcon({required this.color, required this.icon});
 
   @override
   Widget build(BuildContext context) {
+    final ThemeData theme = Theme.of(context);
+
     return Stack(
       clipBehavior: Clip.none,
       alignment: Alignment.center,
       children: [
-        // Decorative Circle Background
+        // Decorative square background, rotated — quiet geometry, not a glow.
         Transform.rotate(
-          angle: -15 * math.pi / 180,
+          angle: -15 * 3.1415926535897932 / 180,
           child: Container(
-            width: 140 * scale,
-            height: 140 * scale,
+            width: 128,
+            height: 128,
             decoration: BoxDecoration(
-              color: AppColors.secondaryColor,
-              borderRadius: BorderRadius.circular(40 * scale),
+              color: theme.colorScheme.onSurface.withValues(alpha: 0.05),
+              borderRadius: BorderRadius.circular(32),
             ),
           ),
         ),
-        // Icon
-        Icon(
-          Icons.mark_email_unread_outlined,
-          size: 80 * scale,
-          color: AppColors.tertiaryColor,
-        ),
+        Icon(icon, size: 72, color: color),
       ],
     );
   }
@@ -370,42 +316,40 @@ class _VerificationIcon extends StatelessWidget {
 
 class _VerificationBody extends StatelessWidget {
   final String email;
-  final double scale;
 
-  const _VerificationBody({required this.email, required this.scale});
+  const _VerificationBody({required this.email});
 
   @override
   Widget build(BuildContext context) {
+    final ThemeData theme = Theme.of(context);
     final l10n = AppLocalizations.of(context)!;
     return Column(
       children: [
         Text(
           l10n.verifyYourEmail,
           textAlign: TextAlign.center,
-          style: TextStyle(
-            fontSize: 24 * scale,
-            fontWeight: FontWeight.bold,
-            color: AppColors.tertiaryColor,
+          style: AllyTypography.headline(
+            size: 24,
+            color: theme.colorScheme.onSurface,
           ),
         ),
-        SizedBox(height: 12 * scale),
+        const SizedBox(height: AllySpacing.md),
         RichText(
           textAlign: TextAlign.center,
           text: TextSpan(
-            style: TextStyle(
-              fontSize: 15 * scale,
-              color: AppColors.tertiaryColor.withValues(alpha: 0.7),
-              fontFamily: Theme.of(context).textTheme.bodyMedium?.fontFamily,
-              height: 1.5,
-            ),
+            style: AllyTypography.body(
+              size: 15,
+              color: theme.colorScheme.onSurfaceVariant,
+            ).copyWith(height: 1.5),
             children: [
               TextSpan(text: '${l10n.pleaseCheckYourEmail} '),
               TextSpan(
                 text: email,
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  color: AppColors.tertiaryColor,
-                ),
+                style: AllyTypography.body(
+                  size: 15,
+                  weight: FontWeight.w600,
+                  color: theme.colorScheme.onSurface,
+                ).copyWith(height: 1.5),
               ),
             ],
           ),

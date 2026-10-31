@@ -45,12 +45,13 @@ class Darkener {
     final origNavColor = current['navigationBarColor'] as Color;
     final origNavIcons = current['navigationBarIconBrightness'] as Brightness;
     final origStatusColor = current['statusBarColor'] as Color? ?? origNavColor;
-    final origStatusIcons = current['statusBarIconBrightness'] as Brightness? ?? origNavIcons;
+    final origStatusIcons =
+        current['statusBarIconBrightness'] as Brightness? ?? origNavIcons;
 
     // 2. Compute the darkened color and appropriate icon brightness.
     final darkColor = _blendWithBlack(origNavColor, factor);
     final iconBrightness =
-    ThemeData.estimateBrightnessForColor(darkColor) == Brightness.dark
+        ThemeData.estimateBrightnessForColor(darkColor) == Brightness.dark
         ? Brightness.light
         : Brightness.dark;
 
@@ -60,7 +61,9 @@ class Darkener {
       systemNavigationBarIconBrightness: iconBrightness,
       systemStatusBarContrastEnforced: false,
       statusBarColor: affectStatusBar ? darkColor : origStatusColor,
-      statusBarIconBrightness: affectStatusBar ? iconBrightness : origStatusIcons,
+      statusBarIconBrightness: affectStatusBar
+          ? iconBrightness
+          : origStatusIcons,
     );
   }
 
@@ -82,12 +85,13 @@ class Darkener {
     final origNavColor = current['navigationBarColor'] as Color;
     final origNavIcons = current['navigationBarIconBrightness'] as Brightness;
     final origStatusColor = current['statusBarColor'] as Color? ?? origNavColor;
-    final origStatusIcons = current['statusBarIconBrightness'] as Brightness? ?? origNavIcons;
+    final origStatusIcons =
+        current['statusBarIconBrightness'] as Brightness? ?? origNavIcons;
 
     // 2. Compute darkened shade & appropriate icon colour
     final darkColor = _blendWithBlack(origNavColor, factor);
-    final iconBrightness = ThemeData.estimateBrightnessForColor(darkColor) ==
-        Brightness.dark
+    final iconBrightness =
+        ThemeData.estimateBrightnessForColor(darkColor) == Brightness.dark
         ? Brightness.light
         : Brightness.dark;
 
@@ -97,10 +101,10 @@ class Darkener {
         systemNavigationBarColor: darkColor,
         systemNavigationBarIconBrightness: iconBrightness,
         systemStatusBarContrastEnforced: false,
-        statusBarColor:
-        affectStatusBar ? darkColor : origStatusColor,
-        statusBarIconBrightness:
-        affectStatusBar ? iconBrightness : origStatusIcons,
+        statusBarColor: affectStatusBar ? darkColor : origStatusColor,
+        statusBarIconBrightness: affectStatusBar
+            ? iconBrightness
+            : origStatusIcons,
       ),
     );
 

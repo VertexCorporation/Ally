@@ -78,12 +78,13 @@ class HealthProvider extends ChangeNotifier {
 
   Future<void> _loadStepsFromNative() async {
     final prefs = await SharedPreferences.getInstance();
-    await prefs.reload(); // IMPORTANT: fetch fresh data modified by Native Service
-    
+    await prefs
+        .reload(); // IMPORTANT: fetch fresh data modified by Native Service
+
     final now = DateTime.now();
     final key = 'steps_${now.day}/${now.month}/${now.year}';
     final steps = prefs.getInt(key);
-    
+
     if (steps != null && _healthData.currentSteps != steps) {
       _healthData.currentSteps = steps;
       notifyListeners();
@@ -122,21 +123,21 @@ class HealthProvider extends ChangeNotifier {
     _stepUpdateTimer?.cancel();
     super.dispose();
   }
-  
+
   // Save data to storage
   Future<void> _saveData() async {
     final prefs = await SharedPreferences.getInstance();
     final String healthDataJson = jsonEncode(_healthData.toJson());
     await prefs.setString('health_data', healthDataJson);
   }
-  
+
   // Water methods
   void updateWaterGlasses(int glasses) {
     _healthData.waterGlasses = glasses;
     notifyListeners();
     _saveData();
   }
-  
+
   void incrementWater() {
     if (_healthData.waterGlasses < _healthData.waterGoal) {
       _healthData.waterGlasses++;
@@ -144,7 +145,7 @@ class HealthProvider extends ChangeNotifier {
       _saveData();
     }
   }
-  
+
   void decrementWater() {
     if (_healthData.waterGlasses > 0) {
       _healthData.waterGlasses--;
@@ -152,7 +153,7 @@ class HealthProvider extends ChangeNotifier {
       _saveData();
     }
   }
-  
+
   // Exercise methods
   void updateExerciseStreak(int streak) {
     _healthData.exerciseStreak = streak;
@@ -160,14 +161,14 @@ class HealthProvider extends ChangeNotifier {
     notifyListeners();
     _saveData();
   }
-  
+
   // Sleep methods
   void updateSleepHours(double hours) {
     _healthData.sleepHours = hours;
     notifyListeners();
     _saveData();
   }
-  
+
   // Weight methods
   void updateWeight(double weight) {
     _healthData.currentWeight = weight;
@@ -179,65 +180,65 @@ class HealthProvider extends ChangeNotifier {
     notifyListeners();
     _saveData();
   }
-  
+
   void updateGoalWeight(double weight) {
     _healthData.goalWeight = weight;
     notifyListeners();
     _saveData();
   }
-  
+
   // Heartbeat methods
   void updateBpm(int bpm) {
     _healthData.currentBpm = bpm;
     notifyListeners();
     _saveData();
   }
-  
+
   // Nutrition methods
   void updateCalories(int calories) {
     _healthData.caloriesConsumed = calories;
     notifyListeners();
     _saveData();
   }
-  
+
   void addCalories(int calories) {
     _healthData.caloriesConsumed += calories;
     notifyListeners();
     _saveData();
   }
-  
+
   void updateCaloriesGoal(int goal) {
     _healthData.caloriesGoal = goal;
     notifyListeners();
     _saveData();
   }
-  
+
   // Steps methods
   void updateSteps(int steps) {
     _healthData.currentSteps = steps;
     notifyListeners();
     _saveData();
   }
-  
+
   void incrementSteps(int amount) {
     _healthData.currentSteps += amount;
     notifyListeners();
     _saveData();
   }
-  
+
   // Update steps from sensor
   void updateStepsFromSensor(int steps) {
     _healthData.currentSteps = steps;
     notifyListeners();
     _saveData();
   }
-  
+
   void updateStepsGoal(int goal) {
     _healthData.stepsGoal = goal;
     notifyListeners();
     _saveData();
   }
-  
+
   void updateWaterGoal(int goal) {
     _healthData.waterGoal = goal;
     notifyListeners();
@@ -262,7 +263,7 @@ class HealthProvider extends ChangeNotifier {
     notifyListeners();
     _saveData();
   }
-  
+
   void updateTargetWeight(double weight) {
     _healthData.goalWeight = weight;
     notifyListeners();
@@ -274,18 +275,18 @@ class HealthProvider extends ChangeNotifier {
     notifyListeners();
     _saveData();
   }
-  
+
   // User profile methods
   Future<void> saveUserProfile(Map<String, dynamic> profile) async {
     final prefs = await SharedPreferences.getInstance();
     final String profileJson = jsonEncode(profile);
     await prefs.setString('user_profile', profileJson);
   }
-  
+
   Future<Map<String, dynamic>?> loadUserProfile() async {
     final prefs = await SharedPreferences.getInstance();
     final String? profileJson = prefs.getString('user_profile');
-    
+
     if (profileJson != null) {
       try {
         return jsonDecode(profileJson) as Map<String, dynamic>;
@@ -295,12 +296,12 @@ class HealthProvider extends ChangeNotifier {
     }
     return null;
   }
-  
+
   Future<bool> isOnboardingCompleted() async {
     final profile = await loadUserProfile();
     return profile?['onboardingCompleted'] == true;
   }
-  
+
   // Units
   String _units = 'metric';
   String get units => _units;
@@ -312,8 +313,14 @@ class HealthProvider extends ChangeNotifier {
     await prefs.setString('units', units);
   }
 
-// Meal log methods
-  void addMealToLog(String nameKey, String displayName, int calories, int grams, Color color) {
+  // Meal log methods
+  void addMealToLog(
+    String nameKey,
+    String displayName,
+    int calories,
+    int grams,
+    Color color,
+  ) {
     _healthData.mealLog.insert(0, {
       'nameKey': nameKey,
       'name': displayName,
@@ -327,7 +334,12 @@ class HealthProvider extends ChangeNotifier {
   }
 
   // Exercise log methods
-  void addExerciseToLog(String nameKey, String displayName, IconData icon, Color color) {
+  void addExerciseToLog(
+    String nameKey,
+    String displayName,
+    IconData icon,
+    Color color,
+  ) {
     _healthData.exerciseLog.insert(0, {
       'nameKey': nameKey,
       'name': displayName,
@@ -339,7 +351,10 @@ class HealthProvider extends ChangeNotifier {
     _saveData();
   }
 
-  void addWorkoutProgramToLog(String programName, List<Map<String, dynamic>> exercises) {
+  void addWorkoutProgramToLog(
+    String programName,
+    List<Map<String, dynamic>> exercises,
+  ) {
     _healthData.exerciseLog.insert(0, {
       'type': 'program',
       'name': programName,

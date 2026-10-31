@@ -14,11 +14,26 @@ import 'package:shared_preferences/shared_preferences.dart';
 /// fetching data from Firestore, caching it locally to allow offline usage,
 /// and providing reactive updates to the UI.
 class UserProvider with ChangeNotifier {
-  final FirebaseAuth _auth = FirebaseAuth.instance;
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  /// Firebase handles. The app supports a fully local mode (offline / dev
+  /// bypass) where Firebase is unavailable; every server-backed operation
+  /// degrades gracefully in that case instead of throwing.
+  FirebaseAuth? _auth;
+  FirebaseFirestore? _firestore;
 
   Map<String, dynamic>? _userData;
   StreamSubscription<DocumentSnapshot>? _userSubscription;
+
+  /// Whether Firebase services can be used at all.
+  bool get _firebaseReady => _auth != null && _firestore != null;
+
+  UserProvider() {
+    try {
+      _auth = FirebaseAuth.instance;
+      _firestore = FirebaseFirestore.instance;
+    } catch (e) {
+      debugPrint('[UserProvider] Firebase unavailable — running in local mode.');
+    }
+  }
 
   // --- Public Getters ---
 
@@ -26,7 +41,8 @@ class UserProvider with ChangeNotifier {
   Map<String, dynamic>? get userData => _userData;
 
   /// Returns true if a user is authenticated and their data has been loaded.
-  bool get isLoggedIn => _auth.currentUser != null && _userData != null;
+  bool get isLoggedIn =>
+      _firebaseReady && _auth!.currentUser != null && _userData != null;
 
   /// The user's display name. Defaults to 'Guest' if unavailable.
   String get username => _userData?['username'] as String? ?? 'Guest';
@@ -100,38 +116,47 @@ class UserProvider with ChangeNotifier {
   /// This method should be called when a user signs in. It sets up a stream
   /// that automatically updates the provider's state when data changes.
   void listenToUserData(User user) {
+    // No Firebase session is possible in local mode — nothing to listen to.
+    if (!_firebaseReady) return;
+
     // Cancel any existing subscription to avoid memory leaks.
     _userSubscription?.cancel();
 
-    _userSubscription = _firestore
+    _userSubscription = _firestore!
         .collection('users')
         .doc(user.uid)
         .snapshots()
-        .listen((snapshot) {
-      if (snapshot.exists) {
-        final data = snapshot.data();
+        .listen(
+          (snapshot) {
+            if (snapshot.exists) {
+              final data = snapshot.data();
 
-        // Safety: Only update if data is not null.
-        if (data != null) {
-          _userData = data;
-          _cacheUserData(data); // Persist updated data to local cache.
+              // Safety: Only update if data is not null.
+              if (data != null) {
+                _userData = data;
+                _cacheUserData(data); // Persist updated data to local cache.
 
-          debugPrint("[LOG | UserProvider] Firing notifyListeners() due to Firestore snapshot update.");
-          notifyListeners();
-          debugPrint("[UserProvider] User data updated for: ${user.uid}");
-        }
-      }
-    }, onError: (error) {
-      debugPrint("[UserProvider] Error listening to user data: $error");
+                debugPrint(
+                  "[LOG | UserProvider] Firing notifyListeners() due to Firestore snapshot update.",
+                );
+                notifyListeners();
+                debugPrint("[UserProvider] User data updated for: ${user.uid}");
+              }
+            }
+          },
+          onError: (error) {
+            debugPrint("[UserProvider] Error listening to user data: $error");
 
-      // UPDATED LOGIC: Do not clear data on transient network errors.
-      // We only force a sign-out state if the permission is explicitly denied,
-      // which usually means the user was banned or deleted server-side.
-      // For network errors, we keep the stale data (Fault Tolerance).
-      if (error is FirebaseException && error.code == 'permission-denied') {
-        clearDataOnSignOut();
-      }
-    });
+            // UPDATED LOGIC: Do not clear data on transient network errors.
+            // We only force a sign-out state if the permission is explicitly denied,
+            // which usually means the user was banned or deleted server-side.
+            // For network errors, we keep the stale data (Fault Tolerance).
+            if (error is FirebaseException &&
+                error.code == 'permission-denied') {
+              clearDataOnSignOut();
+            }
+          },
+        );
   }
 
   /// Fetches the initial user data for a responsive UI on app launch or sign-in.
@@ -139,6 +164,8 @@ class UserProvider with ChangeNotifier {
   /// It prioritizes loading from the cache for immediate UI feedback,
   /// then fetches the latest data from the server to ensure freshness.
   Future<void> fetchInitialData(User user) async {
+    if (!_firebaseReady) return;
+
     try {
       // 1. Load from cache so the UI isn't blocked/blank.
       await _loadCachedUserData();
@@ -146,14 +173,16 @@ class UserProvider with ChangeNotifier {
       if (_userData != null) notifyListeners();
 
       // 2. Fetch the authoritative data from the server.
-      final doc = await _firestore.collection('users').doc(user.uid).get();
+      final doc = await _firestore!.collection('users').doc(user.uid).get();
       if (doc.exists) {
         final data = doc.data();
         if (data != null) {
           _userData = data;
           await _cacheUserData(data);
           notifyListeners(); // Rebuild with fresh data.
-          debugPrint("[UserProvider] Initial user data fetched for: ${user.uid}");
+          debugPrint(
+            "[UserProvider] Initial user data fetched for: ${user.uid}",
+          );
         }
       }
     } catch (e) {
@@ -162,7 +191,6 @@ class UserProvider with ChangeNotifier {
       // (or null data), preventing a crash.
     }
   }
-
 
   /// Clears all user data and cancels the Firestore stream subscription.
   ///
@@ -173,13 +201,13 @@ class UserProvider with ChangeNotifier {
     _userSubscription = null;
     _userData = null;
     await _clearCachedUserData();
-    
+
     try {
-      await FirebaseAuth.instance.signOut();
+      await _auth?.signOut();
     } catch (e) {
       debugPrint("[UserProvider] Error during Firebase signOut: $e");
     }
-    
+
     notifyListeners();
     debugPrint("[UserProvider] All user data and listeners cleared.");
   }
@@ -194,7 +222,7 @@ class UserProvider with ChangeNotifier {
       final jsonString = jsonEncode(
         data,
         toEncodable: (object) =>
-        object is Timestamp ? object.toDate().toIso8601String() : object,
+            object is Timestamp ? object.toDate().toIso8601String() : object,
       );
       await prefs.setString('cached_user_data', jsonString);
     } catch (e) {
@@ -209,7 +237,7 @@ class UserProvider with ChangeNotifier {
     if (jsonString != null) {
       try {
         _userData = jsonDecode(jsonString);
-      } catch(e) {
+      } catch (e) {
         debugPrint("[UserProvider] Failed to parse cached user data: $e");
       }
     }

@@ -1,13 +1,19 @@
+// water.dart
+//
+// © 2026 Vertex Corporation
+// ─────────────────────────────────────────────────────────────────────────────
+// Hydration screen. Data flow (HealthProvider + unit conversion) is unchanged;
+// the giant tinted panel is replaced by the shared metric layout with a
+// restrained water-blue accent and a quiet ring progress.
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-// Project Imports
-import '../providers/health.dart';
-import '../notifications/introvert.dart';
+import '../design_system/design_system.dart';
 import '../l10n/app_localizations.dart';
+import '../notifications/introvert.dart';
+import '../providers/health.dart';
 import '../utils/converter.dart';
-import '../theme.dart';
-import '../app.dart'; // For InvertedColor extension
 
 class WaterScreen extends StatefulWidget {
   const WaterScreen({super.key});
@@ -17,9 +23,6 @@ class WaterScreen extends StatefulWidget {
 }
 
 class _WaterScreenState extends State<WaterScreen> {
-  // Semantic Water Color (Blue)
-  final Color _waterColor = const Color(0xFF64B5F6);
-
   void _addWater(int ml) {
     final healthProvider = Provider.of<HealthProvider>(context, listen: false);
     healthProvider.addWaterMl(ml);
@@ -27,6 +30,7 @@ class _WaterScreenState extends State<WaterScreen> {
 
   void _showGoalDialog() {
     final healthProvider = Provider.of<HealthProvider>(context, listen: false);
+    final l10n = AppLocalizations.of(context)!;
     final isImperial = healthProvider.units == 'imperial';
     final currentGoalMl = healthProvider.healthData.waterGoal * 250;
 
@@ -36,388 +40,293 @@ class _WaterScreenState extends State<WaterScreen> {
 
     final controller = TextEditingController(text: displayGoal.toString());
 
-    // Dynamic Dimensions
-    final sw = MediaQuery.of(context).size.width;
-    final sh = MediaQuery.of(context).size.height;
-
-    // Theme Colors
-    final backgroundColor = AppColors.background;
-    final cardColor = AppColors.secondaryColor;
-    final textColor = AppColors.primaryColor.inverted;
-    final hintColor = AppColors.tertiaryColor;
-
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: Colors.transparent,
-      isScrollControlled: true,
-      builder: (context) => Padding(
-        padding: EdgeInsets.only(
-          bottom: MediaQuery.of(context).viewInsets.bottom,
-        ),
-        child: Container(
-          margin: EdgeInsets.all(sw * 0.04),
-          decoration: BoxDecoration(
-            color: backgroundColor,
-            borderRadius: BorderRadius.all(Radius.circular(sw * 0.06)),
-            border: Border.all(color: AppColors.border, width: 1),
+    AllySheet.show(
+      context,
+      title: l10n.setWaterGoal,
+      subtitle: l10n.howMuchWater,
+      icon: Icons.flag_rounded,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: AllySpacing.lg),
+            decoration: BoxDecoration(
+              color: Theme.of(context).cardColor,
+              borderRadius: AllyRadius.smAll,
+              border: Border.all(
+                color: Theme.of(context).colorScheme.outlineVariant,
+              ),
+            ),
+            child: TextField(
+              controller: controller,
+              keyboardType: TextInputType.number,
+              textAlign: TextAlign.center,
+              style: AllyTypography.metric(
+                size: 32,
+                color: Theme.of(context).colorScheme.onSurface,
+              ),
+              decoration: InputDecoration(
+                border: InputBorder.none,
+                hintText: isImperial ? '64' : '2000',
+                suffixText: isImperial ? 'oz' : 'ml',
+                suffixStyle: AllyTypography.caption(
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                ),
+              ),
+            ),
           ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
+          const SizedBox(height: AllySpacing.xl),
+          Row(
             children: [
-              SizedBox(height: sh * 0.025),
-              Container(
-                padding: EdgeInsets.all(sw * 0.04),
-                decoration: BoxDecoration(
-                  color: _waterColor.withValues(alpha: 0.15),
-                  shape: BoxShape.circle,
-                ),
-                child: Icon(Icons.flag_rounded, color: _waterColor, size: sw * 0.08),
-              ),
-              SizedBox(height: sh * 0.02),
-              Text(
-                'Set Your Water Goal', // Recommend adding to AppLocalizations
-                style: TextStyle(
-                  fontSize: sw * 0.055,
-                  fontWeight: FontWeight.bold,
-                  color: textColor,
+              Expanded(
+                child: AllyButton(
+                  label: l10n.cancel,
+                  kind: AllyButtonKind.ghost,
+                  small: true,
+                  onPressed: () => Navigator.pop(context),
                 ),
               ),
-              SizedBox(height: sh * 0.01),
-              Padding(
-                padding: EdgeInsets.symmetric(horizontal: sw * 0.06),
-                child: Text(
-                  'How much water do you want to drink daily?', // Recommend adding to AppLocalizations
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: sw * 0.035,
-                    color: hintColor,
-                  ),
-                ),
-              ),
-              SizedBox(height: sh * 0.03),
-              Padding(
-                padding: EdgeInsets.symmetric(horizontal: sw * 0.04),
-                child: Container(
-                  padding: EdgeInsets.symmetric(horizontal: sw * 0.05, vertical: sh * 0.005),
-                  decoration: BoxDecoration(
-                    color: cardColor,
-                    borderRadius: BorderRadius.circular(sw * 0.04),
-                    boxShadow: [
-                      BoxShadow(
-                        color: textColor.withValues(alpha: 0.05),
-                        blurRadius: 10,
-                        offset: const Offset(0, 2),
-                      ),
-                    ],
-                  ),
-                  child: TextField(
-                    controller: controller,
-                    keyboardType: TextInputType.number,
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontSize: sw * 0.06,
-                      fontWeight: FontWeight.bold,
-                      color: _waterColor,
-                    ),
-                    decoration: InputDecoration(
-                      hintText: isImperial ? '64' : '2000',
-                      hintStyle: TextStyle(
-                        color: hintColor.withValues(alpha: 0.5),
-                      ),
-                      border: InputBorder.none,
-                      suffix: Text(
-                        isImperial ? 'oz' : 'ml',
-                        style: TextStyle(
-                          fontSize: sw * 0.035,
-                          color: hintColor,
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-              SizedBox(height: sh * 0.03),
-              Padding(
-                padding: EdgeInsets.symmetric(horizontal: sw * 0.04),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: TextButton(
-                        onPressed: () => Navigator.pop(context),
-                        style: TextButton.styleFrom(
-                          padding: EdgeInsets.symmetric(vertical: sh * 0.02),
-                        ),
-                        child: Text(
-                          'Cancel', // Recommend adding to AppLocalizations
-                          style: TextStyle(
-                            color: hintColor,
-                            fontSize: sw * 0.04,
-                          ),
-                        ),
-                      ),
-                    ),
-                    SizedBox(width: sw * 0.03),
-                    Expanded(
-                      child: ElevatedButton(
-                        onPressed: () {
-                          final val = int.tryParse(controller.text);
-                          if (val != null && val > 0) {
-                            final ml = isImperial ? UnitConverter.ozToMl(val.toDouble()).round() : val;
-                            healthProvider.updateWaterGoalMl(ml);
-                            Navigator.pop(context);
+              Expanded(
+                child: AllyButton(
+                  label: l10n.save,
+                  small: true,
+                  onPressed: () {
+                    final val = int.tryParse(controller.text);
+                    if (val != null && val > 0) {
+                      final ml = isImperial
+                          ? UnitConverter.ozToMl(val.toDouble()).round()
+                          : val;
+                      healthProvider.updateWaterGoalMl(ml);
+                      Navigator.pop(context);
 
-                            // Use IntrovertNotificationService
-                            context.read<IntrovertNotificationService>().showNotification(
-                              message: AppLocalizations.of(context)!.dailyGoalSetTo(val.toString(), isImperial ? 'oz' : 'ml'),
-                              type: NotificationType.success,
-                            );
-                          }
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: _waterColor,
-                          foregroundColor: Colors.white,
-                          padding: EdgeInsets.symmetric(vertical: sh * 0.02),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(sw * 0.03),
-                          ),
-                          elevation: 0,
-                        ),
-                        child: Text(
-                          AppLocalizations.of(context)!.setGoal,
-                          style: TextStyle(
-                            fontSize: sw * 0.04,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
+                      context
+                          .read<IntrovertNotificationService>()
+                          .showNotification(
+                            message: l10n.dailyGoalSetTo(
+                              val.toString(),
+                              isImperial ? 'oz' : 'ml',
+                            ),
+                            type: NotificationType.success,
+                          );
+                    }
+                  },
                 ),
               ),
-              SizedBox(height: sh * 0.025),
             ],
           ),
-        ),
+        ],
       ),
     );
   }
 
   @override
   Widget build(BuildContext context) {
-    // -------------------------------------------------------------------------
-    // DYNAMIC DIMENSIONS & COLORS
-    // -------------------------------------------------------------------------
-    final sw = MediaQuery.of(context).size.width;
-    final sh = MediaQuery.of(context).size.height;
-
-    // Spacing
-    final paddingH = sw * 0.05;
-    final paddingV = sh * 0.025;
-
-    // Theme Colors
-    final backgroundColor = AppColors.background;
-    final textColor = AppColors.primaryColor.inverted;
-
-    final healthProvider = Provider.of<HealthProvider>(context);
-    final isImperial = healthProvider.units == 'imperial';
-    final glassesConsumed = healthProvider.healthData.waterGlasses;
-    final dailyGoal = healthProvider.healthData.waterGoal;
-    final mlConsumed = glassesConsumed * 250; // Each glass is 250ml
-    final mlGoal = dailyGoal * 250;
-
-    final displayConsumed = isImperial ? UnitConverter.mlToOz(mlConsumed).round() : mlConsumed;
-    final displayGoal = isImperial ? UnitConverter.mlToOz(mlGoal).round() : mlGoal;
-    final unit = isImperial ? 'oz' : 'ml';
+    final l10n = AppLocalizations.of(context)!;
+    final ThemeData theme = Theme.of(context);
+    final ColorScheme scheme = theme.colorScheme;
+    final AllySemanticPalette semantics = context.allySemantics;
+    final waterColor = semantics.water;
 
     return Scaffold(
-      backgroundColor: backgroundColor,
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        leading: IconButton(
-          icon: Icon(Icons.chevron_left_rounded, color: textColor, size: sw * 0.08),
-          onPressed: () => Navigator.pop(context),
-        ),
-        title: Text(AppLocalizations.of(context)!.waterIntake, style: TextStyle(color: textColor, fontWeight: FontWeight.bold)),
-      ),
+      appBar: AllyAppBar(title: l10n.water),
       body: SafeArea(
-        child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: paddingH, vertical: paddingV),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Hero(
-                tag: 'water_card',
-                child: Material(
-                  color: Colors.transparent,
-                  child: Container(
-                    padding: EdgeInsets.all(sw * 0.06),
-                    decoration: BoxDecoration(
-                      color: _waterColor,
-                      borderRadius: BorderRadius.circular(sw * 0.06),
-                      boxShadow: [
-                        BoxShadow(
-                            color: _waterColor.withValues(alpha: 0.3),
-                            blurRadius: 20,
-                            offset: const Offset(0, 10)
-                        )
-                      ],
-                    ),
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(AllySpacing.xl),
+          child: Consumer<HealthProvider>(
+            builder: (context, healthProvider, _) {
+              final healthData = healthProvider.healthData;
+              final isImperial = healthProvider.units == 'imperial';
+              final dailyGoal = healthData.waterGoal;
+              final glassesConsumed = healthData.waterGlasses;
+
+              final displayConsumed = isImperial
+                  ? UnitConverter.mlToOz(glassesConsumed * 250).round()
+                  : glassesConsumed * 250;
+              final displayGoalValue = isImperial
+                  ? UnitConverter.mlToOz(dailyGoal * 250).round()
+                  : dailyGoal * 250;
+              final unit = isImperial ? 'oz' : 'ml';
+
+              final progress = (glassesConsumed / dailyGoal).clamp(0.0, 1.0);
+
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // ── Intake overview ─────────────────────────────────────
+                  AllyCard(
+                    padding: const EdgeInsets.all(AllySpacing.xxl),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
-                          AppLocalizations.of(context)!.waterIntake,
-                          style: TextStyle(
-                            fontSize: sw * 0.04,
-                            color: Colors.white70,
-                            fontWeight: FontWeight.w500,
-                          ),
+                        Row(
+                          children: [
+                            Container(
+                              width: AllyDimensions.iconChip,
+                              height: AllyDimensions.iconChip,
+                              decoration: BoxDecoration(
+                                color: waterColor.withValues(alpha: 0.14),
+                                borderRadius: AllyRadius.smAll,
+                              ),
+                              child: Icon(
+                                Icons.water_drop_rounded,
+                                color: waterColor,
+                                size: AllyDimensions.iconSm,
+                              ),
+                            ),
+                            const Spacer(),
+                            AllyButton(
+                              label: l10n.editGoal,
+                              kind: AllyButtonKind.ghost,
+                              small: true,
+                              expanded: false,
+                              onPressed: _showGoalDialog,
+                            ),
+                          ],
                         ),
-                        SizedBox(height: sh * 0.015),
-                        ClipRRect(
-                          borderRadius: BorderRadius.circular(sw * 0.03),
-                          child: LinearProgressIndicator(
-                            value: (glassesConsumed / dailyGoal).clamp(0.0, 1.0),
-                            minHeight: sh * 0.015,
-                            backgroundColor: Colors.white70,
-                            valueColor: const AlwaysStoppedAnimation<Color>(Colors.white),
-                          ),
-                        ),
-                        SizedBox(height: sh * 0.02),
+                        const SizedBox(height: AllySpacing.xl),
                         Row(
                           crossAxisAlignment: CrossAxisAlignment.end,
                           children: [
                             Text(
                               '$displayConsumed',
-                              style: TextStyle(
-                                fontSize: sw * 0.16,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white,
-                                height: 1,
+                              style: AllyTypography.metric(
+                                size: 56,
+                                color: scheme.onSurface,
+                                weight: FontWeight.w700,
                               ),
                             ),
-                            SizedBox(width: sw * 0.03),
+                            const SizedBox(width: AllySpacing.md),
                             Padding(
-                              padding: EdgeInsets.only(bottom: sh * 0.01),
+                              padding: const EdgeInsets.only(bottom: 10),
                               child: Text(
-                                AppLocalizations.of(context)!.ofValueUnit(displayGoal.toString(), unit),
-                                style: TextStyle(
-                                  fontSize: sw * 0.06,
-                                  color: Colors.white70,
-                                  fontWeight: FontWeight.w500,
+                                l10n.ofValueUnit(
+                                  displayGoalValue.toString(),
+                                  unit,
+                                ),
+                                style: AllyTypography.body(
+                                  size: 16,
+                                  color: scheme.onSurfaceVariant,
                                 ),
                               ),
                             ),
                           ],
                         ),
-                        SizedBox(height: sh * 0.02),
-                        GestureDetector(
-                          onTap: _showGoalDialog,
-                          child: Container(
-                            padding: EdgeInsets.symmetric(horizontal: sw * 0.04, vertical: sh * 0.01),
-                            decoration: BoxDecoration(
-                              color: Colors.white70,
-                              borderRadius: BorderRadius.circular(sw * 0.05),
+                        const SizedBox(height: AllySpacing.xl),
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(2),
+                          child: LinearProgressIndicator(
+                            value: progress,
+                            minHeight: 6,
+                            backgroundColor: scheme.outlineVariant,
+                            valueColor: AlwaysStoppedAnimation<Color>(
+                              waterColor,
                             ),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Icon(Icons.edit, color: Colors.white, size: sw * 0.04),
-                                SizedBox(width: sw * 0.02),
-                                Text(
-                                  AppLocalizations.of(context)!.editGoal,
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: sw * 0.035,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                              ],
-                            ),
+                          ),
+                        ),
+                        const SizedBox(height: AllySpacing.sm),
+                        Text(
+                          l10n.waterGoalLabel,
+                          style: AllyTypography.caption(
+                            color: scheme.onSurfaceVariant,
                           ),
                         ),
                       ],
                     ),
                   ),
-                ),
-              ),
-              SizedBox(height: sh * 0.04),
-              Text(
-                AppLocalizations.of(context)!.quickAdd,
-                style: TextStyle(fontSize: sw * 0.05, fontWeight: FontWeight.bold, color: textColor),
-              ),
-              SizedBox(height: sh * 0.02),
-              Row(
-                children: [
-                  Expanded(
-                    child: _buildQuickAddButton(
-                        isImperial ? '8oz' : '200ml',
-                        isImperial ? UnitConverter.ozToMl(8).round() : 200,
-                        Icons.water_drop_rounded,
-                        _waterColor
-                    ),
-                  ),
-                  SizedBox(width: sw * 0.03),
-                  Expanded(
-                    child: _buildQuickAddButton(
-                        isImperial ? '16oz' : '500ml',
-                        isImperial ? UnitConverter.ozToMl(16).round() : 500,
-                        Icons.water_drop_rounded,
-                        _waterColor
-                    ),
-                  ),
-                  SizedBox(width: sw * 0.03),
-                  Expanded(
-                    child: _buildQuickAddButton(
-                        isImperial ? '32oz' : '1L',
-                        isImperial ? UnitConverter.ozToMl(32).round() : 1000,
-                        Icons.water_drop_rounded,
-                        _waterColor
-                    ),
+
+                  const SizedBox(height: AllySpacing.section),
+
+                  // ── Quick add ────────────────────────────────────────────
+                  AllySectionHeader(title: l10n.quickAdd),
+                  const SizedBox(height: AllySpacing.lg),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: _QuickAddButton(
+                          label: isImperial ? '8oz' : '200ml',
+                          icon: Icons.water_drop_rounded,
+                          accent: waterColor,
+                          onTap: () => _addWater(
+                            isImperial ? UnitConverter.ozToMl(8).round() : 200,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: AllySpacing.md),
+                      Expanded(
+                        child: _QuickAddButton(
+                          label: isImperial ? '16oz' : '500ml',
+                          icon: Icons.water_drop_rounded,
+                          accent: waterColor,
+                          onTap: () => _addWater(
+                            isImperial ? UnitConverter.ozToMl(16).round() : 500,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: AllySpacing.md),
+                      Expanded(
+                        child: _QuickAddButton(
+                          label: isImperial ? '32oz' : '1L',
+                          icon: Icons.water_drop_rounded,
+                          accent: waterColor,
+                          onTap: () => _addWater(
+                            isImperial
+                                ? UnitConverter.ozToMl(32).round()
+                                : 1000,
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ],
-              ),
-            ],
+              );
+            },
           ),
         ),
       ),
     );
   }
+}
 
-  Widget _buildQuickAddButton(String label, int ml, IconData icon, Color color) {
-    // Dynamic Dimensions
-    final sw = MediaQuery.of(context).size.width;
-    final sh = MediaQuery.of(context).size.height;
+class _QuickAddButton extends StatelessWidget {
+  final String label;
+  final IconData icon;
+  final Color accent;
+  final VoidCallback onTap;
 
-    return GestureDetector(
-      onTap: () => _addWater(ml),
-      child: Container(
-        padding: EdgeInsets.symmetric(vertical: sh * 0.025),
-        decoration: BoxDecoration(
-          color: color,
-          borderRadius: BorderRadius.circular(sw * 0.04),
-          boxShadow: [
-            BoxShadow(
-              color: color.withValues(alpha: 0.3),
-              blurRadius: 12,
-              offset: const Offset(0, 6),
-            ),
-          ],
-        ),
-        child: Column(
-          children: [
-            Icon(icon, color: Colors.white, size: sw * 0.08),
-            SizedBox(height: sh * 0.01),
-            Text(
-              label,
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: sw * 0.045,
-                fontWeight: FontWeight.bold,
+  const _QuickAddButton({
+    required this.label,
+    required this.icon,
+    required this.accent,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final ThemeData theme = Theme.of(context);
+    final ColorScheme scheme = theme.colorScheme;
+
+    return Material(
+      color: theme.cardColor,
+      borderRadius: AllyRadius.mdAll,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: AllyRadius.mdAll,
+        child: Container(
+          padding: const EdgeInsets.symmetric(vertical: AllySpacing.xl),
+          decoration: BoxDecoration(
+            borderRadius: AllyRadius.mdAll,
+            border: Border.all(color: scheme.outlineVariant),
+          ),
+          child: Column(
+            children: [
+              Icon(icon, color: accent, size: AllyDimensions.iconLg),
+              const SizedBox(height: AllySpacing.sm),
+              Text(
+                label,
+                style: AllyTypography.label(size: 15, color: scheme.onSurface),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

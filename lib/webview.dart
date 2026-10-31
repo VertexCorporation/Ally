@@ -1,6 +1,7 @@
 // lib/webview.dart
 
-import 'dart:math' as math; // Used for the PI constant for rotation calculations.
+import 'dart:math'
+    as math; // Used for the PI constant for rotation calculations.
 import 'package:ally/theme.dart';
 import 'package:ally/app.dart';
 import 'package:flutter/foundation.dart';
@@ -18,7 +19,11 @@ import 'package:webview_flutter/webview_flutter.dart';
 final Map<String, WebViewController> _controllerCache = {};
 
 /// Displays a responsive, cached WebView within a modal bottom sheet.
-Future<void> showAppWebViewModal(BuildContext context, String title, String url) async {
+Future<void> showAppWebViewModal(
+  BuildContext context,
+  String title,
+  String url,
+) async {
   if (kDebugMode) {
     print('[AppWebView] Showing modal for: "$title" at $url');
   }
@@ -66,13 +71,18 @@ class _WebViewModalContentState extends State<_WebViewModalContent>
       vsync: this,
       duration: const Duration(milliseconds: 1200),
     )..repeat(reverse: true);
-    _animation = CurvedAnimation(parent: _animationController, curve: Curves.easeInOut);
+    _animation = CurvedAnimation(
+      parent: _animationController,
+      curve: Curves.easeInOut,
+    );
 
     // --- CACHE LOGIC ---
     // Check if a controller for this URL already exists in our cache.
     if (_controllerCache.containsKey(widget.url)) {
       if (kDebugMode) {
-        print('[WebViewModalContent] Found cached controller for ${widget.url}');
+        print(
+          '[WebViewModalContent] Found cached controller for ${widget.url}',
+        );
       }
       // If it exists, use the cached controller.
       _controller = _controllerCache[widget.url]!;
@@ -82,7 +92,9 @@ class _WebViewModalContentState extends State<_WebViewModalContent>
       _updateNavigationState();
     } else {
       if (kDebugMode) {
-        print('[WebViewModalContent] No cached controller found. Creating new one for ${widget.url}');
+        print(
+          '[WebViewModalContent] No cached controller found. Creating new one for ${widget.url}',
+        );
       }
       // If not cached, create a new controller.
       final WebViewController controller = WebViewController()
@@ -92,7 +104,9 @@ class _WebViewModalContentState extends State<_WebViewModalContent>
           NavigationDelegate(
             onPageFinished: (String url) {
               if (kDebugMode) {
-                print('[WebViewModalContent] Page finished loading. Caching controller for ${widget.url}');
+                print(
+                  '[WebViewModalContent] Page finished loading. Caching controller for ${widget.url}',
+                );
               }
               // Once the page successfully loads, add the controller to the cache.
               _controllerCache[widget.url] = _controller;
@@ -102,7 +116,9 @@ class _WebViewModalContentState extends State<_WebViewModalContent>
             },
             onWebResourceError: (WebResourceError error) {
               if (kDebugMode) {
-                print('[WebViewModalContent] WebResourceError: ${error.description}');
+                print(
+                  '[WebViewModalContent] WebResourceError: ${error.description}',
+                );
               }
               if (mounted) {
                 setState(() {
@@ -135,7 +151,9 @@ class _WebViewModalContentState extends State<_WebViewModalContent>
   @override
   void dispose() {
     if (kDebugMode) {
-      print('[WebViewModalContent] Disposing state, but keeping controller in cache.');
+      print(
+        '[WebViewModalContent] Disposing state, but keeping controller in cache.',
+      );
     }
     _animationController.dispose();
     // We DO NOT dispose the WebViewController here, as we want to keep it in the cache.
@@ -170,14 +188,18 @@ class _WebViewModalContentState extends State<_WebViewModalContent>
                       child: SvgPicture.asset(
                         'assets/icons/arrow.svg',
                         colorFilter: ColorFilter.mode(
-                            AppColors.primaryColor.inverted, BlendMode.srcIn),
+                          AppColors.primaryColor.inverted,
+                          BlendMode.srcIn,
+                        ),
                         width: 22,
                       ),
                     ),
-                    onPressed: _canGoBack ? () {
-                      _controller.goBack();
-                      _updateNavigationState();
-                    } : null,
+                    onPressed: _canGoBack
+                        ? () {
+                            _controller.goBack();
+                            _updateNavigationState();
+                          }
+                        : null,
                   ),
                 ),
                 Expanded(
@@ -193,15 +215,23 @@ class _WebViewModalContentState extends State<_WebViewModalContent>
                   ),
                 ),
                 IconButton(
-                  icon: Icon(Icons.close,
-                      color: AppColors.primaryColor.inverted.withValues(alpha: 0.7),
-                      size: 26),
+                  icon: Icon(
+                    Icons.close,
+                    color: AppColors.primaryColor.inverted.withValues(
+                      alpha: 0.7,
+                    ),
+                    size: 26,
+                  ),
                   onPressed: () => Navigator.of(context).pop(),
                 ),
               ],
             ),
           ),
-          Divider(height: 1, thickness: 1, color: AppColors.quinaryColor.withValues(alpha: 0.2)),
+          Divider(
+            height: 1,
+            thickness: 1,
+            color: AppColors.quinaryColor.withValues(alpha: 0.2),
+          ),
 
           // --- Main Content ---
           Expanded(
@@ -213,13 +243,18 @@ class _WebViewModalContentState extends State<_WebViewModalContent>
                   WebViewWidget(
                     controller: _controller,
                     gestureRecognizers: {
-                      Factory<VerticalDragGestureRecognizer>(() => VerticalDragGestureRecognizer()),
+                      Factory<VerticalDragGestureRecognizer>(
+                        () => VerticalDragGestureRecognizer(),
+                      ),
                     },
                   ),
                   if (_isLoading)
                     _TriangleLoadingIndicator(animation: _animation),
                   if (_hasError)
-                    _ErrorDisplay(animation: _animation, localizations: localizations),
+                    _ErrorDisplay(
+                      animation: _animation,
+                      localizations: localizations,
+                    ),
                 ],
               ),
             ),
@@ -271,7 +306,11 @@ class _ErrorDisplay extends StatelessWidget {
           // A gentle pulsing animation for the error icon.
           ScaleTransition(
             scale: animation,
-            child: Icon(Icons.error_outline_rounded, color: AppColors.septenaryColor, size: 70),
+            child: Icon(
+              Icons.error_outline_rounded,
+              color: AppColors.septenaryColor,
+              size: 70,
+            ),
           ),
           const SizedBox(height: 24),
           Text(
@@ -300,7 +339,11 @@ class _TrianglePainter extends CustomPainter {
   final Color color;
   final double strokeWidth;
 
-  _TrianglePainter({required this.progress, required this.color, required this.strokeWidth});
+  _TrianglePainter({
+    required this.progress,
+    required this.color,
+    required this.strokeWidth,
+  });
 
   @override
   void paint(Canvas canvas, Size size) {

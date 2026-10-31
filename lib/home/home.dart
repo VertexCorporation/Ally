@@ -1,25 +1,42 @@
+// home.dart
+//
+// © 2026 Vertex Corporation
+// ─────────────────────────────────────────────────────────────────────────────
+// Ally's home dashboard.
+//
+// Information hierarchy:
+//   1. Greeting and user context   2. Profile / notification actions
+//   3. Daily health overview       4. Important health metrics
+//   5. Vitals (sleep, heart rate)  6. Ally AI entry point
+//
+// Every value comes from [HealthProvider] / [UserProvider] — no synthetic
+// data. Unavailable metrics show professional empty states. The dashboard is
+// fully theme-aware and uses the shared design system components.
+
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'dart:math' as math;
-import 'package:provider/provider.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:provider/provider.dart';
+
+import '../design_system/design_system.dart';
 import '../l10n/app_localizations.dart';
 import '../providers/health.dart';
-import '../services/pedometer.dart';
-import '../utils/converter.dart';
-import '../screens/water.dart';
-import '../screens/nutrition.dart';
-import '../screens/exercises.dart';
-import '../screens/sleep.dart';
-import '../screens/weight.dart';
-import '../screens/heartbeat.dart';
-import '../screens/pedometer.dart';
-import '../screens/score.dart';
-import '../screens/activity.dart';
 import '../screens/achievements.dart';
-import '../screens/settings.dart';
+import '../screens/activity.dart';
 import '../screens/account.dart';
+import '../screens/exercises.dart';
+import '../screens/heartbeat.dart';
+import '../screens/ally_ai_chat.dart';
+import '../screens/nutrition.dart';
+import '../screens/pedometer.dart';
 import '../screens/premium.dart';
+import '../screens/score.dart';
+import '../screens/settings.dart';
+import '../screens/sleep.dart';
+import '../screens/water.dart';
+import '../screens/weight.dart';
+import '../services/pedometer.dart';
+import '../server/user.dart';
+import '../utils/converter.dart';
 import '../widgets/notification.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -31,29 +48,21 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   int _selectedIndex = 0;
+  int _previousIndex = 0;
   bool _isMenuExpanded = false;
-  late AnimationController _fadeController;
-  late AnimationController _slideController;
-  late AnimationController _menuController;
-  AnimationController? _waveController;
-  late Animation<double> _menuAnimation;
 
-  int healthScore = 78;
+  late AnimationController _fadeController;
+  late AnimationController _menuController;
+  late Animation<double> _menuAnimation;
 
   @override
   void initState() {
     super.initState();
 
-    _updateStatusBar();
     _checkPermissionAndStartService();
 
     _fadeController = AnimationController(
-      duration: const Duration(milliseconds: 800),
-      vsync: this,
-    );
-
-    _slideController = AnimationController(
-      duration: const Duration(milliseconds: 600),
+      duration: const Duration(milliseconds: 500),
       vsync: this,
     );
 
@@ -62,43 +71,33 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       vsync: this,
     );
 
-    _waveController = AnimationController(
-      duration: const Duration(seconds: 2),
-      vsync: this,
-    )..repeat();
-
     _menuAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
       CurvedAnimation(parent: _menuController, curve: Curves.easeInOut),
     );
 
     _fadeController.forward();
-    _slideController.forward();
-  }
-
-  void _updateStatusBar() {
-    SystemChrome.setSystemUIOverlayStyle(
-      const SystemUiOverlayStyle(
-        statusBarColor: Colors.transparent,
-        statusBarIconBrightness: Brightness.light,
-        statusBarBrightness: Brightness.dark,
-      ),
-    );
   }
 
   Future<void> _checkPermissionAndStartService() async {
-    final status = await Permission.activityRecognition.status;
+    try {
+      final status = await Permission.activityRecognition.status;
 
-    if (!status.isGranted) {
-      if (mounted) {
-        Future.delayed(const Duration(milliseconds: 500), () {
-          if (mounted) {
-            _showPermissionDialog();
-          }
-        });
+      if (!status.isGranted) {
+        if (mounted) {
+          Future.delayed(const Duration(milliseconds: 500), () {
+            if (mounted) {
+              _showPermissionDialog();
+            }
+          });
+        }
+      } else {
+        final pedometerService = PedometerService();
+        await pedometerService.startNativeService();
       }
-    } else {
-      final pedometerService = PedometerService();
-      await pedometerService.startNativeService();
+    } catch (e) {
+      // Platform without the step-tracking channel (web/desktop/tests) or a
+      // denied lifecycle — the dashboard still renders, tracking stays off.
+      debugPrint('[Home] Step tracking setup skipped: $e');
     }
   }
 
@@ -108,78 +107,75 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       backgroundColor: Colors.transparent,
       isDismissible: false,
       builder: (BuildContext sheetContext) {
+        final l10n = AppLocalizations.of(sheetContext)!;
+        final ThemeData theme = Theme.of(sheetContext);
+        final AllySemanticPalette semantics = sheetContext.allySemantics;
+
         return Container(
-          margin: const EdgeInsets.all(16),
+          margin: const EdgeInsets.all(AllySpacing.lg),
           decoration: BoxDecoration(
-            color: Theme.of(sheetContext).cardColor,
-            borderRadius: const BorderRadius.all(Radius.circular(24)),
+            color: theme.colorScheme.surface,
+            borderRadius: AllyRadius.lgAll,
+            border: Border.all(color: theme.colorScheme.outlineVariant),
           ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const SizedBox(height: 20),
+              const SizedBox(height: AllySpacing.xl),
               Container(
-                padding: const EdgeInsets.all(16),
+                padding: const EdgeInsets.all(AllySpacing.lg),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF4BAADF).withValues(alpha: 0.15),
+                  color: semantics.steps.withValues(alpha: 0.12),
                   shape: BoxShape.circle,
                 ),
-                child: const Icon(
+                child: Icon(
                   Icons.directions_walk_rounded,
-                  color: Color(0xFF4BAADF),
-                  size: 32,
+                  color: semantics.steps,
+                  size: AllyDimensions.iconXl,
                 ),
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: AllySpacing.lg),
               Text(
-                AppLocalizations.of(sheetContext)!.enableStepTracking,
-                style: const TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
+                l10n.enableStepTracking,
+                style: AllyTypography.headline(
+                  size: 20,
+                  color: theme.colorScheme.onSurface,
                 ),
               ),
-              const SizedBox(height: 8),
+              const SizedBox(height: AllySpacing.sm),
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 32),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: AllySpacing.huge,
+                ),
                 child: Text(
-                  AppLocalizations.of(sheetContext)!.stepPermissionMessage,
+                  l10n.stepPermissionMessage,
                   textAlign: TextAlign.center,
-                  style: TextStyle(fontSize: 14, color: Colors.grey[600]),
+                  style: AllyTypography.body(
+                    size: 14,
+                    color: theme.colorScheme.onSurfaceVariant,
+                  ),
                 ),
               ),
-              const SizedBox(height: 24),
+              const SizedBox(height: AllySpacing.xl),
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
+                padding: const EdgeInsets.symmetric(horizontal: AllySpacing.xl),
                 child: Row(
                   children: [
                     Expanded(
-                      child: TextButton(
-                        onPressed: () {
-                          Navigator.pop(sheetContext);
-                        },
-                        style: TextButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(vertical: 16),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                        ),
-                        child: Text(
-                          AppLocalizations.of(sheetContext)!.later,
-                          style: const TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
-                            color: Colors.grey,
-                          ),
-                        ),
+                      child: AllyButton(
+                        label: l10n.later,
+                        kind: AllyButtonKind.ghost,
+                        small: true,
+                        onPressed: () => Navigator.pop(sheetContext),
                       ),
                     ),
-                    const SizedBox(width: 12),
+                    const SizedBox(width: AllySpacing.md),
                     Expanded(
-                      child: ElevatedButton(
+                      child: AllyButton(
+                        label: l10n.allow,
+                        small: true,
                         onPressed: () async {
                           Navigator.pop(sheetContext);
-
-                          final localizations = AppLocalizations.of(context)!;
 
                           final status = await Permission.activityRecognition
                               .request();
@@ -193,40 +189,24 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
 
                             CustomNotification.show(
                               context,
-                              message: localizations.stepTrackingEnabled,
-                              backgroundColor: const Color(0xFF4BAADF),
-                              icon: Icons.directions_walk,
+                              message: l10n.stepTrackingEnabled,
+                              icon: Icons.directions_walk_rounded,
                             );
                           } else {
                             CustomNotification.show(
                               context,
-                              message: localizations.permissionDenied,
-                              backgroundColor: Colors.orange[700]!,
-                              icon: Icons.warning,
+                              message: l10n.permissionDenied,
+                              isError: true,
+                              icon: Icons.warning_rounded,
                             );
                           }
                         },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF4BAADF),
-                          foregroundColor: Colors.white,
-                          padding: const EdgeInsets.symmetric(vertical: 16),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                        ),
-                        child: Text(
-                          AppLocalizations.of(sheetContext)!.allow,
-                          style: const TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
                       ),
                     ),
                   ],
                 ),
               ),
-              const SizedBox(height: 20),
+              const SizedBox(height: AllySpacing.xl),
             ],
           ),
         );
@@ -237,9 +217,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   @override
   void dispose() {
     _fadeController.dispose();
-    _slideController.dispose();
     _menuController.dispose();
-    _waveController?.dispose();
     super.dispose();
   }
 
@@ -254,7 +232,12 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     });
   }
 
-  int _previousIndex = 0;
+  void _onNavDestinationSelected(int index) {
+    setState(() {
+      _previousIndex = _selectedIndex;
+      _selectedIndex = index;
+    });
+  }
 
   Widget _getCurrentScreen() {
     switch (_selectedIndex) {
@@ -271,23 +254,20 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Scaffold(
       extendBody: true,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
         toolbarHeight: 0,
-        systemOverlayStyle: const SystemUiOverlayStyle(
-          statusBarColor: Colors.transparent,
-          statusBarIconBrightness: Brightness.light,
-          statusBarBrightness: Brightness.dark,
-        ),
       ),
       body: Stack(
         children: [
           SafeArea(
             child: AnimatedSwitcher(
-              duration: const Duration(milliseconds: 450),
+              duration: const Duration(milliseconds: 400),
               switchInCurve: Curves.easeInOutCubic,
               switchOutCurve: Curves.easeInOutCubic,
               layoutBuilder: (currentChild, previousChildren) {
@@ -323,652 +303,59 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
             left: 0,
             right: 0,
             bottom: 0,
-            child: _buildTransparentNav(),
+            child: _buildBottomNav(l10n),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildHomeScreen() {
-    return CustomScrollView(
-      physics: const BouncingScrollPhysics(),
-      slivers: [
-        SliverToBoxAdapter(
-          child: Padding(
-            padding: const EdgeInsets.all(20.0),
-            child: Column(
-              children: [
-                Row(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.all(3),
-                      decoration: const BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: Color(0xFF4BAADF),
-                      ),
-                      child: Container(
-                        padding: const EdgeInsets.all(16),
-                        decoration: BoxDecoration(
-                          color: Theme.of(context).cardColor,
-                          shape: BoxShape.circle,
-                        ),
-                        child: const Icon(Icons.person, size: 24),
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          AppLocalizations.of(context)!.dailyReflection,
-                          style: const TextStyle(
-                            fontSize: 12,
-                            color: Color(0xFF888888),
-                          ),
-                        ),
-                        Text(
-                          AppLocalizations.of(context)!.helloAnonymous,
-                          style: const TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ],
-                    ),
-                    const Spacer(),
-                    Container(
-                      decoration: BoxDecoration(
-                        color: Theme.of(context).cardColor,
-                        borderRadius: BorderRadius.circular(12),
-                        boxShadow: const [
-                          BoxShadow(
-                            color: Colors.black12,
-                            blurRadius: 10,
-                            offset: Offset(0, 2),
-                          ),
-                        ],
-                      ),
-                      child: IconButton(
-                        icon: const Icon(Icons.workspace_premium_rounded),
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => const PremiumScreen(),
-                            ),
-                          );
-                        },
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    Container(
-                      decoration: BoxDecoration(
-                        color: Theme.of(context).cardColor,
-                        borderRadius: BorderRadius.circular(12),
-                        boxShadow: const [
-                          BoxShadow(
-                            color: Colors.black12,
-                            blurRadius: 10,
-                            offset: Offset(0, 2),
-                          ),
-                        ],
-                      ),
-                      child: IconButton(
-                        icon: const Icon(Icons.notifications_rounded),
-                        onPressed: () {},
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-        ),
+  // ── Bottom navigation ─────────────────────────────────────────────────────
 
-        SliverToBoxAdapter(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20.0),
-            child: Consumer<HealthProvider>(
-              builder: (context, provider, _) {
-                final healthScore = provider.healthData.healthScore;
-                return GestureDetector(
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const HealthScoreScreen(),
-                      ),
-                    );
-                  },
-                  child: FadeTransition(
-                    opacity: _fadeController,
-                    child: Container(
-                      padding: const EdgeInsets.all(24),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFF64B5F6),
-                        borderRadius: BorderRadius.circular(24),
-                        boxShadow: [
-                          BoxShadow(
-                            color: const Color(
-                              0xFF64B5F6,
-                            ).withValues(alpha: 0.3),
-                            blurRadius: 20,
-                            offset: const Offset(0, 10),
-                          ),
-                        ],
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(
-                                AppLocalizations.of(context)!.healthScore,
-                                style: const TextStyle(
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.white,
-                                ),
-                              ),
-                              Container(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 12,
-                                  vertical: 6,
-                                ),
-                                decoration: BoxDecoration(
-                                  color: Colors.white.withValues(alpha: 0.25),
-                                  borderRadius: BorderRadius.circular(20),
-                                ),
-                                child: Text(
-                                  AppLocalizations.of(context)!.today,
-                                  style: const TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 20),
-                          Row(
-                            crossAxisAlignment: CrossAxisAlignment.end,
-                            children: [
-                              Text(
-                                '${healthScore.toInt()}',
-                                style: const TextStyle(
-                                  fontSize: 52,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.white,
-                                  height: 1,
-                                ),
-                              ),
-                              const SizedBox(width: 8),
-                              Padding(
-                                padding: const EdgeInsets.only(bottom: 8),
-                                child: Text(
-                                  AppLocalizations.of(context)!.of100,
-                                  style: const TextStyle(
-                                    fontSize: 16,
-                                    color: Colors.white70,
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 16),
-                          ClipRRect(
-                            borderRadius: BorderRadius.circular(12),
-                            child: Stack(
-                              children: [
-                                Container(
-                                  height: 12,
-                                  decoration: BoxDecoration(
-                                    color: Colors.white.withValues(alpha: 0.3),
-                                    borderRadius: BorderRadius.circular(12),
-                                  ),
-                                ),
-                                FractionallySizedBox(
-                                  widthFactor: (healthScore / 100),
-                                  child: Container(
-                                    height: 12,
-                                    decoration: BoxDecoration(
-                                      color: Colors.white,
-                                      borderRadius: BorderRadius.circular(12),
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                );
-              },
-            ),
-          ),
-        ),
+  Widget _buildBottomNav(AppLocalizations l10n) {
+    final ThemeData theme = Theme.of(context);
 
-        const SliverToBoxAdapter(child: SizedBox(height: 20)),
-
-        SliverPadding(
-          padding: const EdgeInsets.symmetric(horizontal: 20.0),
-          sliver: Consumer<HealthProvider>(
-            builder: (context, provider, _) {
-              final healthData = provider.healthData;
-              return SliverGrid(
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 2,
-                  mainAxisSpacing: 12,
-                  crossAxisSpacing: 12,
-                  childAspectRatio: 1.1,
-                ),
-                delegate: SliverChildListDelegate([
-                  _buildMetricCard(
-                    AppLocalizations.of(context)!.exercises,
-                    AppLocalizations.of(
-                      context,
-                    )!.daysCount(healthData.exerciseStreak),
-                    Icons.fitness_center_rounded,
-                    const Color(0xFFE57373),
-                    0,
-                  ),
-                  _buildMetricCard(
-                    AppLocalizations.of(context)!.nutrition,
-                    AppLocalizations.of(
-                      context,
-                    )!.calories(healthData.caloriesConsumed),
-                    Icons.restaurant_rounded,
-                    const Color(0xFFFFB74D),
-                    100,
-                  ),
-                  _buildMetricCard(
-                    AppLocalizations.of(context)!.sleep,
-                    AppLocalizations.of(
-                      context,
-                    )!.hours(healthData.sleepHours.toStringAsFixed(1)),
-                    Icons.bedtime_rounded,
-                    const Color(0xFFCE93D8),
-                    200,
-                  ),
-                  _buildMetricCard(
-                    AppLocalizations.of(context)!.water,
-                    UnitConverter.formatWater(
-                      healthData.waterGlasses,
-                      provider.units,
-                    ),
-                    Icons.water_drop_rounded,
-                    const Color(0xFF64B5F6),
-                    300,
-                  ),
-                  _buildMetricCard(
-                    AppLocalizations.of(context)!.weight,
-                    UnitConverter.formatWeight(
-                      healthData.currentWeight,
-                      provider.units,
-                    ),
-                    Icons.monitor_weight_rounded,
-                    const Color(0xFF81C784),
-                    400,
-                  ),
-                  _buildMetricCard(
-                    AppLocalizations.of(context)!.pedometer,
-                    AppLocalizations.of(
-                      context,
-                    )!.steps(healthData.currentSteps, healthData.stepsGoal),
-                    Icons.directions_walk_rounded,
-                    const Color(0xFF4BAADF),
-                    500,
-                  ),
-                ]),
-              );
-            },
-          ),
-        ),
-
-        const SliverToBoxAdapter(child: SizedBox(height: 100)),
-      ],
-    );
-  }
-
-  Widget _buildMetricCard(
-    String title,
-    String value,
-    IconData icon,
-    Color color,
-    int delay,
-  ) {
-    final l10n = AppLocalizations.of(context)!;
-
-    // Special handling for Water card with wave animation
-    if (title == l10n.water) {
-      return _buildWaterCard(value, color, delay);
-    }
-
-    // Special handling for Nutrition card
-    if (title == l10n.nutrition) {
-      return _buildNutritionCard(value, color, delay);
-    }
-
-    // Special handling for Exercises card
-    if (title == l10n.exercises) {
-      return _buildExercisesCard(value, color, delay, icon);
-    }
-
-    // Special handling for Sleep card
-    if (title == l10n.sleep) {
-      return _buildSleepCard(value, color, delay, icon);
-    }
-
-    return FadeTransition(
-      opacity: _fadeController,
-      child: GestureDetector(
-        onTap: () {
-          final l10n = AppLocalizations.of(context)!;
-          Widget? screen;
-
-          if (title == l10n.exercises) {
-            screen = const ExercisesScreen();
-          } else if (title == l10n.sleep) {
-            screen = const SleepScreen();
-          } else if (title == l10n.weight) {
-            screen = const WeightScreen();
-          } else if (title == l10n.heartbeat) {
-            screen = const HeartbeatScreen();
-          } else if (title == l10n.pedometer) {
-            screen = const PedometerScreen();
-          }
-
-          if (screen != null) {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => screen!),
-            );
-          }
-        },
-        child: Container(
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            color: color,
-            borderRadius: BorderRadius.circular(20),
-            boxShadow: [
-              BoxShadow(
-                color: color.withValues(alpha: 0.3),
-                blurRadius: 15,
-                offset: const Offset(0, 8),
-              ),
-            ],
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Icon(icon, size: 32, color: Colors.white),
-              const Spacer(),
-              Text(
-                title,
-                style: const TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
-                  height: 1.2,
-                ),
-              ),
-              const SizedBox(height: 4),
-              Text(
-                value,
-                style: const TextStyle(
-                  fontSize: 12,
-                  color: Colors.white70,
-                  height: 1.2,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildWaterCard(String value, Color color, int delay) {
-    return Consumer<HealthProvider>(
-      builder: (context, healthProvider, child) {
-        final progress =
-            healthProvider.healthData.waterGlasses /
-            healthProvider.healthData.waterGoal;
-
-        return FadeTransition(
-          opacity: _fadeController,
-          child: GestureDetector(
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const WaterScreen()),
-              );
-            },
-            child: Container(
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(20),
-                boxShadow: [
-                  BoxShadow(
-                    color: color.withValues(alpha: 0.3),
-                    blurRadius: 15,
-                    offset: const Offset(0, 8),
-                  ),
-                ],
-              ),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(20),
-                child: Container(
-                  decoration: const BoxDecoration(),
-                  child: Stack(
-                    children: [
-                      // Background
-                      Container(color: color),
-                      // Wave animation only when not empty and not full
-                      if (progress > 0 && progress < 1)
-                        Positioned.fill(
-                          child: CustomPaint(
-                            painter: WavePainter(
-                              progress: progress,
-                              color: Colors.white70,
-                              animation: _waveController ?? _fadeController,
-                            ),
-                          ),
-                        ),
-                      // Bubble animation ONLY when completely full
-                      if (progress >= 1.0)
-                        Positioned.fill(
-                          child: AnimatedBuilder(
-                            animation: _waveController ?? _fadeController,
-                            builder: (context, child) {
-                              return CustomPaint(
-                                painter: HomeBubblePainter(
-                                  animationValue:
-                                      (_waveController ?? _fadeController)
-                                          .value,
-                                ),
-                              );
-                            },
-                          ),
-                        ),
-                      // Content
-                      Padding(
-                        padding: const EdgeInsets.all(16),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            const Icon(
-                              Icons.water_drop_rounded,
-                              size: 32,
-                              color: Colors.white,
-                            ),
-                            const Spacer(),
-                            Text(
-                              AppLocalizations.of(context)!.water,
-                              style: const TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white,
-                                height: 1.2,
-                              ),
-                            ),
-                            const SizedBox(height: 4),
-                            Text(
-                              value,
-                              style: const TextStyle(
-                                fontSize: 12,
-                                color: Colors.white70,
-                                height: 1.2,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-          ),
-        );
-      },
-    );
-  }
-
-  Widget _buildNutritionCard(String value, Color color, int delay) {
-    return Consumer<HealthProvider>(
-      builder: (context, healthProvider, child) {
-        return FadeTransition(
-          opacity: _fadeController,
-          child: GestureDetector(
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => const NutritionScreen(),
-                ),
-              );
-            },
-            child: Container(
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(20),
-                boxShadow: [
-                  BoxShadow(
-                    color: color.withValues(alpha: 0.3),
-                    blurRadius: 15,
-                    offset: const Offset(0, 8),
-                  ),
-                ],
-              ),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(20),
-                child: Container(
-                  decoration: const BoxDecoration(),
-                  child: Stack(
-                    children: [
-                      // Background
-                      Container(color: color),
-                      // Content
-                      Padding(
-                        padding: const EdgeInsets.all(16),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            const Icon(
-                              Icons.restaurant_rounded,
-                              size: 32,
-                              color: Colors.white,
-                            ),
-                            const Spacer(),
-                            Text(
-                              AppLocalizations.of(context)!.nutrition,
-                              style: const TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white,
-                                height: 1.2,
-                              ),
-                            ),
-                            const SizedBox(height: 4),
-                            Text(
-                              value,
-                              style: const TextStyle(
-                                fontSize: 12,
-                                color: Colors.white70,
-                                height: 1.2,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-          ),
-        );
-      },
-    );
-  }
-
-  Widget _buildTransparentNav() {
     return AnimatedBuilder(
       animation: _menuAnimation,
       builder: (context, child) {
         return Container(
-          margin: const EdgeInsets.fromLTRB(20, 0, 20, 30),
+          margin: const EdgeInsets.fromLTRB(
+            AllySpacing.lg,
+            0,
+            AllySpacing.lg,
+            AllySpacing.md,
+          ),
           decoration: BoxDecoration(
-            color: Theme.of(context).scaffoldBackgroundColor,
-            borderRadius: BorderRadius.circular(32),
-            border: Border.all(
-              color: Theme.of(context).brightness == Brightness.dark
-                  ? Colors.grey[800]!
-                  : Colors.grey[300]!,
-              width: 1,
-            ),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.2),
-                blurRadius: 20,
-                offset: const Offset(0, 10),
-              ),
-            ],
+            color: theme.colorScheme.surface,
+            borderRadius: AllyRadius.lgAll,
+            border: Border.all(color: theme.colorScheme.outlineVariant),
           ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               ClipRect(
                 child: AnimatedSize(
-                  duration: const Duration(milliseconds: 400),
+                  duration: const Duration(milliseconds: 300),
                   curve: Curves.easeInOut,
                   child: _isMenuExpanded
                       ? Container(
-                          padding: const EdgeInsets.only(
-                            top: 20,
-                            left: 20,
-                            right: 20,
-                            bottom: 12,
+                          padding: const EdgeInsets.fromLTRB(
+                            AllySpacing.lg,
+                            AllySpacing.lg,
+                            AllySpacing.lg,
+                            AllySpacing.sm,
                           ),
                           child: Column(
                             children: [
                               _buildExpandedMenuItem(
                                 Icons.person_rounded,
-                                AppLocalizations.of(context)!.account,
+                                l10n.account,
                                 0,
                               ),
-                              const SizedBox(height: 10),
+                              const SizedBox(height: AllySpacing.xs),
                               _buildExpandedMenuItem(
                                 Icons.settings_rounded,
-                                AppLocalizations.of(context)!.settings,
+                                l10n.settings,
                                 1,
                               ),
                             ],
@@ -977,25 +364,19 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                       : const SizedBox.shrink(),
                 ),
               ),
-
               Padding(
-                padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
+                padding: const EdgeInsets.symmetric(
+                  vertical: AllySpacing.sm,
+                  horizontal: AllySpacing.xs,
+                ),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
-                    _buildNavItem(
-                      Icons.home_rounded,
-                      AppLocalizations.of(context)!.home,
-                      0,
-                    ),
-                    _buildNavItem(
-                      Icons.bar_chart_rounded,
-                      AppLocalizations.of(context)!.activity,
-                      1,
-                    ),
+                    _buildNavItem(Icons.home_rounded, l10n.home, 0),
+                    _buildNavItem(Icons.bar_chart_rounded, l10n.activity, 1),
                     _buildNavItem(
                       Icons.emoji_events_rounded,
-                      AppLocalizations.of(context)!.achievements,
+                      l10n.achievements,
                       2,
                     ),
                     _buildNavItem(Icons.menu_rounded, '', 3, isMenu: true),
@@ -1010,6 +391,8 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   }
 
   Widget _buildExpandedMenuItem(IconData icon, String label, int index) {
+    final l10n = AppLocalizations.of(context)!;
+
     return TweenAnimationBuilder<double>(
       duration: Duration(milliseconds: 200 + (index * 40)),
       tween: Tween(begin: 0.0, end: _isMenuExpanded ? 1.0 : 0.0),
@@ -1021,7 +404,6 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
             opacity: animValue,
             child: GestureDetector(
               onTap: () {
-                final l10n = AppLocalizations.of(context)!;
                 _toggleMenu();
 
                 if (label == l10n.account) {
@@ -1060,27 +442,29 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
               },
               child: Container(
                 padding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 12,
+                  horizontal: AllySpacing.lg,
+                  vertical: AllySpacing.md,
                 ),
                 decoration: BoxDecoration(
                   color: Theme.of(context).cardColor,
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: AllyRadius.mdAll,
+                  border: Border.all(
+                    color: Theme.of(context).colorScheme.outlineVariant,
+                  ),
                 ),
                 child: Row(
                   children: [
                     Icon(
                       icon,
-                      color: Theme.of(context).textTheme.bodyLarge?.color,
-                      size: 22,
+                      color: Theme.of(context).colorScheme.onSurface,
+                      size: AllyDimensions.iconSm + 2,
                     ),
-                    const SizedBox(width: 12),
+                    const SizedBox(width: AllySpacing.md),
                     Text(
                       label,
-                      style: TextStyle(
-                        color: Theme.of(context).textTheme.bodyLarge?.color,
-                        fontSize: 15,
-                        fontWeight: FontWeight.w600,
+                      style: AllyTypography.label(
+                        size: 15,
+                        color: Theme.of(context).colorScheme.onSurface,
                       ),
                     ),
                   ],
@@ -1099,485 +483,621 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     int index, {
     bool isMenu = false,
   }) {
-    final isSelected = _selectedIndex == index;
-
-    if (isMenu) {
-      return GestureDetector(
-        onTap: _toggleMenu,
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 300),
-          padding: const EdgeInsets.all(12),
-          decoration: BoxDecoration(
-            color: _isMenuExpanded
-                ? Colors.grey.withValues(alpha: 0.15)
-                : Colors.transparent,
-            borderRadius: BorderRadius.circular(20),
-          ),
-          child: AnimatedRotation(
-            turns: _isMenuExpanded ? 0.125 : 0.0,
-            duration: const Duration(milliseconds: 300),
-            child: Icon(
-              _isMenuExpanded ? Icons.close_rounded : Icons.menu_rounded,
-              color: Theme.of(context).brightness == Brightness.dark
-                  ? Colors.white
-                  : Colors.black,
-              size: 24,
-            ),
-          ),
-        ),
-      );
-    }
+    final ThemeData theme = Theme.of(context);
+    final ColorScheme scheme = theme.colorScheme;
+    final bool isSelected = isMenu ? _isMenuExpanded : _selectedIndex == index;
 
     return GestureDetector(
-      onTap: () {
-        setState(() {
-          _previousIndex = _selectedIndex;
-          _selectedIndex = index;
-          if (_isMenuExpanded) {
-            _toggleMenu();
-          }
-        });
-      },
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 300),
-        curve: Curves.easeOut,
-        padding: EdgeInsets.symmetric(
-          horizontal: isSelected ? 16 : 12,
-          vertical: 8,
+      onTap: isMenu ? _toggleMenu : () => _onNavDestinationSelected(index),
+      behavior: HitTestBehavior.opaque,
+      child: Semantics(
+        button: true,
+        selected: isSelected,
+        label: isMenu ? 'Menu' : label,
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 250),
+          curve: Curves.easeOut,
+          padding: const EdgeInsets.symmetric(
+            horizontal: AllySpacing.lg,
+            vertical: AllySpacing.md,
+          ),
+          decoration: BoxDecoration(
+            color: isSelected
+                ? scheme.onSurface.withValues(alpha: 0.07)
+                : Colors.transparent,
+            borderRadius: AllyRadius.pill,
+          ),
+          child: Icon(
+            icon,
+            size: AllyDimensions.iconMd,
+            color: isSelected ? scheme.onSurface : scheme.onSurfaceVariant,
+          ),
         ),
-        decoration: BoxDecoration(
-          color: isSelected
-              ? Colors.grey.withValues(alpha: 0.15)
-              : Colors.transparent,
-          borderRadius: BorderRadius.circular(20),
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(
-              icon,
-              color: isSelected
-                  ? (Theme.of(context).brightness == Brightness.dark
-                        ? Colors.white
-                        : Colors.black)
-                  : Colors.grey[600],
-              size: 24,
-            ),
-            if (isSelected && label.isNotEmpty) ...[
-              const SizedBox(width: 8),
-              Text(
-                label,
-                style: TextStyle(
-                  color: Theme.of(context).brightness == Brightness.dark
-                      ? Colors.white
-                      : Colors.black,
-                  fontSize: 14,
-                  fontWeight: FontWeight.w600,
+      ),
+    );
+  }
+
+  // ── Home dashboard ────────────────────────────────────────────────────────
+
+  Widget _buildHomeScreen() {
+    final l10n = AppLocalizations.of(context)!;
+
+    return FadeTransition(
+      opacity: _fadeController,
+      child: CustomScrollView(
+        physics: const BouncingScrollPhysics(),
+        slivers: [
+          SliverToBoxAdapter(child: _buildHeader(l10n)),
+          SliverToBoxAdapter(child: _buildHealthScoreHero(l10n)),
+          SliverToBoxAdapter(child: _buildMetricsSection(l10n)),
+          SliverToBoxAdapter(child: _buildVitalsSection(l10n)),
+          SliverToBoxAdapter(child: _buildAiEntry(l10n)),
+          const SliverToBoxAdapter(child: SizedBox(height: 140)),
+        ],
+      ),
+    );
+  }
+
+  /// 1. Greeting + user context + quick actions.
+  Widget _buildHeader(AppLocalizations l10n) {
+    final ThemeData theme = Theme.of(context);
+    final ColorScheme scheme = theme.colorScheme;
+    final userProvider = context.watch<UserProvider>();
+
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(
+        AllySpacing.xl,
+        AllySpacing.md,
+        AllySpacing.xl,
+        AllySpacing.xl,
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  l10n.dailyReflection,
+                  style: AllyTypography.caption(color: scheme.onSurfaceVariant),
                 ),
+                const SizedBox(height: AllySpacing.xs),
+                Text(
+                  l10n.hello(userProvider.username),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: AllyTypography.headline(
+                    size: 24,
+                    color: scheme.onSurface,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          AllyIconButton(
+            icon: Icons.workspace_premium_rounded,
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const PremiumScreen()),
+              );
+            },
+            tooltip: l10n.goPremium,
+          ),
+          const SizedBox(width: AllySpacing.md),
+          AllyIconButton(
+            icon: Icons.notifications_rounded,
+            onTap: () {},
+            tooltip: l10n.notifications,
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// 3. Daily health overview — the inverse monochrome hero panel.
+  Widget _buildHealthScoreHero(AppLocalizations l10n) {
+    final ThemeData theme = Theme.of(context);
+    final ColorScheme scheme = theme.colorScheme;
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: AllySpacing.xl),
+      child: Consumer<HealthProvider>(
+        builder: (context, provider, _) {
+          final healthScore = provider.healthData.healthScore;
+
+          return GestureDetector(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const HealthScoreScreen(),
+                ),
+              );
+            },
+            child: Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(AllySpacing.xxl),
+              decoration: BoxDecoration(
+                color: scheme.onSurface,
+                borderRadius: AllyRadius.lgAll,
               ),
-            ],
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Text(
+                        l10n.healthScore,
+                        style: AllyTypography.label(
+                          size: 14,
+                          color: scheme.surface,
+                        ),
+                      ),
+                      const Spacer(),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: AllySpacing.md,
+                          vertical: 6,
+                        ),
+                        decoration: BoxDecoration(
+                          color: scheme.surface.withValues(alpha: 0.14),
+                          borderRadius: AllyRadius.pill,
+                        ),
+                        child: Text(
+                          l10n.today,
+                          style: AllyTypography.label(
+                            size: 12,
+                            color: scheme.surface,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: AllySpacing.xl),
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      Text(
+                        '${healthScore.toInt()}',
+                        style: AllyTypography.metric(
+                          size: 56,
+                          color: scheme.surface,
+                          weight: FontWeight.w700,
+                        ),
+                      ),
+                      const SizedBox(width: AllySpacing.sm),
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 10),
+                        child: Text(
+                          l10n.of100,
+                          style: AllyTypography.body(
+                            size: 16,
+                            color: scheme.surface.withValues(alpha: 0.65),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: AllySpacing.lg),
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(4),
+                    child: Stack(
+                      children: [
+                        Container(
+                          height: 8,
+                          color: scheme.surface.withValues(alpha: 0.22),
+                        ),
+                        FractionallySizedBox(
+                          widthFactor: (healthScore / 100).clamp(0.0, 1.0),
+                          child: Container(height: 8, color: scheme.surface),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+  /// 4. Important health metrics.
+  Widget _buildMetricsSection(AppLocalizations l10n) {
+    final AllySemanticPalette semantics = context.allySemantics;
+
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(
+        AllySpacing.xl,
+        AllySpacing.section,
+        AllySpacing.xl,
+        0,
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          AllySectionHeader(title: l10n.todaysMetrics),
+          const SizedBox(height: AllySpacing.lg),
+          Consumer<HealthProvider>(
+            builder: (context, provider, _) {
+              final healthData = provider.healthData;
+
+              return GridView.count(
+                crossAxisCount: 2,
+                mainAxisSpacing: AllySpacing.md,
+                crossAxisSpacing: AllySpacing.md,
+                childAspectRatio: 1.15,
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                padding: EdgeInsets.zero,
+                children: [
+                  _MetricGridCard(
+                    title: l10n.exercises,
+                    value: l10n.daysCount(healthData.exerciseStreak),
+                    icon: Icons.fitness_center_rounded,
+                    accent: semantics.activity,
+                    onTap: () => _openScreen(const ExercisesScreen()),
+                  ),
+                  _MetricGridCard(
+                    title: l10n.nutrition,
+                    value: l10n.calories(healthData.caloriesConsumed),
+                    icon: Icons.restaurant_rounded,
+                    accent: semantics.nutrition,
+                    onTap: () => _openScreen(const NutritionScreen()),
+                  ),
+                  _MetricGridCard(
+                    title: l10n.sleep,
+                    value: l10n.hours(healthData.sleepHours.toStringAsFixed(1)),
+                    icon: Icons.bedtime_rounded,
+                    accent: semantics.sleep,
+                    onTap: () => _openScreen(const SleepScreen()),
+                  ),
+                  _MetricGridCard(
+                    title: l10n.water,
+                    value: UnitConverter.formatWater(
+                      healthData.waterGlasses,
+                      provider.units,
+                    ),
+                    icon: Icons.water_drop_rounded,
+                    accent: semantics.water,
+                    onTap: () => _openScreen(const WaterScreen()),
+                  ),
+                  _MetricGridCard(
+                    title: l10n.weight,
+                    value: UnitConverter.formatWeight(
+                      healthData.currentWeight,
+                      provider.units,
+                    ),
+                    icon: Icons.monitor_weight_rounded,
+                    accent: semantics.weight,
+                    onTap: () => _openScreen(const WeightScreen()),
+                  ),
+                  _MetricGridCard(
+                    title: l10n.pedometer,
+                    value:
+                        '${healthData.currentSteps} / ${healthData.stepsGoal}',
+                    icon: Icons.directions_walk_rounded,
+                    accent: semantics.steps,
+                    onTap: () => _openScreen(const PedometerScreen()),
+                  ),
+                ],
+              );
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// 5. Vitals — sleep overview and heart rate with honest empty states.
+  Widget _buildVitalsSection(AppLocalizations l10n) {
+    final ThemeData theme = Theme.of(context);
+    final ColorScheme scheme = theme.colorScheme;
+    final AllySemanticPalette semantics = context.allySemantics;
+
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(
+        AllySpacing.xl,
+        AllySpacing.section,
+        AllySpacing.xl,
+        0,
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          AllySectionHeader(title: l10n.vitals),
+          const SizedBox(height: AllySpacing.lg),
+          // IntrinsicHeight keeps both vital cards equal in height without
+          // requiring a bounded parent (CustomScrollView gives none).
+          IntrinsicHeight(
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Expanded(
+                  child: Consumer<HealthProvider>(
+                    builder: (context, provider, _) {
+                      final healthData = provider.healthData;
+                      final progress =
+                          (healthData.sleepHours / healthData.sleepGoal).clamp(
+                            0.0,
+                            1.0,
+                          );
+                      final hasData = healthData.sleepHours > 0;
+
+                      return _VitalsCard(
+                        title: l10n.sleep,
+                        icon: Icons.bedtime_rounded,
+                        accent: semantics.sleep,
+                        value: hasData
+                            ? l10n.hours(
+                                healthData.sleepHours.toStringAsFixed(1),
+                              )
+                            : '—',
+                        hint: hasData
+                            ? l10n.sleepGoalHint(
+                                healthData.sleepGoal.toStringAsFixed(0),
+                              )
+                            : l10n.noSleepData,
+                        progress: hasData ? progress : null,
+                        progressColor: semantics.sleep,
+                        onTap: () => _openScreen(const SleepScreen()),
+                      );
+                    },
+                  ),
+                ),
+                const SizedBox(width: AllySpacing.md),
+                Expanded(
+                  child: Consumer<HealthProvider>(
+                    builder: (context, provider, _) {
+                      final healthData = provider.healthData;
+                      final hasData = healthData.currentBpm > 0;
+
+                      return _VitalsCard(
+                        title: l10n.heartRate,
+                        icon: Icons.monitor_heart_rounded,
+                        accent: semantics.heartRate,
+                        value: hasData ? '${healthData.currentBpm}' : '—',
+                        hint: hasData ? l10n.bpmUnit : l10n.requiresMonitor,
+                        onTap: () => _openScreen(const HeartbeatScreen()),
+                      );
+                    },
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: AllySpacing.md),
+          // 6b. Compact activity preview — opens the Activity tab.
+          AllyCard(
+            onTap: () => _onNavDestinationSelected(1),
+            child: Row(
+              children: [
+                Container(
+                  width: AllyDimensions.iconChip,
+                  height: AllyDimensions.iconChip,
+                  decoration: BoxDecoration(
+                    color: scheme.onSurface.withValues(alpha: 0.06),
+                    borderRadius: AllyRadius.smAll,
+                  ),
+                  child: Icon(
+                    Icons.history_rounded,
+                    size: AllyDimensions.iconSm,
+                    color: scheme.onSurface,
+                  ),
+                ),
+                const SizedBox(width: AllySpacing.lg),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        l10n.recentActivity,
+                        style: AllyTypography.label(
+                          size: 15,
+                          color: scheme.onSurface,
+                        ),
+                      ),
+                      Text(
+                        l10n.activity,
+                        style: AllyTypography.caption(
+                          color: scheme.onSurfaceVariant,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Icon(
+                  Icons.chevron_right_rounded,
+                  size: AllyDimensions.iconMd,
+                  color: scheme.outline,
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// 7. Ally AI entry point.
+  Widget _buildAiEntry(AppLocalizations l10n) {
+    final ThemeData theme = Theme.of(context);
+    final ColorScheme scheme = theme.colorScheme;
+    final AllySemanticPalette semantics = context.allySemantics;
+
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(
+        AllySpacing.xl,
+        AllySpacing.section,
+        AllySpacing.xl,
+        0,
+      ),
+      child: AllyCard(
+        onTap: () => _openScreen(const AllyAiChatScreen()),
+        child: Row(
+          children: [
+            Container(
+              width: AllyDimensions.iconChip,
+              height: AllyDimensions.iconChip,
+              decoration: BoxDecoration(
+                color: semantics.ai.withValues(alpha: 0.12),
+                borderRadius: AllyRadius.smAll,
+              ),
+              child: Icon(
+                Icons.auto_awesome_rounded,
+                size: AllyDimensions.iconSm,
+                color: semantics.ai,
+              ),
+            ),
+            const SizedBox(width: AllySpacing.lg),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    l10n.allyAi,
+                    style: AllyTypography.label(
+                      size: 15,
+                      color: scheme.onSurface,
+                    ),
+                  ),
+                  Text(
+                    l10n.allyAiTagline,
+                    style: AllyTypography.caption(
+                      color: scheme.onSurfaceVariant,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Icon(
+              Icons.chevron_right_rounded,
+              size: AllyDimensions.iconMd,
+              color: scheme.outline,
+            ),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildExercisesCard(
-    String value,
-    Color color,
-    int delay,
-    IconData icon,
-  ) {
-    return TweenAnimationBuilder<double>(
-      duration: Duration(milliseconds: 600 + delay),
-      tween: Tween(begin: 0.0, end: 1.0),
-      curve: Curves.easeOut,
-      builder: (context, animValue, child) {
-        return Transform.scale(
-          scale: 0.8 + (0.2 * animValue),
-          child: Opacity(
-            opacity: animValue,
-            child: GestureDetector(
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const ExercisesScreen(),
-                  ),
-                );
-              },
-              child: Hero(
-                tag: 'exercises_card',
-                child: Material(
-                  color: Colors.transparent,
-                  child: Container(
-                    padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      color: color,
-                      borderRadius: BorderRadius.circular(20),
-                      boxShadow: [
-                        BoxShadow(
-                          color: color.withValues(alpha: 0.3),
-                          blurRadius: 15,
-                          offset: const Offset(0, 8),
-                        ),
-                      ],
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Icon(icon, size: 32, color: Colors.white),
-                        const Spacer(),
-                        Text(
-                          AppLocalizations.of(context)!.exercises,
-                          style: const TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                            height: 1.2,
-                          ),
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          value,
-                          style: const TextStyle(
-                            fontSize: 12,
-                            color: Colors.white70,
-                            height: 1.2,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ),
-        );
-      },
-    );
-  }
-
-  Widget _buildSleepCard(String value, Color color, int delay, IconData icon) {
-    return Consumer<HealthProvider>(
-      builder: (context, healthProvider, child) {
-        return TweenAnimationBuilder<double>(
-          duration: Duration(milliseconds: 600 + delay),
-          tween: Tween(begin: 0.0, end: 1.0),
-          curve: Curves.easeOut,
-          builder: (context, animValue, child) {
-            return Transform.scale(
-              scale: 0.8 + (0.2 * animValue),
-              child: Opacity(
-                opacity: animValue,
-                child: GestureDetector(
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const SleepScreen(),
-                      ),
-                    );
-                  },
-                  child: Hero(
-                    tag: 'sleep_card',
-                    child: Material(
-                      color: Colors.transparent,
-                      child: Container(
-                        padding: const EdgeInsets.all(16),
-                        decoration: BoxDecoration(
-                          color: color,
-                          borderRadius: BorderRadius.circular(20),
-                          boxShadow: [
-                            BoxShadow(
-                              color: color.withValues(alpha: 0.3),
-                              blurRadius: 15,
-                              offset: const Offset(0, 8),
-                            ),
-                          ],
-                        ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Icon(icon, size: 32, color: Colors.white),
-                            const Spacer(),
-                            Text(
-                              AppLocalizations.of(context)!.sleep,
-                              style: const TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white,
-                                height: 1.2,
-                              ),
-                            ),
-                            const SizedBox(height: 4),
-                            Text(
-                              value,
-                              style: const TextStyle(
-                                fontSize: 12,
-                                color: Colors.white70,
-                                height: 1.2,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            );
-          },
-        );
-      },
-    );
+  void _openScreen(Widget screen) {
+    Navigator.push(context, MaterialPageRoute(builder: (context) => screen));
   }
 }
 
-class HealthScorePainter extends CustomPainter {
-  final int score;
-  final int maxScore;
-  HealthScorePainter({required this.score, required this.maxScore});
+/// One metric tile of the dashboard grid.
+class _MetricGridCard extends StatelessWidget {
+  final String title;
+  final String value;
+  final IconData icon;
+  final Color accent;
+  final VoidCallback onTap;
 
-  @override
-  void paint(Canvas canvas, Size size) {
-    final center = Offset(size.width / 2, size.height / 2);
-    final radius = size.width / 2 - 10;
-    final bgPaint = Paint()
-      ..color = Colors.white.withValues(alpha: 0.2)
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 12
-      ..strokeCap = StrokeCap.round;
-    canvas.drawCircle(center, radius, bgPaint);
-    final progressPaint = Paint()
-      ..color = Colors.white
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 12
-      ..strokeCap = StrokeCap.round;
-    final sweepAngle = (score / maxScore) * 2 * math.pi;
-    canvas.drawArc(
-      Rect.fromCircle(center: center, radius: radius),
-      -math.pi / 2,
-      sweepAngle,
-      false,
-      progressPaint,
-    );
-  }
-
-  @override
-  bool shouldRepaint(HealthScorePainter oldDelegate) =>
-      oldDelegate.score != score || oldDelegate.maxScore != maxScore;
-}
-
-class CircleProgressPainter extends CustomPainter {
-  final double progress;
-  final Color color;
-  CircleProgressPainter({required this.progress, required this.color});
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final center = Offset(size.width / 2, size.height / 2);
-    final radius = size.width / 2 - 4;
-    final bgPaint = Paint()
-      ..color = Colors.grey[200]!
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 4;
-    canvas.drawCircle(center, radius, bgPaint);
-    final progressPaint = Paint()
-      ..color = color
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 4
-      ..strokeCap = StrokeCap.round;
-    final sweepAngle = progress * 2 * math.pi;
-    canvas.drawArc(
-      Rect.fromCircle(center: center, radius: radius),
-      -math.pi / 2,
-      sweepAngle,
-      false,
-      progressPaint,
-    );
-  }
-
-  @override
-  bool shouldRepaint(CircleProgressPainter oldDelegate) =>
-      oldDelegate.progress != progress || oldDelegate.color != color;
-}
-
-class WavePainter extends CustomPainter {
-  final double progress;
-  final Color color;
-  final Animation<double> animation;
-
-  WavePainter({
-    required this.progress,
-    required this.color,
-    required this.animation,
-  }) : super(repaint: animation);
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = color
-      ..style = PaintingStyle.fill;
-
-    final path = Path();
-    final waveHeight = 8.0;
-    final waveLength = size.width / 2;
-
-    // Start from bottom left
-    path.moveTo(0, size.height);
-    path.lineTo(0, size.height * (1 - progress));
-
-    // Draw wave
-    for (double x = 0; x <= size.width; x++) {
-      final y =
-          size.height * (1 - progress) +
-          math.sin((x / waveLength + animation.value * 2) * 2 * math.pi) *
-              waveHeight;
-      path.lineTo(x, y);
-    }
-
-    // Complete the path
-    path.lineTo(size.width, size.height);
-    path.close();
-
-    canvas.drawPath(path, paint);
-  }
-
-  @override
-  bool shouldRepaint(WavePainter oldDelegate) => true;
-}
-
-class HomeBubblePainter extends CustomPainter {
-  final double animationValue;
-
-  HomeBubblePainter({required this.animationValue});
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = Colors.white.withValues(alpha: 0.5)
-      ..style = PaintingStyle.fill;
-
-    for (int i = 0; i < 3; i++) {
-      final bubbleStart = i * 0.2;
-      final bubbleDuration = 0.8;
-
-      final bubblePhase =
-          ((animationValue - bubbleStart) % 1.0) / bubbleDuration;
-
-      if (bubblePhase >= 0 && bubblePhase <= 1.0) {
-        final seed = i * 137;
-        final random = math.Random(seed);
-
-        final x = 0.2 + random.nextDouble() * 0.6;
-        final startY = 0.85 + random.nextDouble() * 0.15;
-        final baseSize = 4.0 + random.nextDouble() * 4.0;
-        final speed = 0.6 + random.nextDouble() * 0.3;
-
-        final spawnPhase = (bubblePhase / 0.1).clamp(0.0, 1.0);
-
-        final popPhase = ((bubblePhase - 0.9) / 0.1).clamp(0.0, 1.0);
-
-        double sizeMultiplier = 1.0;
-        if (bubblePhase < 0.1) {
-          sizeMultiplier = spawnPhase;
-        } else if (bubblePhase > 0.9) {
-          sizeMultiplier = 1.0 - popPhase;
-        }
-
-        final bubbleSize = baseSize * sizeMultiplier;
-
-        if (bubbleSize > 0.5) {
-          final riseProgress = bubblePhase.clamp(0.1, 0.9) - 0.1;
-          final currentY =
-              startY * size.height - (riseProgress * speed * size.height);
-
-          final xPos = x * size.width;
-          final wobble = math.sin(bubblePhase * math.pi * 6) * 2;
-
-          canvas.drawCircle(Offset(xPos + wobble, currentY), bubbleSize, paint);
-
-          final highlightPaint = Paint()
-            ..color = Colors.white.withValues(alpha: 0.7)
-            ..style = PaintingStyle.fill;
-
-          canvas.drawCircle(
-            Offset(
-              xPos + wobble - bubbleSize * 0.3,
-              currentY - bubbleSize * 0.3,
-            ),
-            bubbleSize * 0.3,
-            highlightPaint,
-          );
-        }
-      }
-    }
-  }
-
-  @override
-  bool shouldRepaint(HomeBubblePainter oldDelegate) {
-    return oldDelegate.animationValue != animationValue;
-  }
-}
-
-class PizzaPainter extends CustomPainter {
-  final int slices;
-  final int totalSlices;
-  final Color color;
-
-  PizzaPainter({
-    required this.slices,
-    required this.totalSlices,
-    required this.color,
+  const _MetricGridCard({
+    required this.title,
+    required this.value,
+    required this.icon,
+    required this.accent,
+    required this.onTap,
   });
 
   @override
-  void paint(Canvas canvas, Size size) {
-    final center = Offset(size.width / 2, size.height / 2);
-    final radius = math.min(size.width, size.height) / 3;
-
-    final paint = Paint()
-      ..color = color
-      ..style = PaintingStyle.fill;
-
-    final anglePerSlice = (2 * math.pi) / totalSlices;
-
-    // Draw eaten slices (darker overlay)
-    for (int i = 0; i < slices; i++) {
-      final startAngle = -math.pi / 2 + (i * anglePerSlice);
-      final path = Path();
-      path.moveTo(center.dx, center.dy);
-      path.arcTo(
-        Rect.fromCircle(center: center, radius: radius),
-        startAngle,
-        anglePerSlice,
-        false,
-      );
-      path.close();
-      canvas.drawPath(path, paint);
-    }
-
-    // Draw slice separators
-    final linePaint = Paint()
-      ..color = Colors.white.withValues(alpha: 0.5)
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 2;
-
-    for (int i = 0; i < totalSlices; i++) {
-      final angle = -math.pi / 2 + (i * anglePerSlice);
-      final x = center.dx + radius * math.cos(angle);
-      final y = center.dy + radius * math.sin(angle);
-      canvas.drawLine(center, Offset(x, y), linePaint);
-    }
-
-    // Draw circle outline
-    canvas.drawCircle(center, radius, linePaint);
+  Widget build(BuildContext context) {
+    return AllyMetricCard(
+      title: title,
+      value: value,
+      icon: icon,
+      accent: accent,
+      onTap: onTap,
+    );
   }
+}
+
+/// A wider card in the vitals row with an optional progress bar.
+class _VitalsCard extends StatelessWidget {
+  final String title;
+  final String value;
+  final String hint;
+  final IconData icon;
+  final Color accent;
+  final VoidCallback onTap;
+  final double? progress;
+  final Color? progressColor;
+
+  const _VitalsCard({
+    required this.title,
+    required this.value,
+    required this.hint,
+    required this.icon,
+    required this.accent,
+    required this.onTap,
+    this.progress,
+    this.progressColor,
+  });
 
   @override
-  bool shouldRepaint(PizzaPainter oldDelegate) =>
-      oldDelegate.slices != slices || oldDelegate.totalSlices != totalSlices;
+  Widget build(BuildContext context) {
+    final ThemeData theme = Theme.of(context);
+    final ColorScheme scheme = theme.colorScheme;
+
+    return AllyCard(
+      onTap: onTap,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                width: AllyDimensions.iconChipSm,
+                height: AllyDimensions.iconChipSm,
+                decoration: BoxDecoration(
+                  color: accent.withValues(alpha: 0.14),
+                  borderRadius: AllyRadius.smAll,
+                ),
+                child: Icon(icon, size: AllyDimensions.iconSm, color: accent),
+              ),
+              const Spacer(),
+              Icon(
+                Icons.chevron_right_rounded,
+                size: AllyDimensions.iconSm,
+                color: scheme.outline,
+              ),
+            ],
+          ),
+          const SizedBox(height: AllySpacing.lg),
+          Text(
+            value,
+            style: AllyTypography.metric(size: 30, color: scheme.onSurface),
+          ),
+          const SizedBox(height: AllySpacing.xs),
+          Text(
+            title,
+            style: AllyTypography.label(size: 13, color: scheme.onSurface),
+          ),
+          const SizedBox(height: AllySpacing.xs),
+          Text(
+            hint,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: AllyTypography.caption(color: scheme.onSurfaceVariant),
+          ),
+          if (progress != null && progressColor != null) ...[
+            const SizedBox(height: AllySpacing.md),
+            ClipRRect(
+              borderRadius: BorderRadius.circular(2),
+              child: LinearProgressIndicator(
+                value: progress,
+                minHeight: 4,
+                backgroundColor: scheme.outlineVariant,
+                valueColor: AlwaysStoppedAnimation<Color>(progressColor!),
+              ),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
 }

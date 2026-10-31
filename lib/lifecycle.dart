@@ -11,10 +11,7 @@ import 'login/verify.dart';
 
 /// Represents the general states of the application.
 /// Since Ally is currently simple, it only has initializing and ready states.
-enum AppStatus {
-  initializing,
-  ready,
-}
+enum AppStatus { initializing, ready }
 
 /// Main layer managing the application lifecycle and initialization process.
 /// - Listens to AppLifecycleState changes (Background/Foreground).
@@ -30,7 +27,6 @@ class AppLifecycleManager extends StatefulWidget {
 
 class _AppLifecycleManagerState extends State<AppLifecycleManager>
     with WidgetsBindingObserver {
-
   // Service instance
   final SleepTrackerService _sleepService = SleepTrackerService();
 
@@ -62,12 +58,12 @@ class _AppLifecycleManagerState extends State<AppLifecycleManager>
 
     switch (state) {
       case AppLifecycleState.resumed:
-      // Notify that screen is on when app comes to foreground
+        // Notify that screen is on when app comes to foreground
         _sleepService.onScreenOn();
         break;
       case AppLifecycleState.inactive:
       case AppLifecycleState.paused:
-      // Consider screen off when app goes to background or is locked
+        // Consider screen off when app goes to background or is locked
         _sleepService.onScreenOff();
         break;
       case AppLifecycleState.detached:

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../design_system/tokens/colors.dart';
 import 'package:provider/provider.dart';
 import '../providers/health.dart';
 import '../providers/workout.dart';
@@ -15,11 +16,11 @@ class ExercisesScreen extends StatefulWidget {
 }
 
 class _ExercisesScreenState extends State<ExercisesScreen> {
-
   void _showWorkoutDetails(Map<String, dynamic> workout) {
     final exercises = workout['exercises'] as List;
     final time = DateTime.parse(workout['time']);
-    final timeStr = '${time.hour.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')}';
+    final timeStr =
+        '${time.hour.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')}';
 
     showModalBottomSheet(
       context: context,
@@ -41,10 +42,14 @@ class _ExercisesScreenState extends State<ExercisesScreen> {
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: const Color(0xFFE57373).withValues(alpha:0.15),
+                color: AllyUniversalAccents.exercise.withValues(alpha: 0.15),
                 shape: BoxShape.circle,
               ),
-              child: const Icon(Icons.fitness_center, color: Color(0xFFE57373), size: 32),
+              child: const Icon(
+                Icons.fitness_center,
+                color: AllyUniversalAccents.exercise,
+                size: 32,
+              ),
             ),
             const SizedBox(height: 16),
             Text(
@@ -72,7 +77,11 @@ class _ExercisesScreenState extends State<ExercisesScreen> {
                       color: Theme.of(context).cardColor,
                       borderRadius: BorderRadius.circular(16),
                       boxShadow: const [
-                        BoxShadow(color: Colors.black12, blurRadius: 5, offset: Offset(0, 2)),
+                        BoxShadow(
+                          color: Colors.black12,
+                          blurRadius: 5,
+                          offset: Offset(0, 2),
+                        ),
                       ],
                     ),
                     child: Column(
@@ -83,15 +92,19 @@ class _ExercisesScreenState extends State<ExercisesScreen> {
                             Container(
                               padding: const EdgeInsets.all(10),
                               decoration: BoxDecoration(
-                                color: const Color(0xFFE57373).withValues(alpha:0.15),
+                                color: AllyUniversalAccents.exercise.withValues(
+                                  alpha: 0.15,
+                                ),
                                 borderRadius: BorderRadius.circular(10),
                               ),
                               child: Icon(
                                 (exercise['id'] is String
-                                        ? ExerciseLibrary.getExerciseById(exercise['id'] as String)?.icon
+                                        ? ExerciseLibrary.getExerciseById(
+                                            exercise['id'] as String,
+                                          )?.icon
                                         : null) ??
                                     Icons.fitness_center,
-                                color: const Color(0xFFE57373),
+                                color: AllyUniversalAccents.exercise,
                                 size: 20,
                               ),
                             ),
@@ -99,7 +112,10 @@ class _ExercisesScreenState extends State<ExercisesScreen> {
                             Expanded(
                               child: Text(
                                 exercise['name'],
-                                style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                                style: const TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                ),
                               ),
                             ),
                           ],
@@ -117,7 +133,8 @@ class _ExercisesScreenState extends State<ExercisesScreen> {
                                   width: 28,
                                   height: 28,
                                   decoration: BoxDecoration(
-                                    color: const Color(0xFFE57373).withValues(alpha:0.15),
+                                    color: AllyUniversalAccents.exercise
+                                        .withValues(alpha: 0.15),
                                     borderRadius: BorderRadius.circular(6),
                                   ),
                                   child: Center(
@@ -126,7 +143,7 @@ class _ExercisesScreenState extends State<ExercisesScreen> {
                                       style: const TextStyle(
                                         fontSize: 14,
                                         fontWeight: FontWeight.bold,
-                                        color: Color(0xFFE57373),
+                                        color: AllyUniversalAccents.exercise,
                                       ),
                                     ),
                                   ),
@@ -134,20 +151,29 @@ class _ExercisesScreenState extends State<ExercisesScreen> {
                                 const SizedBox(width: 12),
                                 Text(
                                   '${set['reps']} ${AppLocalizations.of(context)!.reps}',
-                                  style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
+                                  style: const TextStyle(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w600,
+                                  ),
                                 ),
                                 if ((set['weight'] as double) > 0) ...[
                                   const SizedBox(width: 8),
                                   Text(
                                     '• ${set['weight']} ${AppLocalizations.of(context)!.kg}',
-                                    style: TextStyle(fontSize: 14, color: Colors.grey[600]),
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      color: Colors.grey[600],
+                                    ),
                                   ),
                                 ],
                                 if ((set['restSeconds'] as int) > 0) ...[
                                   const SizedBox(width: 8),
                                   Text(
                                     '• ${set['restSeconds']}s ${AppLocalizations.of(context)!.rest}',
-                                    style: TextStyle(fontSize: 14, color: Colors.grey[600]),
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      color: Colors.grey[600],
+                                    ),
                                   ),
                                 ],
                               ],
@@ -168,7 +194,7 @@ class _ExercisesScreenState extends State<ExercisesScreen> {
                 child: Container(
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                    color: const Color(0xFF81C784),
+                    color: AllyUniversalAccents.done,
                     borderRadius: BorderRadius.circular(16),
                   ),
                   child: Text(
@@ -207,10 +233,14 @@ class _ExercisesScreenState extends State<ExercisesScreen> {
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: const Color(0xFFE57373).withValues(alpha:0.15),
+                color: AllyUniversalAccents.exercise.withValues(alpha: 0.15),
                 shape: BoxShape.circle,
               ),
-              child: const Icon(Icons.add_rounded, color: Color(0xFFE57373), size: 32),
+              child: const Icon(
+                Icons.add_rounded,
+                color: AllyUniversalAccents.exercise,
+                size: 32,
+              ),
             ),
             const SizedBox(height: 16),
             Text(
@@ -234,17 +264,23 @@ class _ExercisesScreenState extends State<ExercisesScreen> {
                 decoration: BoxDecoration(
                   color: Colors.transparent,
                   borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: Colors.grey.withValues(alpha:0.2)),
+                  border: Border.all(color: Colors.grey.withValues(alpha: 0.2)),
                 ),
                 child: Row(
                   children: [
                     Container(
                       padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
-                        color: const Color(0xFFE57373).withValues(alpha:0.15),
+                        color: AllyUniversalAccents.exercise.withValues(
+                          alpha: 0.15,
+                        ),
                         borderRadius: BorderRadius.circular(12),
                       ),
-                      child: const Icon(Icons.fitness_center, color: Color(0xFFE57373), size: 24),
+                      child: const Icon(
+                        Icons.fitness_center,
+                        color: AllyUniversalAccents.exercise,
+                        size: 24,
+                      ),
                     ),
                     const SizedBox(width: 16),
                     Expanded(
@@ -253,17 +289,29 @@ class _ExercisesScreenState extends State<ExercisesScreen> {
                         children: [
                           Text(
                             AppLocalizations.of(dialogContext)!.customProgram,
-                            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                            style: const TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
                           const SizedBox(height: 4),
                           Text(
-                            AppLocalizations.of(dialogContext)!.buildYourOwnWorkout,
-                            style: const TextStyle(fontSize: 13, color: Colors.grey),
+                            AppLocalizations.of(
+                              dialogContext,
+                            )!.buildYourOwnWorkout,
+                            style: const TextStyle(
+                              fontSize: 13,
+                              color: Colors.grey,
+                            ),
                           ),
                         ],
                       ),
                     ),
-                    const Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey),
+                    const Icon(
+                      Icons.arrow_forward_ios,
+                      size: 16,
+                      color: Colors.grey,
+                    ),
                   ],
                 ),
               ),
@@ -282,17 +330,23 @@ class _ExercisesScreenState extends State<ExercisesScreen> {
                 decoration: BoxDecoration(
                   color: Colors.transparent,
                   borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: Colors.grey.withValues(alpha:0.2)),
+                  border: Border.all(color: Colors.grey.withValues(alpha: 0.2)),
                 ),
                 child: Row(
                   children: [
                     Container(
                       padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
-                        color: const Color(0xFF64B5F6).withValues(alpha:0.15),
+                        color: AllyUniversalAccents.rest.withValues(
+                          alpha: 0.15,
+                        ),
                         borderRadius: BorderRadius.circular(12),
                       ),
-                      child: const Icon(Icons.bolt, color: Color(0xFF64B5F6), size: 24),
+                      child: const Icon(
+                        Icons.bolt,
+                        color: AllyUniversalAccents.rest,
+                        size: 24,
+                      ),
                     ),
                     const SizedBox(width: 16),
                     Expanded(
@@ -301,17 +355,29 @@ class _ExercisesScreenState extends State<ExercisesScreen> {
                         children: [
                           Text(
                             AppLocalizations.of(dialogContext)!.quickLog,
-                            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                            style: const TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
                           const SizedBox(height: 4),
                           Text(
-                            AppLocalizations.of(dialogContext)!.logASingleExercise,
-                            style: const TextStyle(fontSize: 13, color: Colors.grey),
+                            AppLocalizations.of(
+                              dialogContext,
+                            )!.logASingleExercise,
+                            style: const TextStyle(
+                              fontSize: 13,
+                              color: Colors.grey,
+                            ),
                           ),
                         ],
                       ),
                     ),
-                    const Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey),
+                    const Icon(
+                      Icons.arrow_forward_ios,
+                      size: 16,
+                      color: Colors.grey,
+                    ),
                   ],
                 ),
               ),
@@ -343,10 +409,14 @@ class _ExercisesScreenState extends State<ExercisesScreen> {
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: const Color(0xFF64B5F6).withValues(alpha:0.15),
+                color: AllyUniversalAccents.rest.withValues(alpha: 0.15),
                 shape: BoxShape.circle,
               ),
-              child: const Icon(Icons.bolt, color: Color(0xFF64B5F6), size: 32),
+              child: const Icon(
+                Icons.bolt,
+                color: AllyUniversalAccents.rest,
+                size: 32,
+              ),
             ),
             const SizedBox(height: 16),
             Text(
@@ -371,9 +441,14 @@ class _ExercisesScreenState extends State<ExercisesScreen> {
                           ),
                         ),
                       ),
-                      ...ExerciseLibrary.getExercisesByCategory(category).take(3).map(
-                        (exercise) => _buildQuickExerciseOption(dialogContext, exercise),
-                      ),
+                      ...ExerciseLibrary.getExercisesByCategory(category)
+                          .take(3)
+                          .map(
+                            (exercise) => _buildQuickExerciseOption(
+                              dialogContext,
+                              exercise,
+                            ),
+                          ),
                       const SizedBox(height: 12),
                     ],
                   );
@@ -386,11 +461,17 @@ class _ExercisesScreenState extends State<ExercisesScreen> {
     );
   }
 
-  Widget _buildQuickExerciseOption(BuildContext dialogContext, Exercise exercise) {
+  Widget _buildQuickExerciseOption(
+    BuildContext dialogContext,
+    Exercise exercise,
+  ) {
     return GestureDetector(
       onTap: () {
         Navigator.pop(dialogContext);
-        final healthProvider = Provider.of<HealthProvider>(context, listen: false);
+        final healthProvider = Provider.of<HealthProvider>(
+          context,
+          listen: false,
+        );
         final now = DateTime.now();
         final lastDate = healthProvider.healthData.lastExerciseDate;
 
@@ -398,14 +479,16 @@ class _ExercisesScreenState extends State<ExercisesScreen> {
             lastDate.year != now.year ||
             lastDate.month != now.month ||
             lastDate.day != now.day) {
-          healthProvider.updateExerciseStreak(healthProvider.healthData.exerciseStreak + 1);
+          healthProvider.updateExerciseStreak(
+            healthProvider.healthData.exerciseStreak + 1,
+          );
         }
 
         healthProvider.addExerciseToLog(
           exercise.id,
           exercise.name,
           exercise.icon,
-          const Color(0xFFE57373),
+          AllyUniversalAccents.exercise,
         );
       },
       child: Container(
@@ -415,7 +498,11 @@ class _ExercisesScreenState extends State<ExercisesScreen> {
           color: Theme.of(context).cardColor,
           borderRadius: BorderRadius.circular(12),
           boxShadow: const [
-            BoxShadow(color: Colors.black12, blurRadius: 5, offset: Offset(0, 1)),
+            BoxShadow(
+              color: Colors.black12,
+              blurRadius: 5,
+              offset: Offset(0, 1),
+            ),
           ],
         ),
         child: Row(
@@ -423,10 +510,14 @@ class _ExercisesScreenState extends State<ExercisesScreen> {
             Container(
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
-                color: const Color(0xFFE57373).withValues(alpha:0.15),
+                color: AllyUniversalAccents.exercise.withValues(alpha: 0.15),
                 borderRadius: BorderRadius.circular(8),
               ),
-              child: Icon(exercise.icon, color: const Color(0xFFE57373), size: 20),
+              child: Icon(
+                exercise.icon,
+                color: AllyUniversalAccents.exercise,
+                size: 20,
+              ),
             ),
             const SizedBox(width: 12),
             Expanded(
@@ -435,7 +526,10 @@ class _ExercisesScreenState extends State<ExercisesScreen> {
                 children: [
                   Text(
                     exercise.name,
-                    style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
+                    style: const TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                   if (exercise.equipment != null)
                     Text(
@@ -462,12 +556,19 @@ class _ExercisesScreenState extends State<ExercisesScreen> {
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: Icon(Icons.chevron_left_rounded, color: Theme.of(context).iconTheme.color, size: 32),
+          icon: Icon(
+            Icons.chevron_left_rounded,
+            color: Theme.of(context).iconTheme.color,
+            size: 32,
+          ),
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
           AppLocalizations.of(context)!.exercises,
-          style: TextStyle(color: Theme.of(context).textTheme.bodyLarge?.color, fontWeight: FontWeight.bold),
+          style: TextStyle(
+            color: Theme.of(context).textTheme.bodyLarge?.color,
+            fontWeight: FontWeight.bold,
+          ),
         ),
         actions: [
           GestureDetector(
@@ -476,7 +577,7 @@ class _ExercisesScreenState extends State<ExercisesScreen> {
               margin: const EdgeInsets.only(right: 16),
               padding: const EdgeInsets.all(8),
               decoration: const BoxDecoration(
-                color: Color(0xFFE57373),
+                color: AllyUniversalAccents.exercise,
                 shape: BoxShape.circle,
               ),
               child: Icon(Icons.add, color: Colors.white),
@@ -500,11 +601,13 @@ class _ExercisesScreenState extends State<ExercisesScreen> {
                     child: Container(
                       padding: const EdgeInsets.all(24),
                       decoration: BoxDecoration(
-                        color: const Color(0xFFE57373),
+                        color: AllyUniversalAccents.exercise,
                         borderRadius: BorderRadius.circular(24),
                         boxShadow: [
                           BoxShadow(
-                            color: const Color(0xFFE57373).withValues(alpha:0.3),
+                            color: AllyUniversalAccents.exercise.withValues(
+                              alpha: 0.3,
+                            ),
                             blurRadius: 20,
                             offset: const Offset(0, 10),
                           ),
@@ -515,12 +618,15 @@ class _ExercisesScreenState extends State<ExercisesScreen> {
                         children: [
                           Row(
                             children: [
-                              Icon(Icons.local_fire_department, color: Colors.white),
+                              Icon(
+                                Icons.local_fire_department,
+                                color: Colors.white,
+                              ),
                               const SizedBox(width: 12),
                               Text(
                                 currentStreak == 0
-                                  ? AppLocalizations.of(context)!.noStreakYet
-                                  : '$currentStreak ${currentStreak == 1 ? AppLocalizations.of(context)!.day : AppLocalizations.of(context)!.days}',
+                                    ? AppLocalizations.of(context)!.noStreakYet
+                                    : '$currentStreak ${currentStreak == 1 ? AppLocalizations.of(context)!.day : AppLocalizations.of(context)!.days}',
                                 style: const TextStyle(
                                   fontSize: 32,
                                   color: Colors.white,
@@ -548,7 +654,10 @@ class _ExercisesScreenState extends State<ExercisesScreen> {
                 // Quick Programs Section
                 Text(
                   AppLocalizations.of(context)!.quickPrograms,
-                  style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                  style: const TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
                 const SizedBox(height: 16),
 
@@ -563,16 +672,24 @@ class _ExercisesScreenState extends State<ExercisesScreen> {
                         decoration: BoxDecoration(
                           color: Colors.transparent,
                           borderRadius: BorderRadius.circular(20),
-                          border: Border.all(color: Colors.grey.withValues(alpha:0.2)),
+                          border: Border.all(
+                            color: Colors.grey.withValues(alpha: 0.2),
+                          ),
                         ),
                         child: Center(
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              Icon(Icons.add_circle_outline, size: 40, color: Colors.grey[300]),
+                              Icon(
+                                Icons.add_circle_outline,
+                                size: 40,
+                                color: Colors.grey[300],
+                              ),
                               const SizedBox(height: 12),
                               Text(
-                                AppLocalizations.of(context)!.createProgramToQuicklyStart,
+                                AppLocalizations.of(
+                                  context,
+                                )!.createProgramToQuicklyStart,
                                 style: TextStyle(
                                   fontSize: 14,
                                   color: Colors.grey[500],
@@ -593,11 +710,11 @@ class _ExercisesScreenState extends State<ExercisesScreen> {
                         itemBuilder: (context, index) {
                           final program = programs[index];
                           final colors = [
-                            const Color(0xFFE57373),
-                            const Color(0xFF64B5F6),
-                            const Color(0xFF81C784),
-                            const Color(0xFFFFB74D),
-                            const Color(0xFFBA68C8),
+                            AllyUniversalAccents.exercise,
+                            AllyUniversalAccents.rest,
+                            AllyUniversalAccents.done,
+                            AllyUniversalAccents.warn,
+                            AllyUniversalAccents.energy,
                           ];
                           final color = colors[index % colors.length];
 
@@ -611,72 +728,87 @@ class _ExercisesScreenState extends State<ExercisesScreen> {
                                     Navigator.push(
                                       context,
                                       MaterialPageRoute(
-                                        builder: (context) => ActiveWorkoutScreen(program: program),
+                                        builder: (context) =>
+                                            ActiveWorkoutScreen(
+                                              program: program,
+                                            ),
                                       ),
                                     );
                                   },
                                   child: Container(
-                                padding: const EdgeInsets.all(16),
-                                decoration: BoxDecoration(
-                                  color: color,
-                                  borderRadius: BorderRadius.circular(20),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: color.withValues(alpha:0.3),
-                                      blurRadius: 10,
-                                      offset: const Offset(0, 4),
-                                    ),
-                                  ],
-                                ),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Icon(Icons.fitness_center, color: Colors.white),
-                                    const Spacer(),
-                                    Text(
-                                      program.name,
-                                      style: const TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.white,
-                                      ),
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
-                                    const SizedBox(height: 4),
-                                    Row(
-                                      children: [
-                                        Icon(Icons.access_time, color: Colors.white, size: 16),
-                                        const SizedBox(width: 4),
-                                        Expanded(
-                                          child: Text(
-                                            '${program.estimatedDuration} ${AppLocalizations.of(context)!.min}',
-                                            style: const TextStyle(
-                                              fontSize: 12,
-                                              color: Colors.white70,
-                                            ),
-                                            maxLines: 1,
-                                            overflow: TextOverflow.ellipsis,
-                                          ),
-                                        ),
-                                        const SizedBox(width: 8),
-                                        Icon(Icons.fitness_center, color: Colors.white, size: 16),
-                                        const SizedBox(width: 4),
-                                        Expanded(
-                                          child: Text(
-                                            '${program.totalExercises}',
-                                            style: const TextStyle(
-                                              fontSize: 12,
-                                              color: Colors.white70,
-                                            ),
-                                            maxLines: 1,
-                                            overflow: TextOverflow.ellipsis,
-                                          ),
+                                    padding: const EdgeInsets.all(16),
+                                    decoration: BoxDecoration(
+                                      color: color,
+                                      borderRadius: BorderRadius.circular(20),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: color.withValues(alpha: 0.3),
+                                          blurRadius: 10,
+                                          offset: const Offset(0, 4),
                                         ),
                                       ],
                                     ),
-                                  ],
-                                ),
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Icon(
+                                          Icons.fitness_center,
+                                          color: Colors.white,
+                                        ),
+                                        const Spacer(),
+                                        Text(
+                                          program.name,
+                                          style: const TextStyle(
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.white,
+                                          ),
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                        const SizedBox(height: 4),
+                                        Row(
+                                          children: [
+                                            Icon(
+                                              Icons.access_time,
+                                              color: Colors.white,
+                                              size: 16,
+                                            ),
+                                            const SizedBox(width: 4),
+                                            Expanded(
+                                              child: Text(
+                                                '${program.estimatedDuration} ${AppLocalizations.of(context)!.min}',
+                                                style: const TextStyle(
+                                                  fontSize: 12,
+                                                  color: Colors.white70,
+                                                ),
+                                                maxLines: 1,
+                                                overflow: TextOverflow.ellipsis,
+                                              ),
+                                            ),
+                                            const SizedBox(width: 8),
+                                            Icon(
+                                              Icons.fitness_center,
+                                              color: Colors.white,
+                                              size: 16,
+                                            ),
+                                            const SizedBox(width: 4),
+                                            Expanded(
+                                              child: Text(
+                                                '${program.totalExercises}',
+                                                style: const TextStyle(
+                                                  fontSize: 12,
+                                                  color: Colors.white70,
+                                                ),
+                                                maxLines: 1,
+                                                overflow: TextOverflow.ellipsis,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ],
+                                    ),
                                   ),
                                 ),
                                 // Edit icon positioned at top right
@@ -692,24 +824,40 @@ class _ExercisesScreenState extends State<ExercisesScreen> {
                                           margin: const EdgeInsets.all(16),
                                           padding: const EdgeInsets.all(24),
                                           decoration: BoxDecoration(
-                                            color: Theme.of(context).scaffoldBackgroundColor,
-                                            borderRadius: BorderRadius.circular(24),
+                                            color: Theme.of(
+                                              context,
+                                            ).scaffoldBackgroundColor,
+                                            borderRadius: BorderRadius.circular(
+                                              24,
+                                            ),
                                           ),
                                           child: Column(
                                             mainAxisSize: MainAxisSize.min,
                                             children: [
                                               Container(
-                                                padding: const EdgeInsets.all(16),
+                                                padding: const EdgeInsets.all(
+                                                  16,
+                                                ),
                                                 decoration: BoxDecoration(
-                                                  color: const Color(0xFFE57373).withValues(alpha:0.15),
+                                                  color: AllyUniversalAccents
+                                                      .exercise
+                                                      .withValues(alpha: 0.15),
                                                   shape: BoxShape.circle,
                                                 ),
-                                                child: const Icon(Icons.edit, color: Color(0xFFE57373), size: 32),
+                                                child: const Icon(
+                                                  Icons.edit,
+                                                  color: AllyUniversalAccents
+                                                      .exercise,
+                                                  size: 32,
+                                                ),
                                               ),
                                               const SizedBox(height: 16),
                                               Text(
                                                 program.name,
-                                                style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                                                style: const TextStyle(
+                                                  fontSize: 20,
+                                                  fontWeight: FontWeight.bold,
+                                                ),
                                               ),
                                               const SizedBox(height: 24),
                                               GestureDetector(
@@ -718,29 +866,59 @@ class _ExercisesScreenState extends State<ExercisesScreen> {
                                                   Navigator.push(
                                                     context,
                                                     MaterialPageRoute(
-                                                      builder: (context) => WorkoutBuilderScreen(program: program),
+                                                      builder: (context) =>
+                                                          WorkoutBuilderScreen(
+                                                            program: program,
+                                                          ),
                                                     ),
                                                   );
                                                 },
                                                 child: Container(
-                                                  padding: const EdgeInsets.all(20),
+                                                  padding: const EdgeInsets.all(
+                                                    20,
+                                                  ),
                                                   decoration: BoxDecoration(
-                                                    color: Theme.of(context).cardColor,
-                                                    borderRadius: BorderRadius.circular(16),
+                                                    color: Theme.of(
+                                                      context,
+                                                    ).cardColor,
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                          16,
+                                                        ),
                                                     boxShadow: const [
-                                                      BoxShadow(color: Colors.black12, blurRadius: 10, offset: Offset(0, 2)),
+                                                      BoxShadow(
+                                                        color: Colors.black12,
+                                                        blurRadius: 10,
+                                                        offset: Offset(0, 2),
+                                                      ),
                                                     ],
                                                   ),
                                                   child: Row(
                                                     children: [
-                                                      const Icon(Icons.edit, color: Color(0xFFE57373), size: 24),
+                                                      const Icon(
+                                                        Icons.edit,
+                                                        color:
+                                                            AllyUniversalAccents
+                                                                .exercise,
+                                                        size: 24,
+                                                      ),
                                                       const SizedBox(width: 16),
                                                       Text(
-                                                        AppLocalizations.of(dialogContext)!.editProgram,
-                                                        style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                                                        AppLocalizations.of(
+                                                          dialogContext,
+                                                        )!.editProgram,
+                                                        style: const TextStyle(
+                                                          fontSize: 16,
+                                                          fontWeight:
+                                                              FontWeight.w600,
+                                                        ),
                                                       ),
                                                       const Spacer(),
-                                                      const Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey),
+                                                      const Icon(
+                                                        Icons.arrow_forward_ios,
+                                                        size: 16,
+                                                        color: Colors.grey,
+                                                      ),
                                                     ],
                                                   ),
                                                 ),
@@ -751,81 +929,176 @@ class _ExercisesScreenState extends State<ExercisesScreen> {
                                                   Navigator.pop(dialogContext);
                                                   showModalBottomSheet(
                                                     context: context,
-                                                    backgroundColor: Colors.transparent,
+                                                    backgroundColor:
+                                                        Colors.transparent,
                                                     builder: (BuildContext deleteContext) => Container(
-                                                      margin: const EdgeInsets.all(16),
-                                                      padding: const EdgeInsets.all(24),
+                                                      margin:
+                                                          const EdgeInsets.all(
+                                                            16,
+                                                          ),
+                                                      padding:
+                                                          const EdgeInsets.all(
+                                                            24,
+                                                          ),
                                                       decoration: BoxDecoration(
-                                                        color: Theme.of(context).scaffoldBackgroundColor,
-                                                        borderRadius: BorderRadius.circular(24),
+                                                        color: Theme.of(
+                                                          context,
+                                                        ).scaffoldBackgroundColor,
+                                                        borderRadius:
+                                                            BorderRadius.circular(
+                                                              24,
+                                                            ),
                                                       ),
                                                       child: Column(
-                                                        mainAxisSize: MainAxisSize.min,
+                                                        mainAxisSize:
+                                                            MainAxisSize.min,
                                                         children: [
                                                           Container(
-                                                            padding: const EdgeInsets.all(16),
+                                                            padding:
+                                                                const EdgeInsets.all(
+                                                                  16,
+                                                                ),
                                                             decoration: BoxDecoration(
-                                                              color: const Color(0xFFEF5350).withValues(alpha:0.15),
-                                                              shape: BoxShape.circle,
+                                                              color: AllyUniversalAccents
+                                                                  .danger
+                                                                  .withValues(
+                                                                    alpha: 0.15,
+                                                                  ),
+                                                              shape: BoxShape
+                                                                  .circle,
                                                             ),
-                                                            child: const Icon(Icons.delete_outline, color: Color(0xFFEF5350), size: 32),
+                                                            child: const Icon(
+                                                              Icons
+                                                                  .delete_outline,
+                                                              color:
+                                                                  AllyUniversalAccents
+                                                                      .danger,
+                                                              size: 32,
+                                                            ),
                                                           ),
-                                                          const SizedBox(height: 16),
+                                                          const SizedBox(
+                                                            height: 16,
+                                                          ),
                                                           Text(
-                                                            AppLocalizations.of(deleteContext)!.deleteProgramQuestion,
-                                                            style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                                                            AppLocalizations.of(
+                                                              deleteContext,
+                                                            )!.deleteProgramQuestion,
+                                                            style:
+                                                                const TextStyle(
+                                                                  fontSize: 20,
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .bold,
+                                                                ),
                                                           ),
-                                                          const SizedBox(height: 12),
+                                                          const SizedBox(
+                                                            height: 12,
+                                                          ),
                                                           Text(
-                                                            AppLocalizations.of(deleteContext)!.areYouSureDeleteProgram(program.name),
-                                                            style: const TextStyle(fontSize: 14, color: Colors.grey),
-                                                            textAlign: TextAlign.center,
+                                                            AppLocalizations.of(
+                                                              deleteContext,
+                                                            )!.areYouSureDeleteProgram(
+                                                              program.name,
+                                                            ),
+                                                            style:
+                                                                const TextStyle(
+                                                                  fontSize: 14,
+                                                                  color: Colors
+                                                                      .grey,
+                                                                ),
+                                                            textAlign: TextAlign
+                                                                .center,
                                                           ),
-                                                          const SizedBox(height: 24),
+                                                          const SizedBox(
+                                                            height: 24,
+                                                          ),
                                                           Row(
                                                             children: [
                                                               Expanded(
                                                                 child: GestureDetector(
-                                                                  onTap: () => Navigator.pop(deleteContext),
+                                                                  onTap: () =>
+                                                                      Navigator.pop(
+                                                                        deleteContext,
+                                                                      ),
                                                                   child: Container(
-                                                                    padding: const EdgeInsets.all(16),
+                                                                    padding:
+                                                                        const EdgeInsets.all(
+                                                                          16,
+                                                                        ),
                                                                     decoration: BoxDecoration(
-                                                                      color: Theme.of(context).cardColor,
-                                                                      borderRadius: BorderRadius.circular(16),
-                                                                      border: Border.all(color: Colors.grey[300]!),
+                                                                      color: Theme.of(
+                                                                        context,
+                                                                      ).cardColor,
+                                                                      borderRadius:
+                                                                          BorderRadius.circular(
+                                                                            16,
+                                                                          ),
+                                                                      border: Border.all(
+                                                                        color: Colors
+                                                                            .grey[300]!,
+                                                                      ),
                                                                     ),
                                                                     child: Text(
-                                                                      AppLocalizations.of(deleteContext)!.cancel,
-                                                                      textAlign: TextAlign.center,
+                                                                      AppLocalizations.of(
+                                                                        deleteContext,
+                                                                      )!.cancel,
+                                                                      textAlign:
+                                                                          TextAlign
+                                                                              .center,
                                                                       style: const TextStyle(
-                                                                        fontSize: 16,
-                                                                        fontWeight: FontWeight.bold,
-                                                                        color: Colors.grey,
+                                                                        fontSize:
+                                                                            16,
+                                                                        fontWeight:
+                                                                            FontWeight.bold,
+                                                                        color: Colors
+                                                                            .grey,
                                                                       ),
                                                                     ),
                                                                   ),
                                                                 ),
                                                               ),
-                                                              const SizedBox(width: 12),
+                                                              const SizedBox(
+                                                                width: 12,
+                                                              ),
                                                               Expanded(
                                                                 child: GestureDetector(
                                                                   onTap: () async {
-                                                                    Navigator.pop(deleteContext);
-                                                                    await workoutProvider.deleteProgram(program.id);
+                                                                    Navigator.pop(
+                                                                      deleteContext,
+                                                                    );
+                                                                    await workoutProvider
+                                                                        .deleteProgram(
+                                                                          program
+                                                                              .id,
+                                                                        );
                                                                   },
                                                                   child: Container(
-                                                                    padding: const EdgeInsets.all(16),
+                                                                    padding:
+                                                                        const EdgeInsets.all(
+                                                                          16,
+                                                                        ),
                                                                     decoration: BoxDecoration(
-                                                                      color: const Color(0xFFEF5350),
-                                                                      borderRadius: BorderRadius.circular(16),
+                                                                      color: AllyUniversalAccents
+                                                                          .danger,
+                                                                      borderRadius:
+                                                                          BorderRadius.circular(
+                                                                            16,
+                                                                          ),
                                                                     ),
                                                                     child: Text(
-                                                                      AppLocalizations.of(deleteContext)!.delete,
-                                                                      textAlign: TextAlign.center,
+                                                                      AppLocalizations.of(
+                                                                        deleteContext,
+                                                                      )!.delete,
+                                                                      textAlign:
+                                                                          TextAlign
+                                                                              .center,
                                                                       style: const TextStyle(
-                                                                        fontSize: 16,
-                                                                        fontWeight: FontWeight.bold,
-                                                                        color: Colors.white,
+                                                                        fontSize:
+                                                                            16,
+                                                                        fontWeight:
+                                                                            FontWeight.bold,
+                                                                        color: Colors
+                                                                            .white,
                                                                       ),
                                                                     ),
                                                                   ),
@@ -839,24 +1112,51 @@ class _ExercisesScreenState extends State<ExercisesScreen> {
                                                   );
                                                 },
                                                 child: Container(
-                                                  padding: const EdgeInsets.all(20),
+                                                  padding: const EdgeInsets.all(
+                                                    20,
+                                                  ),
                                                   decoration: BoxDecoration(
-                                                    color: Theme.of(context).cardColor,
-                                                    borderRadius: BorderRadius.circular(16),
+                                                    color: Theme.of(
+                                                      context,
+                                                    ).cardColor,
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                          16,
+                                                        ),
                                                     boxShadow: const [
-                                                      BoxShadow(color: Colors.black12, blurRadius: 10, offset: Offset(0, 2)),
+                                                      BoxShadow(
+                                                        color: Colors.black12,
+                                                        blurRadius: 10,
+                                                        offset: Offset(0, 2),
+                                                      ),
                                                     ],
                                                   ),
                                                   child: Row(
                                                     children: [
-                                                      const Icon(Icons.delete_outline, color: Color(0xFFEF5350), size: 24),
+                                                      const Icon(
+                                                        Icons.delete_outline,
+                                                        color:
+                                                            AllyUniversalAccents
+                                                                .danger,
+                                                        size: 24,
+                                                      ),
                                                       const SizedBox(width: 16),
                                                       Text(
-                                                        AppLocalizations.of(dialogContext)!.deleteProgram,
-                                                        style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                                                        AppLocalizations.of(
+                                                          dialogContext,
+                                                        )!.deleteProgram,
+                                                        style: const TextStyle(
+                                                          fontSize: 16,
+                                                          fontWeight:
+                                                              FontWeight.w600,
+                                                        ),
                                                       ),
                                                       const Spacer(),
-                                                      const Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey),
+                                                      const Icon(
+                                                        Icons.arrow_forward_ios,
+                                                        size: 16,
+                                                        color: Colors.grey,
+                                                      ),
                                                     ],
                                                   ),
                                                 ),
@@ -873,7 +1173,9 @@ class _ExercisesScreenState extends State<ExercisesScreen> {
                                         borderRadius: BorderRadius.circular(8),
                                       ),
                                       child: Icon(
-                                        Icons.edit, color: Colors.white),
+                                        Icons.edit,
+                                        color: Colors.white,
+                                      ),
                                     ),
                                   ),
                                 ),
@@ -894,12 +1196,18 @@ class _ExercisesScreenState extends State<ExercisesScreen> {
                   children: [
                     Text(
                       AppLocalizations.of(context)!.todaysPrograms,
-                      style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                      style: const TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                     if (healthData.exerciseLog.isNotEmpty)
                       Text(
                         '${healthData.exerciseLog.length} ${AppLocalizations.of(context)!.logged}',
-                        style: const TextStyle(fontSize: 14, color: Colors.grey),
+                        style: const TextStyle(
+                          fontSize: 14,
+                          color: Colors.grey,
+                        ),
                       ),
                   ],
                 ),
@@ -947,18 +1255,26 @@ class _ExercisesScreenState extends State<ExercisesScreen> {
                         itemBuilder: (context, index) {
                           final exercise = healthData.exerciseLog[index];
                           final time = DateTime.parse(exercise['time']);
-                          final timeStr = '${time.hour.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')}';
-                          final name = exercise['name'] ?? exercise['nameKey'] ?? 'Exercise';
+                          final timeStr =
+                              '${time.hour.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')}';
+                          final name =
+                              exercise['name'] ??
+                              exercise['nameKey'] ??
+                              'Exercise';
                           final isProgram = exercise['type'] == 'program';
                           final icon = isProgram
                               ? Icons.fitness_center
                               : ((exercise['nameKey'] is String
-                                          ? ExerciseLibrary.getExerciseById(exercise['nameKey'] as String)?.icon
-                                          : null) ??
-                                      Icons.fitness_center);
+                                        ? ExerciseLibrary.getExerciseById(
+                                            exercise['nameKey'] as String,
+                                          )?.icon
+                                        : null) ??
+                                    Icons.fitness_center);
 
                           return GestureDetector(
-                            onTap: isProgram ? () => _showWorkoutDetails(exercise) : null,
+                            onTap: isProgram
+                                ? () => _showWorkoutDetails(exercise)
+                                : null,
                             child: Container(
                               margin: const EdgeInsets.only(bottom: 12),
                               padding: const EdgeInsets.all(16),
@@ -966,7 +1282,11 @@ class _ExercisesScreenState extends State<ExercisesScreen> {
                                 color: Theme.of(context).cardColor,
                                 borderRadius: BorderRadius.circular(16),
                                 boxShadow: const [
-                                  BoxShadow(color: Colors.black12, blurRadius: 10, offset: Offset(0, 2)),
+                                  BoxShadow(
+                                    color: Colors.black12,
+                                    blurRadius: 10,
+                                    offset: Offset(0, 2),
+                                  ),
                                 ],
                               ),
                               child: Row(
@@ -975,14 +1295,17 @@ class _ExercisesScreenState extends State<ExercisesScreen> {
                                     padding: const EdgeInsets.all(12),
                                     decoration: BoxDecoration(
                                       color: isProgram
-                                          ? const Color(0xFFE57373).withValues(alpha:0.15)
-                                          : Color(exercise['color']).withValues(alpha:0.15),
+                                          ? AllyUniversalAccents.exercise
+                                                .withValues(alpha: 0.15)
+                                          : Color(
+                                              exercise['color'],
+                                            ).withValues(alpha: 0.15),
                                       borderRadius: BorderRadius.circular(12),
                                     ),
                                     child: Icon(
                                       icon,
                                       color: isProgram
-                                          ? const Color(0xFFE57373)
+                                          ? AllyUniversalAccents.exercise
                                           : Color(exercise['color']),
                                       size: 24,
                                     ),
@@ -990,23 +1313,33 @@ class _ExercisesScreenState extends State<ExercisesScreen> {
                                   const SizedBox(width: 16),
                                   Expanded(
                                     child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
                                       children: [
                                         Text(
                                           name,
-                                          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                                          style: const TextStyle(
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.w600,
+                                          ),
                                         ),
                                         Row(
                                           children: [
                                             Text(
                                               timeStr,
-                                              style: TextStyle(fontSize: 13, color: Colors.grey[600]),
+                                              style: TextStyle(
+                                                fontSize: 13,
+                                                color: Colors.grey[600],
+                                              ),
                                             ),
                                             if (isProgram) ...[
                                               const SizedBox(width: 8),
                                               Text(
                                                 '• ${exercise['exercises'].length} ${AppLocalizations.of(context)!.exercises}',
-                                                style: TextStyle(fontSize: 13, color: Colors.grey[600]),
+                                                style: TextStyle(
+                                                  fontSize: 13,
+                                                  color: Colors.grey[600],
+                                                ),
                                               ),
                                             ],
                                           ],
@@ -1015,8 +1348,12 @@ class _ExercisesScreenState extends State<ExercisesScreen> {
                                     ),
                                   ),
                                   Icon(
-                                    isProgram ? Icons.arrow_forward_ios : Icons.check_circle,
-                                    color: isProgram ? Colors.grey : const Color(0xFFE57373),
+                                    isProgram
+                                        ? Icons.arrow_forward_ios
+                                        : Icons.check_circle,
+                                    color: isProgram
+                                        ? Colors.grey
+                                        : AllyUniversalAccents.exercise,
                                     size: isProgram ? 16 : 24,
                                   ),
                                 ],

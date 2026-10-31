@@ -8,6 +8,8 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 
+import '../design_system/tokens/colors.dart';
+
 /// Defines the visual style of the in-app notification.
 enum NotificationType { success, error, neutral }
 
@@ -22,17 +24,17 @@ class _NotificationStyle {
     switch (type) {
       case NotificationType.success:
         return _NotificationStyle(
-          backgroundColor: Colors.green.shade500,
+          backgroundColor: AllySemanticColors.success,
           icon: Icons.check_circle_outline,
         );
       case NotificationType.error:
         return _NotificationStyle(
-          backgroundColor: Colors.red.shade500,
+          backgroundColor: AllySemanticColors.error,
           icon: Icons.highlight_off,
         );
       case NotificationType.neutral:
         return _NotificationStyle(
-          backgroundColor: const Color(0xFF222222),
+          backgroundColor: VertexDarkColors.surface,
           icon: null,
         );
     }
@@ -45,10 +47,7 @@ class _ActiveNotificationHandle {
   final OverlayEntry entry;
   final VoidCallback dismiss;
 
-  _ActiveNotificationHandle({
-    required this.entry,
-    required this.dismiss,
-  });
+  _ActiveNotificationHandle({required this.entry, required this.dismiss});
 }
 
 /// A dedicated service for displaying custom, animated in-app notifications (overlays).
@@ -124,7 +123,9 @@ class IntrovertNotificationService {
   }) {
     final overlay = navigatorKey.currentState?.overlay;
     if (overlay == null) {
-      debugPrint("[IntrovertService] Overlay not found. Cannot display notification.");
+      debugPrint(
+        "[IntrovertService] Overlay not found. Cannot display notification.",
+      );
       return;
     }
 
@@ -281,19 +282,12 @@ class _AnimatedNotificationState extends State<_AnimatedNotification>
     _slideAnimation = Tween<Offset>(
       begin: const Offset(0, 0.8), // Start a bit lower for a smoother feel
       end: Offset.zero,
-    ).animate(
-      CurvedAnimation(
-        parent: _controller,
-        curve: Curves.easeOutCubic,
-      ),
-    );
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeOutCubic));
 
-    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(
-        parent: _controller,
-        curve: Curves.easeIn,
-      ),
-    );
+    _fadeAnimation = Tween<double>(
+      begin: 0.0,
+      end: 1.0,
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeIn));
 
     // Register this state's dismiss function with the service.
     widget.registerDismiss(dismiss);
@@ -324,15 +318,18 @@ class _AnimatedNotificationState extends State<_AnimatedNotification>
 
   /// Calculates the best-fit font size for the message, especially for single-line notifications.
   double _calculateFontSize(
-      String text,
-      double initialFontSize,
-      double maxWidth,
-      IconData? icon,
-      ) {
+    String text,
+    double initialFontSize,
+    double maxWidth,
+    IconData? icon,
+  ) {
     double fontSize = initialFontSize;
     final minFontSize = initialFontSize * 0.7;
     final textPainter = TextPainter(
-      text: TextSpan(text: text, style: TextStyle(fontSize: fontSize)),
+      text: TextSpan(
+        text: text,
+        style: TextStyle(fontSize: fontSize),
+      ),
       maxLines: widget.oneLine ? 1 : null,
       textDirection: TextDirection.ltr,
     )..layout();
@@ -361,8 +358,7 @@ class _AnimatedNotificationState extends State<_AnimatedNotification>
       screenWidth * 0.9,
       widget.icon,
     );
-    final double iconSize =
-    widget.icon != null ? adjustedFontSize * 1.2 : 0.0;
+    final double iconSize = widget.icon != null ? adjustedFontSize * 1.2 : 0.0;
 
     return SlideTransition(
       position: _slideAnimation,
@@ -376,8 +372,10 @@ class _AnimatedNotificationState extends State<_AnimatedNotification>
             shadowColor: Colors.black.withValues(alpha: 0.3),
             borderRadius: BorderRadius.circular(16.0),
             child: Container(
-              padding:
-              const EdgeInsets.symmetric(vertical: 14.0, horizontal: 20.0),
+              padding: const EdgeInsets.symmetric(
+                vertical: 14.0,
+                horizontal: 20.0,
+              ),
               decoration: BoxDecoration(
                 color: widget.backgroundColor,
                 borderRadius: BorderRadius.circular(16.0),
@@ -387,41 +385,37 @@ class _AnimatedNotificationState extends State<_AnimatedNotification>
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   if (widget.icon != null) ...[
-                    Icon(
-                      widget.icon,
-                      color: widget.textColor,
-                      size: iconSize,
-                    ),
+                    Icon(widget.icon, color: widget.textColor, size: iconSize),
                     const SizedBox(width: 12.0),
                   ],
                   Flexible(
                     child: widget.oneLine
                         ? FittedBox(
-                      fit: BoxFit.scaleDown,
-                      alignment: Alignment.centerLeft,
-                      child: Text(
-                        widget.message,
-                        style: TextStyle(
-                          color: widget.textColor,
-                          fontSize: adjustedFontSize,
-                          fontWeight: FontWeight.w500,
-                        ),
-                        maxLines: 1,
-                        softWrap: false,
-                        overflow: TextOverflow.visible,
-                        textAlign: TextAlign.start,
-                      ),
-                    )
+                            fit: BoxFit.scaleDown,
+                            alignment: Alignment.centerLeft,
+                            child: Text(
+                              widget.message,
+                              style: TextStyle(
+                                color: widget.textColor,
+                                fontSize: adjustedFontSize,
+                                fontWeight: FontWeight.w500,
+                              ),
+                              maxLines: 1,
+                              softWrap: false,
+                              overflow: TextOverflow.visible,
+                              textAlign: TextAlign.start,
+                            ),
+                          )
                         : Text(
-                      widget.message,
-                      style: TextStyle(
-                        color: widget.textColor,
-                        fontSize: adjustedFontSize,
-                        fontWeight: FontWeight.w500,
-                      ),
-                      maxLines: null,
-                      textAlign: TextAlign.start,
-                    ),
+                            widget.message,
+                            style: TextStyle(
+                              color: widget.textColor,
+                              fontSize: adjustedFontSize,
+                              fontWeight: FontWeight.w500,
+                            ),
+                            maxLines: null,
+                            textAlign: TextAlign.start,
+                          ),
                   ),
                 ],
               ),

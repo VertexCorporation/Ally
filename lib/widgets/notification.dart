@@ -1,25 +1,37 @@
+// notification.dart
+//
+// © 2026 Vertex Corporation
+// ─────────────────────────────────────────────────────────────────────────────
+// Overlay toast. Semantic defaults come from the design tokens; callers can
+// still customize icon/duration. Success / error / neutral tones are paired
+// with icons so status never relies on color alone.
+
 import 'package:flutter/material.dart';
 
-/// Custom notification widget with fade animations and modern design
+import '../design_system/design_system.dart';
+
 class CustomNotification extends StatefulWidget {
   final String message;
-  final Color backgroundColor;
+  final Color? backgroundColor;
   final IconData? icon;
+  final bool isError;
   final Duration duration;
 
   const CustomNotification({
     super.key,
     required this.message,
-    this.backgroundColor = const Color(0xFF4BAADF),
+    this.backgroundColor,
     this.icon,
+    this.isError = false,
     this.duration = const Duration(seconds: 3),
   });
 
   static void show(
     BuildContext context, {
     required String message,
-    Color backgroundColor = const Color(0xFF4BAADF),
+    Color? backgroundColor,
     IconData? icon,
+    bool isError = false,
     Duration duration = const Duration(seconds: 3),
   }) {
     final overlay = Overlay.of(context);
@@ -32,6 +44,7 @@ class CustomNotification extends StatefulWidget {
           message: message,
           backgroundColor: backgroundColor,
           icon: icon,
+          isError: isError,
           duration: duration,
         ),
       ),
@@ -65,18 +78,12 @@ class _CustomNotificationState extends State<CustomNotification>
     _fadeAnimation = Tween<double>(
       begin: 0.0,
       end: 1.0,
-    ).animate(CurvedAnimation(
-      parent: _controller,
-      curve: Curves.easeOut,
-    ));
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeOut));
 
     _slideAnimation = Tween<Offset>(
       begin: const Offset(0, -1),
       end: Offset.zero,
-    ).animate(CurvedAnimation(
-      parent: _controller,
-      curve: Curves.easeOut,
-    ));
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeOut));
 
     _controller.forward();
 
@@ -96,6 +103,13 @@ class _CustomNotificationState extends State<CustomNotification>
 
   @override
   Widget build(BuildContext context) {
+    final ThemeData theme = Theme.of(context);
+    final AllySemanticPalette semantics = context.allySemantics;
+
+    final Color background =
+        widget.backgroundColor ??
+        (widget.isError ? semantics.error : theme.colorScheme.onSurface);
+
     return FadeTransition(
       opacity: _fadeAnimation,
       child: SlideTransition(
@@ -103,35 +117,30 @@ class _CustomNotificationState extends State<CustomNotification>
         child: Material(
           color: Colors.transparent,
           child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            padding: const EdgeInsets.symmetric(
+              horizontal: AllySpacing.lg,
+              vertical: AllySpacing.md,
+            ),
             decoration: BoxDecoration(
-              color: widget.backgroundColor,
-              borderRadius: BorderRadius.circular(12),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.1),
-                  blurRadius: 8,
-                  offset: const Offset(0, 4),
-                ),
-              ],
+              color: background,
+              borderRadius: AllyRadius.mdAll,
             ),
             child: Row(
               children: [
                 if (widget.icon != null) ...[
                   Icon(
                     widget.icon,
-                    color: Colors.white,
-                    size: 24,
+                    color: theme.colorScheme.surface,
+                    size: AllyDimensions.iconMd,
                   ),
-                  const SizedBox(width: 12),
+                  const SizedBox(width: AllySpacing.md),
                 ],
                 Expanded(
                   child: Text(
                     widget.message,
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 14,
-                      fontWeight: FontWeight.w500,
+                    style: AllyTypography.label(
+                      size: 14,
+                      color: theme.colorScheme.surface,
                     ),
                   ),
                 ),

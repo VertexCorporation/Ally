@@ -19,9 +19,10 @@ class ShakeWidgetState extends State<ShakeWidget> {
   @override
   void initState() {
     super.initState();
-    _offsetAnimation = Tween<double>(begin: 0, end: 1)
-        .chain(CurveTween(curve: Curves.elasticIn))
-        .animate(widget.controller);
+    _offsetAnimation = Tween<double>(
+      begin: 0,
+      end: 1,
+    ).chain(CurveTween(curve: Curves.elasticIn)).animate(widget.controller);
   }
 
   @override

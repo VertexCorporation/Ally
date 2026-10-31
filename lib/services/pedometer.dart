@@ -8,9 +8,9 @@ class PedometerService {
   static final PedometerService _instance = PedometerService._internal();
   factory PedometerService() => _instance;
   PedometerService._internal();
-  
+
   static const platform = MethodChannel('com.vertex.ally/step_counter');
-  
+
   Future<void> startNativeService() async {
     try {
       final status = await Permission.activityRecognition.request();
@@ -25,7 +25,7 @@ class PedometerService {
       debugPrint('Error starting native service: $e');
     }
   }
-  
+
   Future<void> stopNativeService() async {
     try {
       await platform.invokeMethod('stopStepCounterService');

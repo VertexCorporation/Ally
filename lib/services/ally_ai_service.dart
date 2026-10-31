@@ -47,10 +47,7 @@ class AllyAiResponse {
 
 /// A safe, user-presentable error from the AI service.
 class AllyAiException implements Exception {
-  const AllyAiException({
-    required this.code,
-    required this.message,
-  });
+  const AllyAiException({required this.code, required this.message});
 
   final String code;
   final String message;
@@ -64,12 +61,10 @@ class AllyAiException implements Exception {
 /// Provider keys, model selection, subscription checks, and usage limits stay
 /// on the server. Never send a UID, tier, or model choice as client authority.
 class AllyAiService {
-  AllyAiService({
-    FirebaseFunctions? functions,
-    FirebaseAuth? auth,
-  }) : _functions = functions ??
-            FirebaseFunctions.instanceFor(region: 'europe-west1'),
-       _auth = auth ?? FirebaseAuth.instance;
+  AllyAiService({FirebaseFunctions? functions, FirebaseAuth? auth})
+    : _functions =
+          functions ?? FirebaseFunctions.instanceFor(region: 'europe-west1'),
+      _auth = auth ?? FirebaseAuth.instance;
 
   final FirebaseFunctions _functions;
   final FirebaseAuth _auth;
@@ -103,9 +98,7 @@ class AllyAiService {
     try {
       final callable = _functions.httpsCallable(
         'generateAIResponse',
-        options: HttpsCallableOptions(
-          timeout: const Duration(seconds: 55),
-        ),
+        options: HttpsCallableOptions(timeout: const Duration(seconds: 55)),
       );
       final result = await callable.call<Map<String, dynamic>>({
         'message': normalizedMessage,

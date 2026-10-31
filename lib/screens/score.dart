@@ -1,7 +1,16 @@
+// score.dart
+//
+// © 2026 Vertex Corporation
+// ─────────────────────────────────────────────────────────────────────────────
+// Health score breakdown. All component scores are derived from real
+// [HealthData] values; each contributor keeps its restrained health accent.
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../providers/health.dart';
+
+import '../design_system/design_system.dart';
 import '../l10n/app_localizations.dart';
+import '../providers/health.dart';
 
 class HealthScoreScreen extends StatefulWidget {
   const HealthScoreScreen({super.key});
@@ -11,134 +20,126 @@ class HealthScoreScreen extends StatefulWidget {
 }
 
 class _HealthScoreScreenState extends State<HealthScoreScreen> {
-
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final ThemeData theme = Theme.of(context);
+    final ColorScheme scheme = theme.colorScheme;
+    final AllySemanticPalette semantics = context.allySemantics;
+
     final healthProvider = Provider.of<HealthProvider>(context);
     final healthData = healthProvider.healthData;
     final healthScore = healthData.healthScore;
 
     // Calculate individual scores based on real data
-    final waterScore = ((healthData.waterGlasses / healthData.waterGoal) * 25).clamp(0, 25);
+    final waterScore = ((healthData.waterGlasses / healthData.waterGoal) * 25)
+        .clamp(0, 25);
     final exerciseScore = ((healthData.exerciseStreak / 7) * 25).clamp(0, 25);
-    final sleepScore = ((healthData.sleepHours / healthData.sleepGoal) * 25).clamp(0, 25);
+    final sleepScore = ((healthData.sleepHours / healthData.sleepGoal) * 25)
+        .clamp(0, 25);
     final stepsScore = healthData.stepsGoal > 0
         ? ((healthData.currentSteps / healthData.stepsGoal) * 25).clamp(0, 25)
         : 0.0;
 
     final List<Map<String, dynamic>> scoreBreakdown = [
       {
-        'name': AppLocalizations.of(context)!.exercises,
+        'name': l10n.exercises,
         'icon': Icons.fitness_center_rounded,
-        'color': const Color(0xFFFF6B6B),
+        'color': semantics.activity,
         'weight': 25,
         'currentScore': exerciseScore.round(),
-        'description': AppLocalizations.of(context)!.workoutStreakDesc,
+        'description': l10n.workoutStreakDesc,
       },
       {
-        'name': AppLocalizations.of(context)!.sleep,
+        'name': l10n.sleep,
         'icon': Icons.bedtime_rounded,
-        'color': const Color(0xFF9D50BB),
+        'color': semantics.sleep,
         'weight': 25,
         'currentScore': sleepScore.round(),
-        'description': AppLocalizations.of(context)!.sleepQualityDesc,
+        'description': l10n.sleepQualityDesc,
       },
       {
-        'name': AppLocalizations.of(context)!.water,
+        'name': l10n.water,
         'icon': Icons.water_drop_rounded,
-        'color': const Color(0xFF64B5F6),
+        'color': semantics.water,
         'weight': 25,
         'currentScore': waterScore.round(),
-        'description': AppLocalizations.of(context)!.hydrationGoalDesc,
+        'description': l10n.hydrationGoalDesc,
       },
       {
-        'name': AppLocalizations.of(context)!.pedometer,
+        'name': l10n.pedometer,
         'icon': Icons.directions_walk_rounded,
-        'color': const Color(0xFF81C784),
+        'color': semantics.steps,
         'weight': 25,
         'currentScore': stepsScore.round(),
-        'description': AppLocalizations.of(context)!.dailyStepGoal,
+        'description': l10n.dailyStepGoal,
       },
     ];
 
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-
     return Scaffold(
-      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        leading: IconButton(
-          icon: Icon(Icons.chevron_left_rounded, color: Theme.of(context).iconTheme.color, size: 32),
-          onPressed: () => Navigator.pop(context),
-        ),
-        title: Text(AppLocalizations.of(context)!.healthScore, style: TextStyle(color: Theme.of(context).textTheme.bodyLarge?.color, fontWeight: FontWeight.bold)),
-      ),
+      appBar: AllyAppBar(title: l10n.healthScore),
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.all(20.0),
+          padding: const EdgeInsets.all(AllySpacing.xl),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Main Score Card
+              // ── Main score ring (inverse monochrome hero) ────────────────
               Hero(
                 tag: 'health_score_card',
                 child: Material(
                   color: Colors.transparent,
                   child: Container(
                     width: double.infinity,
-                    padding: const EdgeInsets.all(32),
+                    padding: const EdgeInsets.all(AllySpacing.huge),
                     decoration: BoxDecoration(
-                      color: const Color(0xFF64B5F6),
-                      borderRadius: BorderRadius.circular(24),
-                      boxShadow: [
-                        BoxShadow(
-                          color: const Color(0xFF64B5F6).withValues(alpha:0.3),
-                          blurRadius: 20,
-                          offset: const Offset(0, 10),
-                        ),
-                      ],
+                      color: scheme.onSurface,
+                      borderRadius: AllyRadius.lgAll,
                     ),
                     child: Column(
                       children: [
                         Text(
-                          AppLocalizations.of(context)!.yourHealthScore,
-                          style: TextStyle(
-                            fontSize: 18,
-                            color: Colors.white70,
-                            fontWeight: FontWeight.w500,
+                          l10n.yourHealthScore,
+                          style: AllyTypography.label(
+                            size: 16,
+                            color: scheme.surface,
                           ),
                         ),
-                        const SizedBox(height: 20),
+                        const SizedBox(height: AllySpacing.xl),
                         Stack(
                           alignment: Alignment.center,
                           children: [
                             SizedBox(
-                              width: 200,
-                              height: 200,
+                              width: 190,
+                              height: 190,
                               child: CircularProgressIndicator(
                                 value: healthScore / 100,
-                                strokeWidth: 16,
-                                backgroundColor: Colors.white70,
-                                valueColor: const AlwaysStoppedAnimation<Color>(Colors.white),
+                                strokeWidth: 10,
+                                strokeCap: StrokeCap.round,
+                                backgroundColor: scheme.surface.withValues(
+                                  alpha: 0.18,
+                                ),
+                                valueColor: AlwaysStoppedAnimation<Color>(
+                                  scheme.surface,
+                                ),
                               ),
                             ),
                             Column(
                               children: [
                                 Text(
                                   '$healthScore',
-                                  style: const TextStyle(
-                                    fontSize: 72,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.white,
-                                    height: 1,
+                                  style: AllyTypography.metric(
+                                    size: 68,
+                                    color: scheme.surface,
+                                    weight: FontWeight.w700,
                                   ),
                                 ),
                                 Text(
-                                  AppLocalizations.of(context)!.outOf100,
-                                  style: const TextStyle(
-                                    fontSize: 14,
-                                    color: Colors.white70,
+                                  l10n.outOf100,
+                                  style: AllyTypography.caption(
+                                    color: scheme.surface.withValues(
+                                      alpha: 0.65,
+                                    ),
                                   ),
                                 ),
                               ],
@@ -150,101 +151,96 @@ class _HealthScoreScreenState extends State<HealthScoreScreen> {
                   ),
                 ),
               ),
-              const SizedBox(height: 32),
-              Text(
-                AppLocalizations.of(context)!.scoreBreakdown,
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Theme.of(context).textTheme.bodyLarge?.color),
-              ),
-              const SizedBox(height: 16),
-              ...scoreBreakdown.map((item) => Container(
-                margin: const EdgeInsets.only(bottom: 12),
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: Theme.of(context).cardColor,
-                  borderRadius: BorderRadius.circular(16),
-                  boxShadow: [
-                    BoxShadow(
-                      color: isDark ? Colors.black.withValues(alpha:0.3) : Colors.black.withValues(alpha:0.05),
-                      blurRadius: 10,
-                      offset: const Offset(0, 4),
-                    ),
-                  ],
-                ),
-                child: Column(
-                  children: [
-                    Row(
+              const SizedBox(height: AllySpacing.sectionLg),
+              AllySectionHeader(title: l10n.scoreBreakdown),
+              const SizedBox(height: AllySpacing.lg),
+              ...scoreBreakdown.map(
+                (item) => Container(
+                  margin: const EdgeInsets.only(bottom: AllySpacing.md),
+                  child: AllyCard(
+                    child: Column(
                       children: [
-                        Container(
-                          width: 48,
-                          height: 48,
-                          decoration: BoxDecoration(
-                            color: item['color'].withValues(alpha:0.15),
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: Icon(
-                            item['icon'],
-                            color: item['color'],
-                            size: 24,
-                          ),
-                        ),
-                        const SizedBox(width: 16),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                item['name'],
-                                style: const TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              const SizedBox(height: 2),
-                              Text(
-                                item['description'],
-                                style: TextStyle(
-                                  fontSize: 12,
-                                  color: Colors.grey[600],
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.end,
+                        Row(
                           children: [
-                            Text(
-                              AppLocalizations.of(context)!.scoreSlashWeight(item['currentScore'].toString(), item['weight'].toString()),
-                              style: TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                                color: item['color'],
+                            Container(
+                              width: AllyDimensions.iconChip,
+                              height: AllyDimensions.iconChip,
+                              decoration: BoxDecoration(
+                                color: (item['color'] as Color).withValues(
+                                  alpha: 0.14,
+                                ),
+                                borderRadius: AllyRadius.smAll,
+                              ),
+                              child: Icon(
+                                item['icon'] as IconData,
+                                color: item['color'] as Color,
+                                size: AllyDimensions.iconSm,
                               ),
                             ),
-                            Text(
-                              AppLocalizations.of(context)!.weightPercent(item['weight']),
-                              style: TextStyle(
-                                fontSize: 11,
-                                color: Colors.grey[500],
+                            const SizedBox(width: AllySpacing.lg),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    item['name'] as String,
+                                    style: AllyTypography.label(
+                                      size: 15,
+                                      color: scheme.onSurface,
+                                    ),
+                                  ),
+                                  Text(
+                                    item['description'] as String,
+                                    style: AllyTypography.caption(
+                                      color: scheme.onSurfaceVariant,
+                                    ),
+                                  ),
+                                ],
                               ),
+                            ),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.end,
+                              children: [
+                                Text(
+                                  l10n.scoreSlashWeight(
+                                    item['currentScore'].toString(),
+                                    item['weight'].toString(),
+                                  ),
+                                  style: AllyTypography.metric(
+                                    size: 18,
+                                    color: item['color'] as Color,
+                                  ),
+                                ),
+                                Text(
+                                  l10n.weightPercent(item['weight']),
+                                  style: AllyTypography.caption(
+                                    color: scheme.onSurfaceVariant,
+                                  ),
+                                ),
+                              ],
                             ),
                           ],
                         ),
+                        const SizedBox(height: AllySpacing.lg),
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(2),
+                          child: LinearProgressIndicator(
+                            value:
+                                (item['currentScore'] as int) /
+                                (item['weight'] as int),
+                            minHeight: 4,
+                            backgroundColor: scheme.outlineVariant,
+                            valueColor: AlwaysStoppedAnimation<Color>(
+                              item['color'] as Color,
+                            ),
+                          ),
+                        ),
                       ],
                     ),
-                    const SizedBox(height: 12),
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(8),
-                      child: LinearProgressIndicator(
-                        value: item['currentScore'] / item['weight'],
-                        minHeight: 8,
-                        backgroundColor: item['color'].withValues(alpha:0.1),
-                        valueColor: AlwaysStoppedAnimation<Color>(item['color']),
-                      ),
-                    ),
-                  ],
+                  ),
                 ),
-              )),
+              ),
+              const SizedBox(height: AllySpacing.huge),
             ],
           ),
         ),

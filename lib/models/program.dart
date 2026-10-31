@@ -31,9 +31,11 @@ class WorkoutProgram {
     return WorkoutProgram(
       id: json['id'] ?? '',
       name: json['name'] ?? '',
-      exercises: (json['exercises'] as List?)
-          ?.map((e) => ProgramExercise.fromJson(e))
-          .toList() ?? [],
+      exercises:
+          (json['exercises'] as List?)
+              ?.map((e) => ProgramExercise.fromJson(e))
+              .toList() ??
+          [],
       createdAt: json['createdAt'] != null
           ? DateTime.parse(json['createdAt'])
           : DateTime.now(),
@@ -45,10 +47,7 @@ class ProgramExercise {
   final String exerciseId;
   final List<ProgramSet> sets;
 
-  ProgramExercise({
-    required this.exerciseId,
-    required this.sets,
-  });
+  ProgramExercise({required this.exerciseId, required this.sets});
 
   Map<String, dynamic> toJson() => {
     'exerciseId': exerciseId,
@@ -58,9 +57,11 @@ class ProgramExercise {
   factory ProgramExercise.fromJson(Map<String, dynamic> json) {
     return ProgramExercise(
       exerciseId: json['exerciseId'] ?? '',
-      sets: (json['sets'] as List?)
-          ?.map((s) => ProgramSet.fromJson(s))
-          .toList() ?? [],
+      sets:
+          (json['sets'] as List?)
+              ?.map((s) => ProgramSet.fromJson(s))
+              .toList() ??
+          [],
     );
   }
 }

@@ -2,41 +2,41 @@ class HealthData {
   // Water
   int waterGlasses;
   int waterGoal;
-  
+
   // Exercises
   int exerciseStreak;
   int exerciseGoal;
   DateTime? lastExerciseDate;
-  
+
   // Sleep
   double sleepHours;
   double sleepGoal;
-  
+
   // Weight
   double currentWeight;
   double goalWeight;
   double height; // in cm
-  
+
   // Heartbeat
   int currentBpm;
   int goalBpm;
-  
+
   // Nutrition
   int caloriesConsumed;
   int caloriesGoal;
-  
+
   // Steps (Pedometer)
   int currentSteps;
   int stepsGoal;
-  
+
   // Units
   String units; // 'metric' or 'imperial'
-  
+
   // Logs
   List<Map<String, dynamic>> mealLog;
   List<Map<String, dynamic>> exerciseLog;
   List<Map<String, dynamic>> weightHistory;
-  
+
   // BMI calculation
   double get bmi {
     if (height <= 0 || currentWeight <= 0) return 0.0;
@@ -102,9 +102,9 @@ class HealthData {
     List<Map<String, dynamic>>? mealLog,
     List<Map<String, dynamic>>? exerciseLog,
     List<Map<String, dynamic>>? weightHistory,
-  })  : mealLog = mealLog ?? [],
-        exerciseLog = exerciseLog ?? [],
-        weightHistory = weightHistory ?? [];
+  }) : mealLog = mealLog ?? [],
+       exerciseLog = exerciseLog ?? [],
+       weightHistory = weightHistory ?? [];
 
   Map<String, dynamic> toJson() {
     return {
@@ -137,7 +137,9 @@ class HealthData {
       waterGoal: json['waterGoal'] ?? 8,
       exerciseStreak: json['exerciseStreak'] ?? 0,
       exerciseGoal: json['exerciseGoal'] ?? 30,
-      lastExerciseDate: json['lastExerciseDate'] != null ? DateTime.parse(json['lastExerciseDate']) : null,
+      lastExerciseDate: json['lastExerciseDate'] != null
+          ? DateTime.parse(json['lastExerciseDate'])
+          : null,
       sleepHours: json['sleepHours'] ?? 0,
       sleepGoal: json['sleepGoal'] ?? 8.0,
       currentWeight: json['currentWeight'] ?? 0,
@@ -150,9 +152,15 @@ class HealthData {
       currentSteps: json['currentSteps'] ?? 0,
       stepsGoal: json['stepsGoal'] ?? 6000,
       units: json['units'] ?? 'metric',
-      mealLog: json['mealLog'] != null ? List<Map<String, dynamic>>.from(json['mealLog']) : [],
-      exerciseLog: json['exerciseLog'] != null ? List<Map<String, dynamic>>.from(json['exerciseLog']) : [],
-      weightHistory: json['weightHistory'] != null ? List<Map<String, dynamic>>.from(json['weightHistory']) : [],
+      mealLog: json['mealLog'] != null
+          ? List<Map<String, dynamic>>.from(json['mealLog'])
+          : [],
+      exerciseLog: json['exerciseLog'] != null
+          ? List<Map<String, dynamic>>.from(json['exerciseLog'])
+          : [],
+      weightHistory: json['weightHistory'] != null
+          ? List<Map<String, dynamic>>.from(json['weightHistory'])
+          : [],
     );
   }
 }

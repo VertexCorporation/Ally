@@ -1,8 +1,31 @@
+// login/screen.dart
+//
+// © 2026 Vertex Corporation
+// ─────────────────────────────────────────────────────────────────────────────
+// Sign-in flow: method selection → email → password.
+//
+// Presentation notes:
+//  • A persistent brand bar (Ally mark + "BY VERTEX" + hairline rule) anchors
+//    the screen to the Vertex/Ally identity on every step.
+//  • Sign-in methods are a structured, bordered group instead of floating
+//    buttons — quiet, precise, monochrome.
+//  • A developer entry (visible only in debug builds) opens the dev sheet;
+//    it is compiled out of release builds.
+
+import 'package:ally/design_system/design_system.dart';
 import 'package:ally/l10n/app_localizations.dart';
 import 'package:ally/login/controller.dart';
-import 'package:ally/theme.dart'; // Theme dosyanın yolu
+import 'package:ally/main.dart' show isFirebaseInitialized;
+import 'package:ally/theme.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+
+import '../../shake.dart';
+import '../notifications/introvert.dart';
+import '../providers/health.dart';
+import '../screen.dart';
+import '../screens/onboard.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -43,9 +66,6 @@ class _LoginScreenContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Tema değişikliğinde rebuild olması için context'i dinliyoruz
-    // Not: AppColors statik olsa da Flutter'ın theme yapısı değiştikçe build tetiklenir.
-
     final controller = context.watch<LoginController>();
     final size = MediaQuery.of(context).size;
 
@@ -59,67 +79,73 @@ class _LoginScreenContent extends StatelessWidget {
         if (didPop) return;
         controller.goBack();
       },
-      child: Theme(
-        // Burası uygulamanın genel temasını kullanır, özel bir override yapmıyoruz
-        data: Theme.of(context),
-        child: Scaffold(
-          backgroundColor: AppColors.background,
-          resizeToAvoidBottomInset: true,
-          body: Stack(
-            fit: StackFit.expand,
-            children: [
-              AnimatedSwitcher(
-                duration: const Duration(milliseconds: 350),
-                child: Opacity(
-                  key: ValueKey(controller.currentStep),
-                  opacity: 0.16,
-                  child: Image.asset(
-                    controller.currentStep == LoginStep.passwordInput
-                        ? 'assets/images/background_signin.png'
-                        : 'assets/images/background_password.png',
-                    fit: BoxFit.cover,
-                    alignment: Alignment.bottomCenter,
-                  ),
+      child: Scaffold(
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+        resizeToAvoidBottomInset: true,
+        body: Stack(
+          fit: StackFit.expand,
+          children: [
+            AnimatedSwitcher(
+              duration: const Duration(milliseconds: 350),
+              child: Opacity(
+                key: ValueKey(controller.currentStep),
+                opacity: 0.12,
+                child: Image.asset(
+                  controller.currentStep == LoginStep.passwordInput
+                      ? 'assets/images/background_signin.png'
+                      : 'assets/images/background_password.png',
+                  fit: BoxFit.cover,
+                  alignment: Alignment.bottomCenter,
                 ),
               ),
-              LayoutBuilder(
-                builder: (context, constraints) {
-                  return SizedBox(
-                    width: constraints.maxWidth,
-                    height: constraints.maxHeight,
-                    child: AnimatedSwitcher(
-                      duration: const Duration(milliseconds: 400),
-                      transitionBuilder:
-                          (Widget child, Animation<double> animation) {
-                            final offsetAnimation =
-                                Tween<Offset>(
-                                  begin: const Offset(0.0, 0.08),
-                                  end: Offset.zero,
-                                ).animate(
-                                  CurvedAnimation(
-                                    parent: animation,
-                                    curve: Curves.easeOutCubic,
+            ),
+            SafeArea(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  const _BrandBar(),
+                  Container(
+                    height: 1,
+                    color: Theme.of(context).colorScheme.outlineVariant,
+                  ),
+                  Expanded(
+                    child: LayoutBuilder(
+                      builder: (context, constraints) {
+                        return AnimatedSwitcher(
+                          duration: const Duration(milliseconds: 350),
+                          transitionBuilder:
+                              (Widget child, Animation<double> animation) {
+                                final offsetAnimation =
+                                    Tween<Offset>(
+                                      begin: const Offset(0.0, 0.06),
+                                      end: Offset.zero,
+                                    ).animate(
+                                      CurvedAnimation(
+                                        parent: animation,
+                                        curve: Curves.easeOutCubic,
+                                      ),
+                                    );
+                                return FadeTransition(
+                                  opacity: animation,
+                                  child: SlideTransition(
+                                    position: offsetAnimation,
+                                    child: child,
                                   ),
                                 );
-                            return FadeTransition(
-                              opacity: animation,
-                              child: SlideTransition(
-                                position: offsetAnimation,
-                                child: child,
-                              ),
-                            );
-                          },
-                      child: _buildStepView(
-                        controller.currentStep,
-                        constraints,
-                        contentWidth,
-                      ),
+                              },
+                          child: _buildStepView(
+                            controller.currentStep,
+                            constraints,
+                            contentWidth,
+                          ),
+                        );
+                      },
                     ),
-                  );
-                },
+                  ),
+                ],
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
@@ -152,6 +178,65 @@ class _LoginScreenContent extends StatelessWidget {
     }
   }
 }
+// ── Persistent brand bar ─────────────────────────────────────────────────────
+
+class _BrandBar extends StatelessWidget {
+  const _BrandBar();
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final ThemeData theme = Theme.of(context);
+    final ColorScheme scheme = theme.colorScheme;
+
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(
+        AllySpacing.xxl,
+        AllySpacing.lg,
+        AllySpacing.xxl,
+        AllySpacing.md,
+      ),
+      child: Row(
+        children: [
+          ClipRRect(
+            borderRadius: BorderRadius.circular(AllyRadius.sm),
+            child: Image.asset(
+              'assets/images/logo.png',
+              width: 26,
+              height: 26,
+              fit: BoxFit.cover,
+            ),
+          ),
+          const SizedBox(width: AllySpacing.md),
+          Text(
+            l10n.ally,
+            style: AllyTypography.headline(size: 16, color: scheme.onSurface),
+          ),
+          const SizedBox(width: AllySpacing.md),
+          Container(
+            padding: const EdgeInsets.symmetric(
+              horizontal: AllySpacing.sm,
+              vertical: 2,
+            ),
+            decoration: BoxDecoration(
+              borderRadius: AllyRadius.smAll,
+              border: Border.all(color: scheme.outlineVariant),
+            ),
+            child: Text(
+              'BY VERTEX',
+              style: AllyTypography.label(
+                size: 9,
+                weight: FontWeight.w700,
+                color: scheme.onSurfaceVariant,
+                letterSpacing: 1.4,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
 
 // --- ALT GÖRÜNÜMLER (SUB-VIEWS) ---
 
@@ -170,120 +255,244 @@ class _MethodSelectionView extends StatelessWidget {
     final controller = context.read<LoginController>();
     final l10n = AppLocalizations.of(context)!;
     final isLoading = context.select<LoginController, bool>((c) => c.isLoading);
+    final ThemeData theme = Theme.of(context);
+    final ColorScheme scheme = theme.colorScheme;
 
     return Container(
       width: constraints.maxWidth,
-      height: constraints.maxHeight,
       color: Colors.transparent,
-      child: SafeArea(
-        child: LayoutBuilder(
-          builder: (context, safeConstraints) => SingleChildScrollView(
-            child: ConstrainedBox(
-              constraints: BoxConstraints(minHeight: safeConstraints.maxHeight),
-              child: Center(
-                child: SizedBox(
-                  width: contentWidth,
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 32.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        SizedBox(height: constraints.maxHeight * 0.05),
-
-                        Text(
-                          l10n.signIn, // "Sign in"
-                          style: TextStyle(
-                            fontSize: 24,
-                            fontWeight: FontWeight.bold,
-                            color: AppColors.tertiaryColor, // Tema metin rengi
-                            letterSpacing: 1,
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        Text(
-                          l10n.chooseSignInMethod, // "Choose your sign in method"
-                          style: TextStyle(
-                            fontSize: 16,
-                            color: AppColors.tertiaryColor.withValues(
-                              alpha: 0.7,
-                            ),
-                          ),
-                        ),
-
-                        SizedBox(height: constraints.maxHeight * 0.15),
-
-                        // --- Butonlar ---
-                        _AuthButton(
-                          text: l10n.continueWithGoogle,
-                          icon: Icons.g_mobiledata_rounded,
-                          onTap: isLoading
-                              ? null
-                              : () => controller.signInWithGoogle(context),
-                        ),
-
-                        const SizedBox(height: 16),
-
-                        _AuthButton(
-                          text: l10n.continueWithApple, // "Continue with Apple"
-                          icon: Icons.apple,
-                          onTap: isLoading
-                              ? null
-                              : () => controller.signInWithApple(context),
-                        ),
-
-                        const SizedBox(height: 16),
-
-                        _AuthButton(
-                          text: l10n.continueWithEmail,
-                          icon: Icons.email_outlined,
-                          onTap: isLoading ? null : controller.goToEmailStep,
-                        ),
-
-                        const SizedBox(height: 16),
-
-                        _AuthButton(
-                          text: l10n.continueAsAnonymous,
-                          icon: Icons.person_outline_rounded,
-                          onTap: isLoading
-                              ? null
-                              : () => controller.signInAnonymously(context),
-                        ),
-
-                        SizedBox(height: constraints.maxHeight * 0.04),
-
-                        // Footer
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text(
-                              l10n.dontHaveAccount, // "Don't have an account? "
-                              style: TextStyle(
-                                color: AppColors.tertiaryColor.withValues(
-                                  alpha: 0.7,
-                                ),
-                                fontSize: 14,
-                              ),
-                            ),
-                            GestureDetector(
-                              onTap: () => controller.goToSignUp(context),
-                              child: Text(
-                                l10n.signUp, // "Sign Up"
-                                style: TextStyle(
-                                  color: AppColors.tertiaryColor,
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-
-                        const SizedBox(height: 20),
-                      ],
-                    ),
-                  ),
+      child: SingleChildScrollView(
+        padding: const EdgeInsets.fromLTRB(
+          AllySpacing.xxl,
+          AllySpacing.xxl,
+          AllySpacing.xxl,
+          AllySpacing.xl,
+        ),
+        child: SizedBox(
+          width: contentWidth,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Anton display moment — the wordmark voice, used sparingly.
+              Text(
+                l10n.signIn.toUpperCase(),
+                style: AllyTypography.display(
+                  size: 38,
+                  color: scheme.onSurface,
                 ),
               ),
+              const SizedBox(height: AllySpacing.md),
+              Text(
+                l10n.chooseSignInMethod,
+                style: AllyTypography.body(
+                  size: 15,
+                  color: scheme.onSurfaceVariant,
+                ),
+              ),
+
+              const SizedBox(height: AllySpacing.xxl),
+
+              // --- Structured method group ---
+              AllySettingsGroup(
+                tiles: [
+                  AllySettingsTile(
+                    title: l10n.continueWithGoogle,
+                    icon: Icons.g_mobiledata_rounded,
+                    onTap: isLoading
+                        ? null
+                        : () => controller.signInWithGoogle(context),
+                  ),
+                  AllySettingsTile(
+                    title: l10n.continueWithApple,
+                    icon: Icons.apple,
+                    onTap: isLoading
+                        ? null
+                        : () => controller.signInWithApple(context),
+                  ),
+                  AllySettingsTile(
+                    title: l10n.continueWithEmail,
+                    icon: Icons.mail_outline_rounded,
+                    onTap: isLoading ? null : controller.goToEmailStep,
+                  ),
+                ],
+              ),
+
+              const SizedBox(height: AllySpacing.md),
+
+              AllyButton(
+                label: l10n.continueAsAnonymous,
+                icon: Icons.person_outline_rounded,
+                kind: AllyButtonKind.ghost,
+                onPressed: isLoading
+                    ? null
+                    : () => controller.signInAnonymously(context),
+              ),
+
+              SizedBox(height: constraints.maxHeight * 0.06),
+
+              // Footer
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    l10n.dontHaveAccount,
+                    style: AllyTypography.body(
+                      size: 14,
+                      color: scheme.onSurfaceVariant,
+                    ),
+                  ),
+                  TextButton(
+                    onPressed: () => controller.goToSignUp(context),
+                    style: TextButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: AllySpacing.sm,
+                      ),
+                    ),
+                    child: Text(
+                      l10n.signUp,
+                      style: AllyTypography.label(
+                        size: 14,
+                        color: scheme.onSurface,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+
+              // ── Developer entry (debug builds only) ────────────────────
+              if (kDebugMode) ...[
+                SizedBox(height: constraints.maxHeight * 0.04),
+                Center(child: _DevEntryChip(onTap: _showDevSheet)),
+              ],
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _showDevSheet(BuildContext context) {
+    final themeProvider = context.read<ThemeProvider>();
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    AllySheet.show(
+      context,
+      title: 'Developer',
+      subtitle: 'Dev-mode utilities. Compiled out of release builds.',
+      icon: Icons.terminal_rounded,
+      child: Column(
+        children: [
+          AllySettingsGroup(
+            tiles: [
+              AllySettingsTile(
+                title: 'Dev sign-in (local bypass)',
+                subtitle: 'No Firebase session is created — offline dev entry.',
+                icon: Icons.bolt_rounded,
+                onTap: () {
+                  Navigator.pop(context);
+                  _enterDevBypass(context);
+                },
+              ),
+              AllySettingsTile(
+                title: 'Toggle theme',
+                subtitle: isDark ? 'Dark → Light' : 'Light → Dark',
+                icon: Icons.contrast_rounded,
+                onTap: () {
+                  themeProvider.changeTheme(
+                    isDark ? AppTheme.light : AppTheme.dark,
+                  );
+                },
+              ),
+            ],
+          ),
+          const SizedBox(height: AllySpacing.md),
+          Align(
+            alignment: Alignment.centerLeft,
+            child: Text(
+              'Firebase: ${isFirebaseInitialized ? 'initialized' : 'offline mode'}',
+              style: AllyTypography.caption(
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// Developer bypass: enters the app without any Firebase session (no
+  /// anonymous account either). Everything keeps working from the local
+  /// providers; server-backed features degrade to their offline states.
+  Future<void> _enterDevBypass(BuildContext context) async {
+    if (!kDebugMode) return;
+
+    final notificationService = context.read<IntrovertNotificationService>();
+    final health = context.read<HealthProvider>();
+    final onboardingCompleted = await health.isOnboardingCompleted();
+
+    if (!context.mounted) return;
+
+    Navigator.of(context).pushReplacement(
+      MaterialPageRoute(
+        builder: (_) =>
+            onboardingCompleted ? const MainScreen() : const OnboardingScreen(),
+      ),
+    );
+
+    notificationService.showNotification(
+      message: 'Dev mode — local session (no Firebase).',
+      type: NotificationType.neutral,
+    );
+  }
+}
+
+/// Small, intentional-looking developer affordance.
+class _DevEntryChip extends StatelessWidget {
+  final void Function(BuildContext) onTap;
+
+  const _DevEntryChip({required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    final ThemeData theme = Theme.of(context);
+    final ColorScheme scheme = theme.colorScheme;
+
+    return Tooltip(
+      message: 'Developer entry (debug only)',
+      child: Material(
+        color: Colors.transparent,
+        borderRadius: AllyRadius.pill,
+        child: InkWell(
+          onTap: () => onTap(context),
+          borderRadius: AllyRadius.pill,
+          child: Container(
+            padding: const EdgeInsets.symmetric(
+              horizontal: AllySpacing.lg,
+              vertical: 6,
+            ),
+            decoration: BoxDecoration(
+              borderRadius: AllyRadius.pill,
+              border: Border.all(color: scheme.outlineVariant),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(
+                  Icons.terminal_rounded,
+                  size: 14,
+                  color: scheme.onSurfaceVariant,
+                ),
+                const SizedBox(width: AllySpacing.sm),
+                Text(
+                  'DEV',
+                  style: AllyTypography.label(
+                    size: 11,
+                    weight: FontWeight.w700,
+                    color: scheme.onSurfaceVariant,
+                    letterSpacing: 1.2,
+                  ),
+                ),
+              ],
             ),
           ),
         ),
@@ -309,100 +518,57 @@ class _EmailInputView extends StatelessWidget {
       (c) => c.emailError,
     );
     final l10n = AppLocalizations.of(context)!;
+    final ThemeData theme = Theme.of(context);
+    final ColorScheme scheme = theme.colorScheme;
 
     return Container(
       width: constraints.maxWidth,
-      height: constraints.maxHeight,
       color: Colors.transparent,
-      child: SafeArea(
-        child: Center(
-          child: SingleChildScrollView(
-            child: SizedBox(
-              width: contentWidth,
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 32.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const SizedBox(height: 20),
-
-                    GestureDetector(
-                      onTap: controller.goBack,
-                      child: Icon(
-                        Icons.chevron_left,
-                        color: AppColors.tertiaryColor,
-                        size: 32,
-                      ),
-                    ),
-
-                    SizedBox(height: constraints.maxHeight * 0.02),
-
-                    Text(
-                      l10n.signInWithEmail, // "Sign in with email"
-                      style: TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                        color: AppColors.tertiaryColor,
-                        letterSpacing: 1,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      l10n.enterEmailAddress, // "Enter your email address"
-                      style: TextStyle(
-                        fontSize: 16,
-                        color: AppColors.tertiaryColor.withValues(alpha: 0.7),
-                      ),
-                    ),
-
-                    SizedBox(height: constraints.maxHeight * 0.1),
-
-                    _ShakeableInput(
-                      controller: controller.emailController,
-                      animationController: controller.emailShakeController,
-                      hintText: l10n.emailHint,
-                      icon: Icons.email_outlined,
-                      keyboardType: TextInputType.emailAddress,
-                      onChanged: (_) => controller.clearErrorsOnInput(),
-                      errorText: errorText == " " ? null : errorText,
-                    ),
-
-                    const SizedBox(height: 16),
-
-                    Container(
-                      width: double.infinity,
-                      decoration: BoxDecoration(
-                        color: AppColors.senaryColor, // Tema vurgu rengi
-                        borderRadius: BorderRadius.circular(30),
-                      ),
-                      child: Material(
-                        color: Colors.transparent,
-                        child: InkWell(
-                          onTap: () => controller.goToPasswordStep(context),
-                          borderRadius: BorderRadius.circular(30),
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 18),
-                            child: Text(
-                              l10n.next, // "Next"
-                              textAlign: TextAlign.center,
-                              style: const TextStyle(
-                                color: Colors
-                                    .white, // Vurgu rengi üzerinde genelde beyaz okunur
-                                fontSize: 16,
-                                fontWeight: FontWeight.w600,
-                                letterSpacing: 0.5,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-
-                    const SizedBox(height: 20),
-                  ],
+      child: SingleChildScrollView(
+        padding: const EdgeInsets.fromLTRB(
+          AllySpacing.xxl,
+          AllySpacing.xl,
+          AllySpacing.xxl,
+          AllySpacing.xl,
+        ),
+        child: SizedBox(
+          width: contentWidth,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _AuthBackButton(onTap: controller.goBack),
+              const SizedBox(height: AllySpacing.md),
+              Text(
+                l10n.signInWithEmail,
+                style: AllyTypography.headline(
+                  size: 26,
+                  color: scheme.onSurface,
                 ),
               ),
-            ),
+              const SizedBox(height: AllySpacing.sm),
+              Text(
+                l10n.enterEmailAddress,
+                style: AllyTypography.body(
+                  size: 15,
+                  color: scheme.onSurfaceVariant,
+                ),
+              ),
+              const SizedBox(height: AllySpacing.huge),
+              _ShakeableInput(
+                controller: controller.emailController,
+                animationController: controller.emailShakeController,
+                hintText: l10n.emailHint,
+                icon: Icons.mail_outline_rounded,
+                keyboardType: TextInputType.emailAddress,
+                onChanged: (_) => controller.clearErrorsOnInput(),
+                errorText: errorText == " " ? null : errorText,
+              ),
+              const SizedBox(height: AllySpacing.lg),
+              AllyButton(
+                label: l10n.next,
+                onPressed: () => controller.goToPasswordStep(context),
+              ),
+            ],
           ),
         ),
       ),
@@ -431,132 +597,72 @@ class _PasswordInputView extends StatelessWidget {
       (c) => c.passwordError,
     );
     final l10n = AppLocalizations.of(context)!;
+    final ThemeData theme = Theme.of(context);
+    final ColorScheme scheme = theme.colorScheme;
 
     return Container(
       width: constraints.maxWidth,
-      height: constraints.maxHeight,
       color: Colors.transparent,
-      child: SafeArea(
-        child: Center(
-          child: SingleChildScrollView(
-            child: SizedBox(
-              width: contentWidth,
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 32.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const SizedBox(height: 20),
-
-                    GestureDetector(
-                      onTap: controller.goBack,
-                      child: Icon(
-                        Icons.chevron_left,
-                        color: AppColors.tertiaryColor,
-                        size: 32,
-                      ),
-                    ),
-
-                    SizedBox(height: constraints.maxHeight * 0.02),
-
-                    Text(
-                      l10n.signInWithEmail,
-                      style: TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                        color: AppColors.tertiaryColor,
-                        letterSpacing: 1,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      l10n.enterPassword, // "Enter your password"
-                      style: TextStyle(
-                        fontSize: 16,
-                        color: AppColors.tertiaryColor.withValues(alpha: 0.7),
-                      ),
-                    ),
-
-                    SizedBox(height: constraints.maxHeight * 0.1),
-
-                    _ShakeableInput(
-                      controller: controller.passwordController,
-                      animationController: controller.passwordShakeController,
-                      hintText: l10n.passwordHint,
-                      icon: Icons.lock_outline,
-                      obscureText: !isVisible,
-                      suffixIcon: IconButton(
-                        icon: Icon(
-                          isVisible
-                              ? Icons.visibility_outlined
-                              : Icons.visibility_off_outlined,
-                        ),
-                        color: AppColors.tertiaryColor.withValues(alpha: 0.6),
-                        onPressed: controller.togglePasswordVisibility,
-                      ),
-                      onChanged: (_) => controller.clearErrorsOnInput(),
-                      errorText: errorText == " " ? null : errorText,
-                    ),
-
-                    const SizedBox(height: 16),
-
-                    Container(
-                      width: double.infinity,
-                      decoration: BoxDecoration(
-                        color: AppColors
-                            .background, // Temanın arka plan rengi (outline stili için)
-                        borderRadius: BorderRadius.circular(30),
-                        border: Border.all(
-                          color: AppColors.tertiaryColor,
-                          width: 2,
-                        ), // Çerçeve
-                      ),
-                      child: Material(
-                        color: Colors.transparent,
-                        child: InkWell(
-                          onTap: isLoading
-                              ? null
-                              : () => controller.submitEmailLogin(context),
-                          borderRadius: BorderRadius.circular(30),
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 18),
-                            child: isLoading
-                                ? SizedBox(
-                                    height: 20,
-                                    child: Center(
-                                      child: SizedBox(
-                                        width: 20,
-                                        height: 20,
-                                        child: CircularProgressIndicator(
-                                          strokeWidth: 2,
-                                          valueColor:
-                                              AlwaysStoppedAnimation<Color>(
-                                                AppColors.tertiaryColor,
-                                              ),
-                                        ),
-                                      ),
-                                    ),
-                                  )
-                                : Text(
-                                    l10n.signIn, // "Sign In"
-                                    textAlign: TextAlign.center,
-                                    style: TextStyle(
-                                      color: AppColors.tertiaryColor,
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.w600,
-                                      letterSpacing: 0.5,
-                                    ),
-                                  ),
-                          ),
-                        ),
-                      ),
-                    ),
-
-                    const SizedBox(height: 20),
-                  ],
+      child: SingleChildScrollView(
+        padding: const EdgeInsets.fromLTRB(
+          AllySpacing.xxl,
+          AllySpacing.xl,
+          AllySpacing.xxl,
+          AllySpacing.xl,
+        ),
+        child: SizedBox(
+          width: contentWidth,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _AuthBackButton(onTap: controller.goBack),
+              const SizedBox(height: AllySpacing.md),
+              Text(
+                l10n.enterPassword,
+                style: AllyTypography.headline(
+                  size: 26,
+                  color: scheme.onSurface,
                 ),
               ),
-            ),
+              const SizedBox(height: AllySpacing.sm),
+              Text(
+                controller.emailController.text,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: AllyTypography.body(
+                  size: 15,
+                  color: scheme.onSurfaceVariant,
+                ),
+              ),
+              const SizedBox(height: AllySpacing.huge),
+              _ShakeableInput(
+                controller: controller.passwordController,
+                animationController: controller.passwordShakeController,
+                hintText: l10n.passwordHint,
+                icon: Icons.lock_outline_rounded,
+                obscureText: !isVisible,
+                onChanged: (_) => controller.clearErrorsOnInput(),
+                errorText: errorText == " " ? null : errorText,
+                suffix: IconButton(
+                  onPressed: controller.togglePasswordVisibility,
+                  icon: Icon(
+                    isVisible
+                        ? Icons.visibility_off_outlined
+                        : Icons.visibility_outlined,
+                    size: 22,
+                    color: scheme.onSurfaceVariant,
+                  ),
+                ),
+              ),
+              const SizedBox(height: AllySpacing.lg),
+              AllyButton(
+                label: l10n.signIn,
+                isLoading: isLoading,
+                onPressed: isLoading
+                    ? null
+                    : () => controller.submitEmailLogin(context),
+              ),
+            ],
           ),
         ),
       ),
@@ -564,55 +670,25 @@ class _PasswordInputView extends StatelessWidget {
   }
 }
 
-// --- YARDIMCI WIDGET'LAR ---
+/// Themed back affordance for auth sub-steps.
+class _AuthBackButton extends StatelessWidget {
+  final VoidCallback onTap;
 
-class _AuthButton extends StatelessWidget {
-  final String text;
-  final IconData icon;
-  final VoidCallback? onTap;
-
-  const _AuthButton({required this.text, required this.icon, this.onTap});
+  const _AuthBackButton({required this.onTap});
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      decoration: BoxDecoration(
-        color: AppColors.secondaryColor, // Buton arka planı
-        borderRadius: BorderRadius.circular(30),
-        border: Border.all(color: AppColors.border, width: 1),
-      ),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          onTap: onTap,
-          borderRadius: BorderRadius.circular(30),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 18),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(icon, color: AppColors.tertiaryColor, size: 24),
-                const SizedBox(width: 12),
-                Text(
-                  text,
-                  style: TextStyle(
-                    color: AppColors.tertiaryColor,
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
+    final ThemeData theme = Theme.of(context);
+    return IconButton(
+      onPressed: onTap,
+      icon: const Icon(Icons.arrow_back_rounded),
+      color: theme.colorScheme.onSurface,
+      tooltip: MaterialLocalizations.of(context).backButtonTooltip,
     );
   }
 }
 
-/// Shake (Titreme) animasyonlu Input alanı.
-/// Tema renklerini (Secondary, Border, Tertiary) kullanır.
+/// Input field with the error shake feedback preserved from the old design.
 class _ShakeableInput extends StatelessWidget {
   final TextEditingController controller;
   final AnimationController animationController;
@@ -620,9 +696,9 @@ class _ShakeableInput extends StatelessWidget {
   final IconData icon;
   final bool obscureText;
   final TextInputType? keyboardType;
-  final Widget? suffixIcon;
   final ValueChanged<String>? onChanged;
   final String? errorText;
+  final Widget? suffix;
 
   const _ShakeableInput({
     required this.controller,
@@ -631,102 +707,26 @@ class _ShakeableInput extends StatelessWidget {
     required this.icon,
     this.obscureText = false,
     this.keyboardType,
-    this.suffixIcon,
     this.onChanged,
     this.errorText,
+    this.suffix,
   });
 
   @override
   Widget build(BuildContext context) {
-    return AnimatedBuilder(
-      animation: animationController,
-      builder: (context, child) {
-        // Basit bir sinüs dalgası simülasyonu
-        // (math kütüphanesi import etmeden temiz kod için)
-        final double translateX =
-            10.0 *
-            (animationController.value > 0 && animationController.value < 0.25
-                ? -1
-                : animationController.value >= 0.25 &&
-                      animationController.value < 0.75
-                ? 1
-                : animationController.value >= 0.75 &&
-                      animationController.value < 1.0
-                ? -0.5
-                : 0);
-
-        return Transform.translate(
-          offset: Offset(translateX * (1 - animationController.value), 0),
-          child: child,
-        );
-      },
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          TextField(
-            controller: controller,
-            obscureText: obscureText,
-            keyboardType: keyboardType,
-            onChanged: onChanged,
-            style: TextStyle(
-              color: AppColors.tertiaryColor,
-            ), // Yazılan metin rengi
-            cursorColor: AppColors.tertiaryColor,
-            decoration: InputDecoration(
-              hintText: hintText,
-              hintStyle: TextStyle(
-                color: AppColors.tertiaryColor.withValues(alpha: 0.5),
-              ),
-              prefixIcon: Icon(
-                icon,
-                color: AppColors.tertiaryColor.withValues(alpha: 0.7),
-              ),
-              suffixIcon: suffixIcon,
-              filled: true,
-              fillColor: AppColors.secondaryColor, // Input arka planı
-              // Hata ve Normal Durum Sınırları
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(30),
-                borderSide: BorderSide(
-                  color: errorText != null
-                      ? AppColors.septenaryColor
-                      : AppColors.border,
-                  width: 1.5,
-                ),
-              ),
-              enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(30),
-                borderSide: BorderSide(
-                  color: errorText != null
-                      ? AppColors.septenaryColor
-                      : AppColors.border,
-                  width: 1.5,
-                ),
-              ),
-              focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(30),
-                borderSide: BorderSide(
-                  color: errorText != null
-                      ? AppColors.septenaryColor
-                      : AppColors.tertiaryColor,
-                  width: 1.5,
-                ),
-              ),
-              contentPadding: const EdgeInsets.symmetric(
-                horizontal: 20,
-                vertical: 18,
-              ),
-            ),
-          ),
-          if (errorText != null && errorText!.trim().isNotEmpty)
-            Padding(
-              padding: const EdgeInsets.only(left: 20.0, top: 8.0),
-              child: Text(
-                errorText!,
-                style: TextStyle(color: AppColors.septenaryColor, fontSize: 12),
-              ),
-            ),
-        ],
+    return ShakeWidget(
+      controller: animationController,
+      child: AllyTextField(
+        controller: controller,
+        hint: hintText,
+        prefixIcon: icon,
+        obscureText: obscureText,
+        keyboardType: keyboardType,
+        onChanged: onChanged,
+        errorText: errorText,
+        suffix: suffix,
+        autocorrect: false,
+        enableSuggestions: false,
       ),
     );
   }

@@ -1,17 +1,26 @@
-// lib/screens/settings_screen.dart
+// settings.dart
+//
+// © 2026 Vertex Corporation
+// ─────────────────────────────────────────────────────────────────────────────
+// Settings: Account / Appearance / Notifications / Privacy / Language /
+// Health integrations / About Ally / Vertex Corporation.
+//
+// All existing behaviour (logout, units, language, theme selection persisted
+// through ThemeProvider, legal & about dialogs) is preserved; the theme
+// selector now writes through the provider to the real `selectedTheme` key
+// and supports the `system` option correctly.
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-// Imports for app resources
+import '../design_system/design_system.dart';
 import '../l10n/app_localizations.dart';
-import '../providers/health.dart';
 import '../language.dart'; // LocaleProvider
-import '../theme.dart';    // ThemeProvider
-import '../server/user.dart';
+import '../providers/health.dart';
 import '../login/screen.dart';
+import '../server/user.dart';
+import '../theme.dart';
 import '../widgets/notification.dart';
 
 class SettingsScreen extends StatefulWidget {
@@ -21,15 +30,15 @@ class SettingsScreen extends StatefulWidget {
   State<SettingsScreen> createState() => _SettingsScreenState();
 }
 
-class _SettingsScreenState extends State<SettingsScreen> with SingleTickerProviderStateMixin {
+class _SettingsScreenState extends State<SettingsScreen>
+    with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<double> _scaleAnimation;
   late Animation<double> _fadeAnimation;
 
-  // Settings State
+  // Notifications state (persisted in the original implementation).
   bool _pushNotifications = true;
   bool _emailNotifications = false;
-  String _themeValue = 'system'; // system, light, dark
   String _selectedLanguage = 'English';
   bool _isInitialized = false;
 
@@ -38,19 +47,20 @@ class _SettingsScreenState extends State<SettingsScreen> with SingleTickerProvid
     super.initState();
     _loadSettings();
 
-    // Animation Setup
     _controller = AnimationController(
       duration: const Duration(milliseconds: 300),
       vsync: this,
     );
 
-    _scaleAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeOutCubic),
-    );
+    _scaleAnimation = Tween<double>(
+      begin: 0.98,
+      end: 1.0,
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeOutCubic));
 
-    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeOut),
-    );
+    _fadeAnimation = Tween<double>(
+      begin: 0.0,
+      end: 1.0,
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeOut));
 
     _controller.forward();
   }
@@ -61,16 +71,13 @@ class _SettingsScreenState extends State<SettingsScreen> with SingleTickerProvid
     setState(() {
       _pushNotifications = prefs.getBool('push_notifications') ?? true;
       _emailNotifications = prefs.getBool('email_notifications') ?? false;
-      // We load the theme for the UI selector, though the Provider handles the actual app theme
-      _themeValue = prefs.getString('theme') ?? 'system';
     });
   }
 
-  Future<void> _saveSettings() async {
+  Future<void> _saveNotificationSettings() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool('push_notifications', _pushNotifications);
     await prefs.setBool('email_notifications', _emailNotifications);
-    await prefs.setString('theme', _themeValue);
   }
 
   @override
@@ -84,13 +91,26 @@ class _SettingsScreenState extends State<SettingsScreen> with SingleTickerProvid
     // Dynamically update the displayed language name based on Provider state
     final currentLocale = context.watch<LocaleProvider>().locale;
     switch (currentLocale.languageCode) {
-      case 'en': _selectedLanguage = 'English'; break;
-      case 'tr': _selectedLanguage = 'Türkçe'; break;
-      case 'es': _selectedLanguage = 'Español'; break;
-      case 'fr': _selectedLanguage = 'Français'; break;
-      case 'de': _selectedLanguage = 'Deutsch'; break;
-      case 'zh': _selectedLanguage = '中文'; break;
-      default:   _selectedLanguage = 'English';
+      case 'en':
+        _selectedLanguage = 'English';
+        break;
+      case 'tr':
+        _selectedLanguage = 'Türkçe';
+        break;
+      case 'es':
+        _selectedLanguage = 'Español';
+        break;
+      case 'fr':
+        _selectedLanguage = 'Français';
+        break;
+      case 'de':
+        _selectedLanguage = 'Deutsch';
+        break;
+      case 'zh':
+        _selectedLanguage = '中文';
+        break;
+      default:
+        _selectedLanguage = 'English';
     }
   }
 
@@ -100,13 +120,15 @@ class _SettingsScreenState extends State<SettingsScreen> with SingleTickerProvid
     super.dispose();
   }
 
-  Future<void> _handleLogout(BuildContext context) async {
+  Future<void> _handleLogout() async {
     final userProvider = context.read<UserProvider>();
     await userProvider.clearDataOnSignOut();
-    
-    if (!context.mounted) return;
-    Navigator.of(context).pushAndRemoveUntil(
-      MaterialPageRoute(builder: (_) => const LoginScreen()),
+
+    if (!mounted) return;
+
+    final navigator = Navigator.of(context);
+    navigator.pushAndRemoveUntil(
+      MaterialPageRoute(builder: (context) => const LoginScreen()),
       (route) => false,
     );
   }
@@ -121,15 +143,10 @@ class _SettingsScreenState extends State<SettingsScreen> with SingleTickerProvid
 
   @override
   Widget build(BuildContext context) {
-    // --- Dynamic Sizing Logic ---
-    final Size size = MediaQuery.of(context).size;
-    // Reference design width (e.g., iPhone 11 Pro is ~375)
-    final double scaleFactor = size.width / 375.0;
-
-    // Helper functions for dynamic scaling
-    double rw(double val) => val * scaleFactor; // Relative Width/General Scale
-    double rh(double val) => val * (size.height / 812.0); // Relative Height
-    double rs(double val) => val * scaleFactor; // Relative Font Size
+    final l10n = AppLocalizations.of(context)!;
+    final ThemeData theme = Theme.of(context);
+    final ColorScheme scheme = theme.colorScheme;
+    final themeProvider = context.watch<ThemeProvider>();
 
     return PopScope(
       canPop: false,
@@ -138,658 +155,554 @@ class _SettingsScreenState extends State<SettingsScreen> with SingleTickerProvid
         _handleBack();
       },
       child: Scaffold(
-        appBar: AppBar(
-          backgroundColor: Colors.transparent,
-          elevation: 0,
-          toolbarHeight: 0,
-          systemOverlayStyle: const SystemUiOverlayStyle(
-            statusBarColor: Colors.transparent,
-            statusBarIconBrightness: Brightness.light,
-            statusBarBrightness: Brightness.dark,
-          ),
-        ),
-        body: AnimatedBuilder(
-          animation: _controller,
-          builder: (context, child) {
-            return Transform.scale(
-              scale: _scaleAnimation.value,
-              child: Opacity(
-                opacity: _fadeAnimation.value,
-                child: SafeArea(
-                  child: CustomScrollView(
-                    physics: const BouncingScrollPhysics(),
-                    slivers: [
-                      SliverToBoxAdapter(
-                        child: Padding(
-                          padding: EdgeInsets.all(rw(20.0)),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              // Header
-                              Row(
-                                children: [
-                                  GestureDetector(
-                                    onTap: _handleBack,
-                                    child: Icon(Icons.chevron_left_rounded, size: rs(28)),
-                                  ),
-                                  SizedBox(width: rw(16)),
-                                  Text(
-                                    AppLocalizations.of(context)!.settings,
-                                    style: TextStyle(
-                                      fontSize: rs(20),
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                ],
+        appBar: AllyAppBar(title: l10n.settings, onBack: _handleBack),
+        body: FadeTransition(
+          opacity: _fadeAnimation,
+          child: Transform.scale(
+            scale: _scaleAnimation.value,
+            child: SafeArea(
+              child: CustomScrollView(
+                physics: const BouncingScrollPhysics(),
+                slivers: [
+                  SliverToBoxAdapter(
+                    child: Padding(
+                      padding: const EdgeInsets.all(AllySpacing.xl),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // ── Account ─────────────────────────────────────
+                          AllySectionHeader(title: l10n.account),
+                          const SizedBox(height: AllySpacing.md),
+                          AllySettingsGroup(
+                            tiles: [
+                              AllySettingsTile(
+                                title: l10n.yourProfile,
+                                icon: Icons.person_rounded,
+                                accent: scheme.onSurfaceVariant,
+                                onTap: () {},
                               ),
-                              SizedBox(height: rh(30)),
-
-                              // Profile Section
-                              _buildSectionTitle(AppLocalizations.of(context)!.profile, rs),
-                              SizedBox(height: rh(12)),
-                              _buildGroupedTiles(
-                                [
-                                  _buildIconTile(AppLocalizations.of(context)!.yourProfile, Icons.person_rounded, rw, rs, onTap: () {}),
-                                  _buildIconTile(AppLocalizations.of(context)!.pushNotifications, Icons.notifications_rounded, rw, rs, onTap: () {}),
-                                ],
-                                rw,
-                              ),
-
-                              SizedBox(height: rh(30)),
-
-                              // Privacy & Security Section
-                              _buildSectionTitle(AppLocalizations.of(context)!.privacySecurity, rs),
-                              SizedBox(height: rh(12)),
-                              _buildGroupedTiles(
-                                [
-                                  _buildIconTile(AppLocalizations.of(context)!.privacySettings, Icons.privacy_tip_rounded, rw, rs, onTap: () {}),
-                                  _buildIconTile(AppLocalizations.of(context)!.dataStorage, Icons.storage_rounded, rw, rs, onTap: () {}),
-                                ],
-                                rw,
-                              ),
-
-                              SizedBox(height: rh(30)),
-
-                              // App Settings Section
-                              _buildSectionTitle(AppLocalizations.of(context)!.appSettings, rs),
-                              SizedBox(height: rh(12)),
-                              _buildGroupedTiles(
-                                [
-                                  _buildIconTile(AppLocalizations.of(context)!.language, Icons.language_rounded, rw, rs, onTap: () => _showLanguageDialog(rw, rs)),
-                                  _buildIconTile(AppLocalizations.of(context)!.theme, Icons.palette_rounded, rw, rs, onTap: () => _showThemeDialog(rw, rs)),
-                                  _buildIconTile(AppLocalizations.of(context)!.units, Icons.straighten_rounded, rw, rs, onTap: () => _showUnitsDialog(rw, rs)),
-                                ],
-                                rw,
-                              ),
-
-                              SizedBox(height: rh(30)),
-
-                              // Support Section
-                              _buildSectionTitle(AppLocalizations.of(context)!.support, rs),
-                              SizedBox(height: rh(12)),
-                              _buildGroupedTiles(
-                                [
-                                  _buildIconTile(AppLocalizations.of(context)!.support, Icons.help_rounded, rw, rs, onTap: () {}),
-                                  _buildIconTile(AppLocalizations.of(context)!.legal, Icons.description_rounded, rw, rs, onTap: () => _showLegalDialog(rw, rs)),
-                                  _buildIconTile(AppLocalizations.of(context)!.aboutAlly, Icons.info_rounded, rw, rs, onTap: () => _showAboutAllyDialog(rw, rs)),
-                                ],
-                                rw,
-                              ),
-
-                              SizedBox(height: rh(30)),
-
-                              _buildSectionTitle(AppLocalizations.of(context)!.account, rs),
-                              SizedBox(height: rh(12)),
-                              _buildGroupedTiles(
-                                [
-                                  _buildIconTile(
-                                    AppLocalizations.of(context)!.exit,
-                                    Icons.logout_rounded,
-                                    rw, rs,
-                                    onTap: () => _handleLogout(context),
-                                  ),
-                                ],
-                                rw,
+                              AllySettingsTile(
+                                title: l10n.exit,
+                                icon: Icons.logout_rounded,
+                                accent: scheme.error,
+                                showChevron: false,
+                                onTap: () {
+                                  AllyDialog.confirm(
+                                    context,
+                                    title: l10n.exit,
+                                    message: l10n.exitAppConfirmation,
+                                    confirmLabel: l10n.yes,
+                                    cancelLabel: l10n.no,
+                                    icon: Icons.logout_rounded,
+                                    destructive: true,
+                                  ).then((confirmed) {
+                                    if (!confirmed) return;
+                                    if (!mounted) return;
+                                    _handleLogout();
+                                  });
+                                },
                               ),
                             ],
                           ),
-                        ),
+
+                          const SizedBox(height: AllySpacing.section),
+
+                          // ── Appearance ──────────────────────────────────
+                          AllySectionHeader(title: l10n.appearance),
+                          const SizedBox(height: AllySpacing.md),
+                          AllySettingsGroup(
+                            tiles: [
+                              AllySettingsTile(
+                                title: l10n.theme,
+                                subtitle: _themeDisplayName(
+                                  themeProvider.currentTheme,
+                                  l10n,
+                                ),
+                                icon: Icons.palette_rounded,
+                                onTap: _showThemeSheet,
+                              ),
+                              AllySettingsTile(
+                                title: l10n.language,
+                                subtitle: _selectedLanguage,
+                                icon: Icons.language_rounded,
+                                onTap: _showLanguageSheet,
+                              ),
+                              AllySettingsTile(
+                                title: l10n.units,
+                                subtitle:
+                                    context.watch<HealthProvider>().units ==
+                                        'metric'
+                                    ? l10n.metric
+                                    : l10n.imperial,
+                                icon: Icons.straighten_rounded,
+                                onTap: _showUnitsSheet,
+                              ),
+                            ],
+                          ),
+
+                          const SizedBox(height: AllySpacing.section),
+
+                          // ── Notifications ───────────────────────────────
+                          AllySectionHeader(title: l10n.notifications),
+                          const SizedBox(height: AllySpacing.md),
+                          AllySettingsGroup(
+                            tiles: [
+                              SwitchListTile(
+                                value: _pushNotifications,
+                                onChanged: (value) {
+                                  setState(() => _pushNotifications = value);
+                                  _saveNotificationSettings();
+                                },
+                                title: Text(
+                                  l10n.pushNotifications,
+                                  style: AllyTypography.label(
+                                    size: 15,
+                                    color: scheme.onSurface,
+                                  ),
+                                ),
+                                secondary: Icon(
+                                  Icons.notifications_rounded,
+                                  color: scheme.onSurfaceVariant,
+                                ),
+                              ),
+                              SwitchListTile(
+                                value: _emailNotifications,
+                                onChanged: (value) {
+                                  setState(() => _emailNotifications = value);
+                                  _saveNotificationSettings();
+                                },
+                                title: Text(
+                                  l10n.emailNotifications,
+                                  style: AllyTypography.label(
+                                    size: 15,
+                                    color: scheme.onSurface,
+                                  ),
+                                ),
+                                secondary: Icon(
+                                  Icons.alternate_email_rounded,
+                                  color: scheme.onSurfaceVariant,
+                                ),
+                              ),
+                            ],
+                          ),
+
+                          const SizedBox(height: AllySpacing.section),
+
+                          // ── Privacy ─────────────────────────────────────
+                          AllySectionHeader(title: l10n.privacySecurity),
+                          const SizedBox(height: AllySpacing.md),
+                          AllySettingsGroup(
+                            tiles: [
+                              AllySettingsTile(
+                                title: l10n.privacySettings,
+                                icon: Icons.privacy_tip_rounded,
+                                onTap: () {},
+                              ),
+                              AllySettingsTile(
+                                title: l10n.dataStorage,
+                                icon: Icons.storage_rounded,
+                                onTap: () {},
+                              ),
+                            ],
+                          ),
+
+                          const SizedBox(height: AllySpacing.section),
+
+                          // ── Support & Legal ─────────────────────────────
+                          AllySectionHeader(title: l10n.support),
+                          const SizedBox(height: AllySpacing.md),
+                          AllySettingsGroup(
+                            tiles: [
+                              AllySettingsTile(
+                                title: l10n.support,
+                                icon: Icons.help_rounded,
+                                onTap: () {},
+                              ),
+                              AllySettingsTile(
+                                title: l10n.legal,
+                                icon: Icons.description_rounded,
+                                onTap: _showLegalSheet,
+                              ),
+                              AllySettingsTile(
+                                title: l10n.aboutAlly,
+                                icon: Icons.info_rounded,
+                                onTap: _showAboutSheet,
+                              ),
+                            ],
+                          ),
+
+                          const SizedBox(height: AllySpacing.sectionLg),
+
+                          // ── Vertex Corporation ──────────────────────────
+                          Center(
+                            child: Column(
+                              children: [
+                                Text(
+                                  'BY VERTEX',
+                                  style: AllyTypography.label(
+                                    size: 11,
+                                    weight: FontWeight.w700,
+                                    color: scheme.onSurfaceVariant,
+                                    letterSpacing: 2,
+                                  ),
+                                ),
+                                const SizedBox(height: AllySpacing.xs),
+                                Text(
+                                  l10n.copyright,
+                                  style: AllyTypography.caption(
+                                    color: scheme.onSurfaceVariant,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(height: AllySpacing.massive),
+                        ],
                       ),
-                      SliverToBoxAdapter(child: SizedBox(height: rh(100))),
-                    ],
+                    ),
                   ),
-                ),
+                ],
               ),
-            );
-          },
+            ),
+          ),
         ),
       ),
     );
   }
 
-  Widget _buildSectionTitle(String title, double Function(double) rs) {
-    return Text(
-      title,
-      style: TextStyle(
-        fontSize: rs(16),
-        fontWeight: FontWeight.bold,
-        color: const Color(0xFF888888),
-      ),
-    );
+  String _themeDisplayName(String themeName, AppLocalizations l10n) {
+    switch (themeName) {
+      case AppTheme.system:
+        return l10n.systemDefault;
+      case AppTheme.dark:
+        return l10n.darkMode;
+      case AppTheme.light:
+        return l10n.lightMode;
+      default:
+        // Preserved custom themes keep their readable names.
+        return themeName[0].toUpperCase() + themeName.substring(1);
+    }
   }
 
-  Widget _buildGroupedTiles(List<Widget> tiles, double Function(double) rw) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    return Container(
-      decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF1E1E1E) : Colors.white,
-        borderRadius: BorderRadius.circular(rw(16)),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
-            blurRadius: rw(10),
-            offset: Offset(0, rw(2)),
+  // ── Sheets ────────────────────────────────────────────────────────────────
+
+  void _showThemeSheet() {
+    final l10n = AppLocalizations.of(context)!;
+    final themeProvider = context.read<ThemeProvider>();
+    final current = themeProvider.currentTheme;
+
+    AllySheet.show(
+      context,
+      title: l10n.selectTheme,
+      icon: Icons.palette_rounded,
+      child: Column(
+        children: [
+          _OptionRow(
+            text: l10n.systemDefault,
+            selected: current == AppTheme.system,
+            onTap: () {
+              themeProvider.changeTheme(AppTheme.system);
+              Navigator.pop(context);
+            },
+          ),
+          _OptionRow(
+            text: l10n.lightMode,
+            selected: current == AppTheme.light,
+            onTap: () {
+              themeProvider.changeTheme(AppTheme.light);
+              Navigator.pop(context);
+            },
+          ),
+          _OptionRow(
+            text: l10n.darkMode,
+            selected: current == AppTheme.dark,
+            onTap: () {
+              themeProvider.changeTheme(AppTheme.dark);
+              Navigator.pop(context);
+            },
           ),
         ],
       ),
-      child: Column(
-        children: tiles,
-      ),
     );
   }
 
-  Widget _buildIconTile(String title, IconData icon, double Function(double) rw, double Function(double) rs, {VoidCallback? onTap}) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: EdgeInsets.symmetric(horizontal: rw(16), vertical: rw(14)),
-        decoration: BoxDecoration(
-          border: Border(
-            bottom: BorderSide(
-              color: isDark ? Colors.transparent : const Color(0xFFF0F0F0),
-              width: 1, // Hairline borders are usually kept 1.0 or 0.5
-            ),
-          ),
-        ),
-        child: Row(
-          children: [
-            Container(
-              padding: EdgeInsets.all(rw(8)),
-              decoration: BoxDecoration(
-                color: const Color(0xFF4BAADF).withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(rw(8)),
-              ),
-              child: Icon(icon, color: const Color(0xFF4BAADF), size: rs(18)),
-            ),
-            SizedBox(width: rw(12)),
-            Expanded(
-              child: Text(
-                title,
-                style: TextStyle(
-                  fontSize: rs(15),
-                  fontWeight: FontWeight.w500,
-                  color: isDark ? Colors.white : Colors.black,
-                ),
-              ),
-            ),
-            Icon(
-              Icons.arrow_forward_ios_rounded,
-              size: rs(16),
-              color: isDark ? Colors.white54 : const Color(0xFF888888),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  // --- Dialogs with Dynamic Sizing Passed Down ---
-
-  void _showLanguageDialog(double Function(double) rw, double Function(double) rs) {
+  void _showLanguageSheet() {
     final l10n = AppLocalizations.of(context)!;
     final localeProvider = context.read<LocaleProvider>();
 
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: Colors.transparent,
-      builder: (context) => _buildScrollableDialog(
-        l10n.selectLanguage,
-        Icons.language_rounded,
-        const Color(0xFF4BAADF),
-        [
-          _buildDialogOption('English', _selectedLanguage == 'English', () {
-            setState(() => _selectedLanguage = 'English');
-            localeProvider.setLocale(const Locale('en'));
-            Navigator.pop(context);
-          }, rw, rs),
-          _buildDialogOption('Español', _selectedLanguage == 'Español', () {
-            setState(() => _selectedLanguage = 'Español');
-            localeProvider.setLocale(const Locale('es'));
-            Navigator.pop(context);
-          }, rw, rs),
-          _buildDialogOption('Français', _selectedLanguage == 'Français', () {
-            setState(() => _selectedLanguage = 'Français');
-            localeProvider.setLocale(const Locale('fr'));
-            Navigator.pop(context);
-          }, rw, rs),
-          _buildDialogOption('Deutsch', _selectedLanguage == 'Deutsch', () {
-            setState(() => _selectedLanguage = 'Deutsch');
-            localeProvider.setLocale(const Locale('de'));
-            Navigator.pop(context);
-          }, rw, rs),
-          _buildDialogOption('Türkçe', _selectedLanguage == 'Türkçe', () {
-            setState(() => _selectedLanguage = 'Türkçe');
-            localeProvider.setLocale(const Locale('tr'));
-            Navigator.pop(context);
-          }, rw, rs),
-          _buildDialogOption('中文', _selectedLanguage == '中文', () {
-            setState(() => _selectedLanguage = '中文');
-            localeProvider.setLocale(const Locale('zh'));
-            Navigator.pop(context);
-          }, rw, rs),
-        ],
-        rw, rs,
-      ),
-    );
-  }
-
-  void _showThemeDialog(double Function(double) rw, double Function(double) rs) {
-    final l10n = AppLocalizations.of(context)!;
-    final themeProvider = context.read<ThemeProvider>();
-
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: Colors.transparent,
-      builder: (context) => _buildSimpleDialog(
-        l10n.selectTheme,
-        Icons.palette_rounded,
-        const Color(0xFF4BAADF),
-        [
-          _buildDialogOption(l10n.systemDefault, _themeValue == 'system', () {
-            setState(() => _themeValue = 'system');
-            // Assuming system defaults to light/dark in logic, or passing a specific string if handled
-            themeProvider.changeTheme('light');
-            _saveSettings();
-            Navigator.pop(context);
-          }, rw, rs),
-          _buildDialogOption(l10n.lightMode, _themeValue == 'light', () {
-            setState(() => _themeValue = 'light');
-            themeProvider.changeTheme('light');
-            _saveSettings();
-            Navigator.pop(context);
-          }, rw, rs),
-          _buildDialogOption(l10n.darkMode, _themeValue == 'dark', () {
-            setState(() => _themeValue = 'dark');
-            themeProvider.changeTheme('dark');
-            _saveSettings();
-            Navigator.pop(context);
-          }, rw, rs),
-        ],
-        rw, rs,
-      ),
-    );
-  }
-
-  void _showAboutAllyDialog(double Function(double) rw, double Function(double) rs) {
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: Colors.transparent,
-      builder: (context) => Container(
-        margin: EdgeInsets.all(rw(16)),
-        padding: EdgeInsets.all(rw(24)),
-        decoration: BoxDecoration(
-          color: Theme.of(context).scaffoldBackgroundColor,
-          borderRadius: BorderRadius.circular(rw(24)),
-        ),
+    AllySheet.show(
+      context,
+      title: l10n.selectLanguage,
+      icon: Icons.language_rounded,
+      child: SingleChildScrollView(
         child: Column(
-          mainAxisSize: MainAxisSize.min,
           children: [
-            Container(
-              padding: EdgeInsets.all(rw(16)),
-              decoration: BoxDecoration(
-                color: const Color(0xFF4BAADF).withValues(alpha: 0.15),
-                shape: BoxShape.circle,
-              ),
-              child: Icon(Icons.info_rounded, color: const Color(0xFF4BAADF), size: rs(32)),
-            ),
-            SizedBox(height: rw(16)),
-            Text(
-              AppLocalizations.of(context)!.about,
-              style: TextStyle(
-                fontSize: rs(24),
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            SizedBox(height: rw(8)),
-            Text(
-              AppLocalizations.of(context)!.motto,
-              style: TextStyle(
-                fontSize: rs(16),
-                fontStyle: FontStyle.italic,
-                color: Colors.grey[700],
-              ),
-              textAlign: TextAlign.center,
-            ),
-            SizedBox(height: rw(20)),
-            Container(
-              padding: EdgeInsets.symmetric(horizontal: rw(16), vertical: rw(8)),
-              decoration: BoxDecoration(
-                color: const Color(0xFF4BAADF).withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(rw(12)),
-              ),
-              child: Text(
-                AppLocalizations.of(context)!.version,
-                style: TextStyle(
-                  fontSize: rs(14),
-                  fontWeight: FontWeight.w600,
-                  color: Colors.grey[800],
-                ),
-              ),
-            ),
-            SizedBox(height: rw(24)),
-            GestureDetector(
+            _OptionRow(
+              text: 'English',
+              selected: _selectedLanguage == 'English',
               onTap: () {
-                CustomNotification.show(
-                  context,
-                  message: AppLocalizations.of(context)!.openingWebsite,
-                  backgroundColor: const Color(0xFF4BAADF),
-                  icon: Icons.language,
-                );
+                setState(() => _selectedLanguage = 'English');
+                localeProvider.setLocale(const Locale('en'));
+                Navigator.pop(context);
               },
-              child: Container(
-                padding: EdgeInsets.symmetric(horizontal: rw(20), vertical: rw(16)),
-                margin: EdgeInsets.symmetric(vertical: rw(6)),
-                decoration: BoxDecoration(
-                  color: Theme.of(context).cardColor,
-                  borderRadius: BorderRadius.circular(rw(16)),
-                  boxShadow: const [
-                    BoxShadow(
-                      color: Colors.black12,
-                      blurRadius: 10,
-                      offset: Offset(0, 2),
-                    ),
-                  ],
-                ),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: Text(
-                        AppLocalizations.of(context)!.visitWebsite,
-                        style: TextStyle(
-                          fontSize: rs(16),
-                          fontWeight: FontWeight.w600,
-                          color: Theme.of(context).textTheme.bodyLarge?.color,
-                        ),
-                      ),
-                    ),
-                    Icon(
-                      Icons.open_in_new_rounded,
-                      size: rs(18),
-                      color: const Color(0xFF4BAADF),
-                    ),
-                  ],
-                ),
-              ),
             ),
-            // ... Similar dynamic sizing for other buttons ...
-            SizedBox(height: rw(20)),
-            Text(
-              AppLocalizations.of(context)!.copyright,
-              style: TextStyle(
-                fontSize: rs(12),
-                color: Colors.grey[500],
-              ),
+            _OptionRow(
+              text: 'Español',
+              selected: _selectedLanguage == 'Español',
+              onTap: () {
+                setState(() => _selectedLanguage = 'Español');
+                localeProvider.setLocale(const Locale('es'));
+                Navigator.pop(context);
+              },
             ),
-            SizedBox(height: rw(20)),
+            _OptionRow(
+              text: 'Français',
+              selected: _selectedLanguage == 'Français',
+              onTap: () {
+                setState(() => _selectedLanguage = 'Français');
+                localeProvider.setLocale(const Locale('fr'));
+                Navigator.pop(context);
+              },
+            ),
+            _OptionRow(
+              text: 'Deutsch',
+              selected: _selectedLanguage == 'Deutsch',
+              onTap: () {
+                setState(() => _selectedLanguage = 'Deutsch');
+                localeProvider.setLocale(const Locale('de'));
+                Navigator.pop(context);
+              },
+            ),
+            _OptionRow(
+              text: 'Türkçe',
+              selected: _selectedLanguage == 'Türkçe',
+              onTap: () {
+                setState(() => _selectedLanguage = 'Türkçe');
+                localeProvider.setLocale(const Locale('tr'));
+                Navigator.pop(context);
+              },
+            ),
+            _OptionRow(
+              text: '中文',
+              selected: _selectedLanguage == '中文',
+              onTap: () {
+                setState(() => _selectedLanguage = '中文');
+                localeProvider.setLocale(const Locale('zh'));
+                Navigator.pop(context);
+              },
+            ),
           ],
         ),
       ),
     );
   }
 
-  void _showLegalDialog(double Function(double) rw, double Function(double) rs) {
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: Colors.transparent,
-      builder: (context) => Container(
-        margin: EdgeInsets.all(rw(16)),
-        padding: EdgeInsets.all(rw(24)),
-        decoration: BoxDecoration(
-          color: Theme.of(context).scaffoldBackgroundColor,
-          borderRadius: BorderRadius.circular(rw(24)),
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              padding: EdgeInsets.all(rw(16)),
-              decoration: BoxDecoration(
-                color: const Color(0xFF4BAADF).withValues(alpha: 0.15),
-                shape: BoxShape.circle,
-              ),
-              child: Icon(Icons.gavel_rounded, color: const Color(0xFF4BAADF), size: rs(32)),
-            ),
-            SizedBox(height: rw(16)),
-            Text(
-              AppLocalizations.of(context)!.legal,
-              style: TextStyle(
-                fontSize: rs(20),
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            SizedBox(height: rw(8)),
-            Text(
-              AppLocalizations.of(context)!.readPolicies,
-              style: TextStyle(
-                fontSize: rs(14),
-                color: Colors.grey[600],
-              ),
-            ),
-            SizedBox(height: rw(24)),
-            // Example Button with dynamic sizing
-            GestureDetector(
-              onTap: () {
-                CustomNotification.show(
-                  context,
-                  message: AppLocalizations.of(context)!.openingPrivacyPolicy,
-                  backgroundColor: const Color(0xFF4BAADF),
-                  icon: Icons.privacy_tip,
-                );
-              },
-              child: Container(
-                padding: EdgeInsets.symmetric(horizontal: rw(20), vertical: rw(16)),
-                margin: EdgeInsets.symmetric(vertical: rw(6)),
-                decoration: BoxDecoration(
-                  color: Theme.of(context).cardColor,
-                  borderRadius: BorderRadius.circular(rw(16)),
-                  boxShadow: const [
-                    BoxShadow(color: Colors.black12, blurRadius: 10, offset: Offset(0, 2)),
-                  ],
-                ),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: Text(
-                        AppLocalizations.of(context)!.privacyPolicy,
-                        style: TextStyle(fontSize: rs(16), fontWeight: FontWeight.w600, color: Theme.of(context).textTheme.bodyLarge?.color),
-                      ),
-                    ),
-                    Icon(Icons.open_in_new_rounded, size: rs(18), color: const Color(0xFF4BAADF)),
-                  ],
-                ),
-              ),
-            ),
-            // ... Repeat for Terms of Service ...
-            SizedBox(height: rw(20)),
-          ],
-        ),
-      ),
-    );
-  }
-
-  void _showUnitsDialog(double Function(double) rw, double Function(double) rs) {
+  void _showUnitsSheet() {
     final l10n = AppLocalizations.of(context)!;
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: Colors.transparent,
-      builder: (context) => _buildSimpleDialog(
-        l10n.selectUnits,
-        Icons.straighten_rounded,
-        const Color(0xFF4BAADF),
-        [
-          _buildDialogOption(l10n.metric, Provider.of<HealthProvider>(context, listen: false).units == 'metric', () {
-            Provider.of<HealthProvider>(context, listen: false).setUnits('metric');
-            Navigator.pop(context);
-          }, rw, rs),
-          _buildDialogOption(l10n.imperial, Provider.of<HealthProvider>(context, listen: false).units == 'imperial', () {
-            Provider.of<HealthProvider>(context, listen: false).setUnits('imperial');
-            Navigator.pop(context);
-          }, rw, rs),
-        ],
-        rw, rs,
-      ),
-    );
-  }
+    final healthProvider = context.read<HealthProvider>();
+    final units = healthProvider.units;
 
-  // Scrollable dialog with fade effect
-  Widget _buildScrollableDialog(String title, IconData icon, Color color, List<Widget> options, double Function(double) rw, double Function(double) rs) {
-    return Container(
-      margin: EdgeInsets.all(rw(16)),
-      constraints: BoxConstraints(
-        maxHeight: MediaQuery.of(context).size.height * 0.7,
-      ),
-      decoration: BoxDecoration(
-        color: Theme.of(context).scaffoldBackgroundColor,
-        borderRadius: BorderRadius.circular(rw(24)),
-      ),
+    AllySheet.show(
+      context,
+      title: l10n.selectUnits,
+      icon: Icons.straighten_rounded,
       child: Column(
-        mainAxisSize: MainAxisSize.min,
         children: [
-          SizedBox(height: rw(20)),
-          Container(
-            padding: EdgeInsets.all(rw(16)),
-            decoration: BoxDecoration(
-              color: color.withValues(alpha: 0.15),
-              shape: BoxShape.circle,
-            ),
-            child: Icon(icon, color: color, size: rs(32)),
+          _OptionRow(
+            text: l10n.metric,
+            selected: units == 'metric',
+            onTap: () {
+              healthProvider.setUnits('metric');
+              Navigator.pop(context);
+            },
           ),
-          SizedBox(height: rw(16)),
-          Text(
-            title,
-            style: TextStyle(
-              fontSize: rs(20),
-              fontWeight: FontWeight.bold,
-            ),
+          _OptionRow(
+            text: l10n.imperial,
+            selected: units == 'imperial',
+            onTap: () {
+              healthProvider.setUnits('imperial');
+              Navigator.pop(context);
+            },
           ),
-          SizedBox(height: rw(20)),
-          Flexible(
-            child: Stack(
-              children: [
-                ListView(
-                  shrinkWrap: true,
-                  physics: const BouncingScrollPhysics(),
-                  children: options,
-                ),
-                Positioned(
-                  bottom: 0, left: 0, right: 0, height: rw(60),
-                  child: IgnorePointer(
-                    child: Container(
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          begin: Alignment.topCenter,
-                          end: Alignment.bottomCenter,
-                          colors: [
-                            Theme.of(context).scaffoldBackgroundColor.withValues(alpha: 0.0),
-                            Theme.of(context).scaffoldBackgroundColor,
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          SizedBox(height: rw(20)),
         ],
       ),
     );
   }
 
-  // Simple dialog without scrolling
-  Widget _buildSimpleDialog(String title, IconData icon, Color color, List<Widget> options, double Function(double) rw, double Function(double) rs) {
-    return Container(
-      margin: EdgeInsets.all(rw(16)),
-      decoration: BoxDecoration(
-        color: Theme.of(context).scaffoldBackgroundColor,
-        borderRadius: BorderRadius.circular(rw(24)),
-      ),
+  void _showLegalSheet() {
+    final l10n = AppLocalizations.of(context)!;
+
+    AllySheet.show(
+      context,
+      title: l10n.legal,
+      subtitle: l10n.readPolicies,
+      icon: Icons.gavel_rounded,
       child: Column(
-        mainAxisSize: MainAxisSize.min,
         children: [
-          SizedBox(height: rw(20)),
-          Container(
-            padding: EdgeInsets.all(rw(16)),
-            decoration: BoxDecoration(
-              color: color.withValues(alpha: 0.15),
-              shape: BoxShape.circle,
-            ),
-            child: Icon(icon, color: color, size: rs(32)),
+          AllySettingsGroup(
+            tiles: [
+              AllySettingsTile(
+                title: l10n.privacyPolicy,
+                icon: Icons.privacy_tip_rounded,
+                onTap: () {
+                  CustomNotification.show(
+                    context,
+                    message: l10n.openingPrivacyPolicy,
+                    icon: Icons.privacy_tip_rounded,
+                  );
+                },
+              ),
+              AllySettingsTile(
+                title: l10n.termsOfService,
+                icon: Icons.description_rounded,
+                onTap: () {
+                  CustomNotification.show(
+                    context,
+                    message: l10n.openingWebsite,
+                    icon: Icons.description_rounded,
+                  );
+                },
+              ),
+            ],
           ),
-          SizedBox(height: rw(16)),
-          Text(
-            title,
-            style: TextStyle(
-              fontSize: rs(20),
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          SizedBox(height: rw(20)),
-          Column(children: options),
-          SizedBox(height: rw(20)),
         ],
       ),
     );
   }
 
-  Widget _buildDialogOption(String text, bool isSelected, VoidCallback onTap, double Function(double) rw, double Function(double) rs) {
-    return GestureDetector(
+  void _showAboutSheet() {
+    final l10n = AppLocalizations.of(context)!;
+    final ThemeData theme = Theme.of(context);
+    final ColorScheme scheme = theme.colorScheme;
+
+    AllySheet.show(
+      context,
+      title: l10n.about,
+      icon: Icons.info_rounded,
+      child: Column(
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              ClipRRect(
+                borderRadius: BorderRadius.circular(AllyRadius.sm),
+                child: Image.asset(
+                  'assets/images/logo.png',
+                  width: 40,
+                  height: 40,
+                  fit: BoxFit.cover,
+                ),
+              ),
+              const SizedBox(width: AllySpacing.md),
+              Text(
+                l10n.ally,
+                style: AllyTypography.headline(
+                  size: 20,
+                  color: scheme.onSurface,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: AllySpacing.md),
+          Text(
+            l10n.motto,
+            textAlign: TextAlign.center,
+            style: AllyTypography.body(
+              size: 15,
+              color: scheme.onSurfaceVariant,
+            ),
+          ),
+          const SizedBox(height: AllySpacing.xl),
+          Container(
+            padding: const EdgeInsets.symmetric(
+              horizontal: AllySpacing.lg,
+              vertical: AllySpacing.sm,
+            ),
+            decoration: BoxDecoration(
+              borderRadius: AllyRadius.smAll,
+              border: Border.all(color: scheme.outlineVariant),
+            ),
+            child: Text(
+              l10n.version,
+              style: AllyTypography.label(size: 13, color: scheme.onSurface),
+            ),
+          ),
+          const SizedBox(height: AllySpacing.xl),
+          AllySettingsGroup(
+            tiles: [
+              AllySettingsTile(
+                title: l10n.visitWebsite,
+                icon: Icons.language_rounded,
+                onTap: () {
+                  CustomNotification.show(
+                    context,
+                    message: l10n.openingWebsite,
+                    icon: Icons.language_rounded,
+                  );
+                },
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Standard selectable row used inside the option sheets.
+class _OptionRow extends StatelessWidget {
+  final String text;
+  final bool selected;
+  final VoidCallback onTap;
+
+  const _OptionRow({
+    required this.text,
+    required this.selected,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final ThemeData theme = Theme.of(context);
+    final ColorScheme scheme = theme.colorScheme;
+
+    return InkWell(
       onTap: onTap,
+      borderRadius: AllyRadius.smAll,
       child: Container(
-        margin: EdgeInsets.symmetric(horizontal: rw(16), vertical: rw(6)),
-        padding: EdgeInsets.symmetric(horizontal: rw(20), vertical: rw(16)),
-        decoration: BoxDecoration(
-          color: isSelected
-              ? const Color(0xFF4BAADF).withValues(alpha: 0.1)
-              : (Theme.of(context).brightness == Brightness.dark ? Colors.grey[800] : Colors.white),
-          borderRadius: BorderRadius.circular(rw(16)),
-          border: isSelected ? Border.all(color: const Color(0xFF4BAADF), width: 2) : null,
-          boxShadow: isSelected ? [] : [
-            BoxShadow(
-              color: Theme.of(context).brightness == Brightness.dark
-                  ? Colors.black.withValues(alpha: 0.3)
-                  : Colors.black12,
-              blurRadius: rw(10),
-              offset: Offset(0, rw(2)),
-            ),
-          ],
+        padding: const EdgeInsets.symmetric(
+          horizontal: AllySpacing.lg,
+          vertical: AllySpacing.lg,
         ),
+        decoration: BoxDecoration(
+          color: selected
+              ? scheme.onSurface.withValues(alpha: 0.06)
+              : Colors.transparent,
+          borderRadius: AllyRadius.smAll,
+          border: Border.all(
+            color: selected ? scheme.onSurface : scheme.outlineVariant,
+            width: selected ? 1.4 : 1,
+          ),
+        ),
+        margin: const EdgeInsets.only(bottom: AllySpacing.md),
         child: Row(
           children: [
             Expanded(
               child: Text(
                 text,
-                style: TextStyle(
-                  fontSize: rs(16),
-                  fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
-                  color: isSelected ? const Color(0xFF4BAADF) : Theme.of(context).textTheme.bodyLarge?.color,
+                style: AllyTypography.label(
+                  size: 15,
+                  weight: selected ? FontWeight.w600 : FontWeight.w500,
+                  color: selected ? scheme.onSurface : scheme.onSurfaceVariant,
                 ),
               ),
             ),
-            if (isSelected)
-              Icon(Icons.check_circle_rounded, color: const Color(0xFF4BAADF), size: rs(24)),
+            if (selected)
+              Icon(
+                Icons.check_rounded,
+                size: AllyDimensions.iconMd,
+                color: scheme.onSurface,
+              ),
           ],
         ),
       ),

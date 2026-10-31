@@ -62,11 +62,7 @@ class WorkoutSet {
   final double weight; // in kg (0 for bodyweight)
   final int restSeconds;
 
-  WorkoutSet({
-    required this.reps,
-    required this.weight,
-    this.restSeconds = 60,
-  });
+  WorkoutSet({required this.reps, required this.weight, this.restSeconds = 60});
 
   Map<String, dynamic> toJson() => {
     'reps': reps,
@@ -106,7 +102,11 @@ class WorkoutExercise {
   factory WorkoutExercise.fromJson(Map<String, dynamic> json) {
     return WorkoutExercise(
       exerciseId: json['exerciseId'] ?? '',
-      sets: (json['sets'] as List?)?.map((s) => WorkoutSet.fromJson(s)).toList() ?? [],
+      sets:
+          (json['sets'] as List?)
+              ?.map((s) => WorkoutSet.fromJson(s))
+              .toList() ??
+          [],
       timestamp: DateTime.parse(json['timestamp']),
       totalCaloriesBurned: json['totalCaloriesBurned'] ?? 0,
     );

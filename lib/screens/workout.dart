@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../design_system/tokens/colors.dart';
 import 'package:provider/provider.dart';
 import 'dart:async';
 
@@ -13,10 +14,7 @@ import '../app.dart'; // For InvertedColor extension
 class ActiveWorkoutScreen extends StatefulWidget {
   final WorkoutProgram program;
 
-  const ActiveWorkoutScreen({
-    super.key,
-    required this.program,
-  });
+  const ActiveWorkoutScreen({super.key, required this.program});
 
   @override
   State<ActiveWorkoutScreen> createState() => _ActiveWorkoutScreenState();
@@ -31,21 +29,28 @@ class _ActiveWorkoutScreenState extends State<ActiveWorkoutScreen> {
   Timer? restTimer;
 
   // Semantic Colors
-  final Color _workoutColor = const Color(0xFFE57373);
-  final Color _restColor = const Color(0xFF64B5F6);
-  final Color _completedColor = const Color(0xFF81C784);
+  final Color _workoutColor = AllyUniversalAccents.exercise;
+  final Color _restColor = AllyUniversalAccents.rest;
+  final Color _completedColor = AllyUniversalAccents.done;
 
   @override
   void initState() {
     super.initState();
     // Initialize sets
     for (var exercise in widget.program.exercises) {
-      completedSets[exercise.exerciseId] = List.filled(exercise.sets.length, false);
-      modifiedSets[exercise.exerciseId] = exercise.sets.map((set) => {
-        'reps': set.reps,
-        'weight': set.weight,
-        'restSeconds': set.restSeconds,
-      }).toList();
+      completedSets[exercise.exerciseId] = List.filled(
+        exercise.sets.length,
+        false,
+      );
+      modifiedSets[exercise.exerciseId] = exercise.sets
+          .map(
+            (set) => {
+              'reps': set.reps,
+              'weight': set.weight,
+              'restSeconds': set.restSeconds,
+            },
+          )
+          .toList();
     }
   }
 
@@ -84,8 +89,12 @@ class _ActiveWorkoutScreenState extends State<ActiveWorkoutScreen> {
 
   void _editSet(String exerciseId, int setIndex) {
     final setData = modifiedSets[exerciseId]![setIndex];
-    final repsController = TextEditingController(text: setData['reps'].toString());
-    final weightController = TextEditingController(text: setData['weight'].toStringAsFixed(1));
+    final repsController = TextEditingController(
+      text: setData['reps'].toString(),
+    );
+    final weightController = TextEditingController(
+      text: setData['weight'].toStringAsFixed(1),
+    );
 
     // Dynamic Dimensions
     final sw = MediaQuery.of(context).size.width;
@@ -126,9 +135,9 @@ class _ActiveWorkoutScreenState extends State<ActiveWorkoutScreen> {
               Text(
                 AppLocalizations.of(dialogContext)!.editSetNumber(setIndex + 1),
                 style: TextStyle(
-                    fontSize: sw * 0.05,
-                    fontWeight: FontWeight.bold,
-                    color: textColor
+                  fontSize: sw * 0.05,
+                  fontWeight: FontWeight.bold,
+                  color: textColor,
                 ),
               ),
               SizedBox(height: sh * 0.03),
@@ -140,7 +149,11 @@ class _ActiveWorkoutScreenState extends State<ActiveWorkoutScreen> {
                       children: [
                         Text(
                           AppLocalizations.of(dialogContext)!.reps,
-                          style: TextStyle(fontSize: sw * 0.035, fontWeight: FontWeight.bold, color: hintColor),
+                          style: TextStyle(
+                            fontSize: sw * 0.035,
+                            fontWeight: FontWeight.bold,
+                            color: hintColor,
+                          ),
                         ),
                         SizedBox(height: sh * 0.01),
                         TextField(
@@ -155,7 +168,10 @@ class _ActiveWorkoutScreenState extends State<ActiveWorkoutScreen> {
                               borderRadius: BorderRadius.circular(sw * 0.04),
                               borderSide: BorderSide.none,
                             ),
-                            contentPadding: EdgeInsets.symmetric(horizontal: sw * 0.05, vertical: sh * 0.02),
+                            contentPadding: EdgeInsets.symmetric(
+                              horizontal: sw * 0.05,
+                              vertical: sh * 0.02,
+                            ),
                           ),
                         ),
                       ],
@@ -168,14 +184,26 @@ class _ActiveWorkoutScreenState extends State<ActiveWorkoutScreen> {
                       children: [
                         Text(
                           AppLocalizations.of(dialogContext)!.weightWithUnit(
-                              Provider.of<HealthProvider>(context, listen: false).units == 'imperial' ? 'lbs' : 'kg'
+                            Provider.of<HealthProvider>(
+                                      context,
+                                      listen: false,
+                                    ).units ==
+                                    'imperial'
+                                ? 'lbs'
+                                : 'kg',
                           ),
-                          style: TextStyle(fontSize: sw * 0.035, fontWeight: FontWeight.bold, color: hintColor),
+                          style: TextStyle(
+                            fontSize: sw * 0.035,
+                            fontWeight: FontWeight.bold,
+                            color: hintColor,
+                          ),
                         ),
                         SizedBox(height: sh * 0.01),
                         TextField(
                           controller: weightController,
-                          keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                          keyboardType: const TextInputType.numberWithOptions(
+                            decimal: true,
+                          ),
                           style: TextStyle(color: textColor),
                           decoration: InputDecoration(
                             filled: true,
@@ -184,7 +212,10 @@ class _ActiveWorkoutScreenState extends State<ActiveWorkoutScreen> {
                               borderRadius: BorderRadius.circular(sw * 0.04),
                               borderSide: BorderSide.none,
                             ),
-                            contentPadding: EdgeInsets.symmetric(horizontal: sw * 0.05, vertical: sh * 0.02),
+                            contentPadding: EdgeInsets.symmetric(
+                              horizontal: sw * 0.05,
+                              vertical: sh * 0.02,
+                            ),
                           ),
                         ),
                       ],
@@ -222,12 +253,16 @@ class _ActiveWorkoutScreenState extends State<ActiveWorkoutScreen> {
                     child: GestureDetector(
                       onTap: () {
                         final newReps = int.tryParse(repsController.text);
-                        final newWeight = double.tryParse(weightController.text);
+                        final newWeight = double.tryParse(
+                          weightController.text,
+                        );
 
                         if (newReps != null && newWeight != null) {
                           setState(() {
-                            modifiedSets[exerciseId]![setIndex]['reps'] = newReps;
-                            modifiedSets[exerciseId]![setIndex]['weight'] = newWeight;
+                            modifiedSets[exerciseId]![setIndex]['reps'] =
+                                newReps;
+                            modifiedSets[exerciseId]![setIndex]['weight'] =
+                                newWeight;
                           });
                           Navigator.pop(dialogContext);
                         }
@@ -276,7 +311,9 @@ class _ActiveWorkoutScreenState extends State<ActiveWorkoutScreen> {
   }
 
   bool _isWorkoutComplete() {
-    return completedSets.values.every((sets) => sets.every((completed) => completed));
+    return completedSets.values.every(
+      (sets) => sets.every((completed) => completed),
+    );
   }
 
   void _moveToNextExercise() {
@@ -324,12 +361,20 @@ class _ActiveWorkoutScreenState extends State<ActiveWorkoutScreen> {
                 color: _workoutColor.withValues(alpha: 0.15),
                 shape: BoxShape.circle,
               ),
-              child: Icon(Icons.warning_rounded, color: _workoutColor, size: sw * 0.08),
+              child: Icon(
+                Icons.warning_rounded,
+                color: _workoutColor,
+                size: sw * 0.08,
+              ),
             ),
             SizedBox(height: sh * 0.02),
             Text(
               AppLocalizations.of(dialogContext)!.workoutNotComplete,
-              style: TextStyle(fontSize: sw * 0.05, fontWeight: FontWeight.bold, color: textColor),
+              style: TextStyle(
+                fontSize: sw * 0.05,
+                fontWeight: FontWeight.bold,
+                color: textColor,
+              ),
             ),
             SizedBox(height: sh * 0.015),
             Text(
@@ -405,13 +450,17 @@ class _ActiveWorkoutScreenState extends State<ActiveWorkoutScreen> {
         lastDate.year != now.year ||
         lastDate.month != now.month ||
         lastDate.day != now.day) {
-      healthProvider.updateExerciseStreak(healthProvider.healthData.exerciseStreak + 1);
+      healthProvider.updateExerciseStreak(
+        healthProvider.healthData.exerciseStreak + 1,
+      );
     }
 
     // Log the workout program
     final exercisesData = <Map<String, dynamic>>[];
     for (var programExercise in widget.program.exercises) {
-      final exercise = ExerciseLibrary.getExerciseById(programExercise.exerciseId);
+      final exercise = ExerciseLibrary.getExerciseById(
+        programExercise.exerciseId,
+      );
       if (exercise != null) {
         final allSets = modifiedSets[programExercise.exerciseId];
         final completedSetsList = completedSets[programExercise.exerciseId];
@@ -440,7 +489,9 @@ class _ActiveWorkoutScreenState extends State<ActiveWorkoutScreen> {
       Navigator.pop(context);
       // Use IntrovertNotificationService
       context.read<IntrovertNotificationService>().showNotification(
-        message: widget.program.name, // "Workout Completed" is implied or can be prefixed
+        message: widget
+            .program
+            .name, // "Workout Completed" is implied or can be prefixed
         type: NotificationType.success,
       );
     }
@@ -464,20 +515,29 @@ class _ActiveWorkoutScreenState extends State<ActiveWorkoutScreen> {
     final textColor = AppColors.primaryColor.inverted;
     final subTextColor = AppColors.tertiaryColor;
 
-    final currentProgramExercise = widget.program.exercises[currentExerciseIndex];
-    final currentExercise = ExerciseLibrary.getExerciseById(currentProgramExercise.exerciseId);
+    final currentProgramExercise =
+        widget.program.exercises[currentExerciseIndex];
+    final currentExercise = ExerciseLibrary.getExerciseById(
+      currentProgramExercise.exerciseId,
+    );
 
     if (currentExercise == null) {
       return Scaffold(
         backgroundColor: backgroundColor,
         body: Center(
-          child: Text(AppLocalizations.of(context)!.exerciseNotFound, style: TextStyle(color: textColor)),
+          child: Text(
+            AppLocalizations.of(context)!.exerciseNotFound,
+            style: TextStyle(color: textColor),
+          ),
         ),
       );
     }
 
-    final isCurrentExerciseComplete = _isExerciseComplete(currentProgramExercise.exerciseId);
-    final isLastExercise = currentExerciseIndex == widget.program.exercises.length - 1;
+    final isCurrentExerciseComplete = _isExerciseComplete(
+      currentProgramExercise.exerciseId,
+    );
+    final isLastExercise =
+        currentExerciseIndex == widget.program.exercises.length - 1;
 
     return Scaffold(
       backgroundColor: backgroundColor,
@@ -505,20 +565,33 @@ class _ActiveWorkoutScreenState extends State<ActiveWorkoutScreen> {
                     Container(
                       padding: EdgeInsets.all(sw * 0.04),
                       decoration: BoxDecoration(
-                        color: Colors.red.withValues(alpha: 0.15),
+                        color: AllyUniversalAccents.danger.withValues(
+                          alpha: 0.15,
+                        ),
                         shape: BoxShape.circle,
                       ),
-                      child: Icon(Icons.exit_to_app_rounded, color: Colors.red, size: sw * 0.08),
+                      child: Icon(
+                        Icons.exit_to_app_rounded,
+                        color: AllyUniversalAccents.danger,
+                        size: sw * 0.08,
+                      ),
                     ),
                     SizedBox(height: sh * 0.02),
                     Text(
                       AppLocalizations.of(dialogContext)!.exitWorkout,
-                      style: TextStyle(fontSize: sw * 0.05, fontWeight: FontWeight.bold, color: textColor),
+                      style: TextStyle(
+                        fontSize: sw * 0.05,
+                        fontWeight: FontWeight.bold,
+                        color: textColor,
+                      ),
                     ),
                     SizedBox(height: sh * 0.015),
                     Text(
                       AppLocalizations.of(dialogContext)!.progressNotSaved,
-                      style: TextStyle(fontSize: sw * 0.035, color: subTextColor),
+                      style: TextStyle(
+                        fontSize: sw * 0.035,
+                        color: subTextColor,
+                      ),
                       textAlign: TextAlign.center,
                     ),
                     SizedBox(height: sh * 0.03),
@@ -556,7 +629,7 @@ class _ActiveWorkoutScreenState extends State<ActiveWorkoutScreen> {
                             child: Container(
                               padding: EdgeInsets.all(sw * 0.04),
                               decoration: BoxDecoration(
-                                color: Colors.red,
+                                color: AllyUniversalAccents.danger,
                                 borderRadius: BorderRadius.circular(sw * 0.04),
                               ),
                               child: Text(
@@ -594,16 +667,21 @@ class _ActiveWorkoutScreenState extends State<ActiveWorkoutScreen> {
             },
             child: Container(
               margin: EdgeInsets.only(right: sw * 0.04),
-              padding: EdgeInsets.symmetric(horizontal: sw * 0.04, vertical: sh * 0.01),
+              padding: EdgeInsets.symmetric(
+                horizontal: sw * 0.04,
+                vertical: sh * 0.01,
+              ),
               decoration: BoxDecoration(
                 color: _workoutColor,
                 borderRadius: BorderRadius.circular(sw * 0.05),
               ),
-              child: Text(AppLocalizations.of(context)!.finish, style: TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.bold,
-                fontSize: sw * 0.035,
-              ),
+              child: Text(
+                AppLocalizations.of(context)!.finish,
+                style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                  fontSize: sw * 0.035,
+                ),
               ),
             ),
           ),
@@ -614,14 +692,20 @@ class _ActiveWorkoutScreenState extends State<ActiveWorkoutScreen> {
           children: [
             // Progress indicator
             Container(
-              margin: EdgeInsets.symmetric(horizontal: paddingH, vertical: paddingV),
+              margin: EdgeInsets.symmetric(
+                horizontal: paddingH,
+                vertical: paddingV,
+              ),
               child: Column(
                 children: [
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        AppLocalizations.of(context)!.exerciseProgress(currentExerciseIndex + 1, widget.program.exercises.length),
+                        AppLocalizations.of(context)!.exerciseProgress(
+                          currentExerciseIndex + 1,
+                          widget.program.exercises.length,
+                        ),
                         style: TextStyle(
                           fontSize: sw * 0.035,
                           color: subTextColor,
@@ -629,7 +713,9 @@ class _ActiveWorkoutScreenState extends State<ActiveWorkoutScreen> {
                         ),
                       ),
                       Text(
-                        AppLocalizations.of(context)!.percentComplete(_calculateProgress()),
+                        AppLocalizations.of(
+                          context,
+                        )!.percentComplete(_calculateProgress()),
                         style: TextStyle(
                           fontSize: sw * 0.035,
                           color: _completedColor,
@@ -644,7 +730,9 @@ class _ActiveWorkoutScreenState extends State<ActiveWorkoutScreen> {
                     child: LinearProgressIndicator(
                       value: _calculateProgress() / 100,
                       backgroundColor: subTextColor.withValues(alpha: 0.2),
-                      valueColor: AlwaysStoppedAnimation<Color>(_completedColor),
+                      valueColor: AlwaysStoppedAnimation<Color>(
+                        _completedColor,
+                      ),
                       minHeight: sh * 0.01,
                     ),
                   ),
@@ -655,7 +743,10 @@ class _ActiveWorkoutScreenState extends State<ActiveWorkoutScreen> {
             // Rest Timer Overlay
             if (isResting)
               Container(
-                margin: EdgeInsets.symmetric(horizontal: paddingH, vertical: paddingV),
+                margin: EdgeInsets.symmetric(
+                  horizontal: paddingH,
+                  vertical: paddingV,
+                ),
                 padding: EdgeInsets.all(sw * 0.06),
                 decoration: BoxDecoration(
                   color: _restColor,
@@ -676,7 +767,11 @@ class _ActiveWorkoutScreenState extends State<ActiveWorkoutScreen> {
                         color: Colors.white70,
                         borderRadius: BorderRadius.circular(sw * 0.03),
                       ),
-                      child: Icon(Icons.timer, color: Colors.white, size: sw * 0.06),
+                      child: Icon(
+                        Icons.timer,
+                        color: Colors.white,
+                        size: sw * 0.06,
+                      ),
                     ),
                     SizedBox(width: sw * 0.04),
                     Expanded(
@@ -706,7 +801,10 @@ class _ActiveWorkoutScreenState extends State<ActiveWorkoutScreen> {
                     GestureDetector(
                       onTap: _skipRest,
                       child: Container(
-                        padding: EdgeInsets.symmetric(horizontal: sw * 0.05, vertical: sh * 0.015),
+                        padding: EdgeInsets.symmetric(
+                          horizontal: sw * 0.05,
+                          vertical: sh * 0.015,
+                        ),
                         decoration: BoxDecoration(
                           color: cardColor,
                           borderRadius: BorderRadius.circular(sw * 0.04),
@@ -756,10 +854,13 @@ class _ActiveWorkoutScreenState extends State<ActiveWorkoutScreen> {
                                 padding: EdgeInsets.all(sw * 0.03),
                                 decoration: BoxDecoration(
                                   color: Colors.white70,
-                                  borderRadius: BorderRadius.circular(sw * 0.03),
+                                  borderRadius: BorderRadius.circular(
+                                    sw * 0.03,
+                                  ),
                                 ),
                                 child: Icon(
-                                  currentExercise.icon, color: Colors.white,
+                                  currentExercise.icon,
+                                  color: Colors.white,
                                   size: sw * 0.08,
                                 ),
                               ),
@@ -789,7 +890,10 @@ class _ActiveWorkoutScreenState extends State<ActiveWorkoutScreen> {
                               ),
                               if (isCurrentExerciseComplete)
                                 Icon(
-                                    Icons.check_circle, color: Colors.white, size: sw * 0.08),
+                                  Icons.check_circle,
+                                  color: Colors.white,
+                                  size: sw * 0.08,
+                                ),
                             ],
                           ),
                         ],
@@ -809,9 +913,15 @@ class _ActiveWorkoutScreenState extends State<ActiveWorkoutScreen> {
                     ),
                     SizedBox(height: sh * 0.015),
 
-                    ...List.generate(currentProgramExercise.sets.length, (setIndex) {
-                      final setData = modifiedSets[currentProgramExercise.exerciseId]![setIndex];
-                      final isCompleted = completedSets[currentProgramExercise.exerciseId]![setIndex];
+                    ...List.generate(currentProgramExercise.sets.length, (
+                      setIndex,
+                    ) {
+                      final setData =
+                          modifiedSets[currentProgramExercise
+                              .exerciseId]![setIndex];
+                      final isCompleted =
+                          completedSets[currentProgramExercise
+                              .exerciseId]![setIndex];
 
                       return Container(
                         margin: EdgeInsets.only(bottom: sh * 0.015),
@@ -827,7 +937,9 @@ class _ActiveWorkoutScreenState extends State<ActiveWorkoutScreen> {
                               color: isCompleted ? _completedColor : cardColor,
                               borderRadius: BorderRadius.circular(sw * 0.04),
                               border: Border.all(
-                                color: isCompleted ? _completedColor : AppColors.border,
+                                color: isCompleted
+                                    ? _completedColor
+                                    : AppColors.border,
                                 width: 2,
                               ),
                               boxShadow: [
@@ -855,7 +967,9 @@ class _ActiveWorkoutScreenState extends State<ActiveWorkoutScreen> {
                                       style: TextStyle(
                                         fontSize: sw * 0.04,
                                         fontWeight: FontWeight.bold,
-                                        color: isCompleted ? _completedColor : _workoutColor,
+                                        color: isCompleted
+                                            ? _completedColor
+                                            : _workoutColor,
                                       ),
                                     ),
                                   ),
@@ -865,14 +979,17 @@ class _ActiveWorkoutScreenState extends State<ActiveWorkoutScreen> {
                                   child: Row(
                                     children: [
                                       Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
                                         children: [
                                           Text(
                                             '${setData['reps']} ${AppLocalizations.of(context)!.repsLowercase}',
                                             style: TextStyle(
                                               fontSize: sw * 0.045,
                                               fontWeight: FontWeight.bold,
-                                              color: isCompleted ? Colors.white : textColor,
+                                              color: isCompleted
+                                                  ? Colors.white
+                                                  : textColor,
                                             ),
                                           ),
                                           if ((setData['weight'] as double) > 0)
@@ -880,7 +997,9 @@ class _ActiveWorkoutScreenState extends State<ActiveWorkoutScreen> {
                                               '${setData['weight']} ${AppLocalizations.of(context)!.kgUnit}',
                                               style: TextStyle(
                                                 fontSize: sw * 0.035,
-                                                color: isCompleted ? Colors.white70 : subTextColor,
+                                                color: isCompleted
+                                                    ? Colors.white70
+                                                    : subTextColor,
                                               ),
                                             ),
                                         ],
@@ -888,27 +1007,42 @@ class _ActiveWorkoutScreenState extends State<ActiveWorkoutScreen> {
                                       const Spacer(),
                                       if ((setData['restSeconds'] as int) > 0)
                                         Container(
-                                          padding: EdgeInsets.symmetric(horizontal: sw * 0.03, vertical: sh * 0.008),
+                                          padding: EdgeInsets.symmetric(
+                                            horizontal: sw * 0.03,
+                                            vertical: sh * 0.008,
+                                          ),
                                           decoration: BoxDecoration(
                                             color: isCompleted
                                                 ? Colors.white70
-                                                : _restColor.withValues(alpha: 0.15),
-                                            borderRadius: BorderRadius.circular(sw * 0.03),
+                                                : _restColor.withValues(
+                                                    alpha: 0.15,
+                                                  ),
+                                            borderRadius: BorderRadius.circular(
+                                              sw * 0.03,
+                                            ),
                                           ),
                                           child: Row(
                                             children: [
                                               Icon(
                                                 Icons.timer,
                                                 size: sw * 0.04,
-                                                color: isCompleted ? Colors.white : _restColor,
+                                                color: isCompleted
+                                                    ? Colors.white
+                                                    : _restColor,
                                               ),
                                               SizedBox(width: sw * 0.01),
                                               Text(
-                                                AppLocalizations.of(context)!.restSeconds(setData['restSeconds']),
+                                                AppLocalizations.of(
+                                                  context,
+                                                )!.restSeconds(
+                                                  setData['restSeconds'],
+                                                ),
                                                 style: TextStyle(
                                                   fontSize: sw * 0.03,
                                                   fontWeight: FontWeight.w600,
-                                                  color: isCompleted ? Colors.white : _restColor,
+                                                  color: isCompleted
+                                                      ? Colors.white
+                                                      : _restColor,
                                                 ),
                                               ),
                                             ],
@@ -920,12 +1054,19 @@ class _ActiveWorkoutScreenState extends State<ActiveWorkoutScreen> {
                                 SizedBox(width: sw * 0.03),
                                 if (!isCompleted)
                                   GestureDetector(
-                                    onTap: () => _editSet(currentProgramExercise.exerciseId, setIndex),
+                                    onTap: () => _editSet(
+                                      currentProgramExercise.exerciseId,
+                                      setIndex,
+                                    ),
                                     child: Container(
                                       padding: EdgeInsets.all(sw * 0.015),
                                       decoration: BoxDecoration(
-                                        color: _workoutColor.withValues(alpha: 0.15),
-                                        borderRadius: BorderRadius.circular(sw * 0.02),
+                                        color: _workoutColor.withValues(
+                                          alpha: 0.15,
+                                        ),
+                                        borderRadius: BorderRadius.circular(
+                                          sw * 0.02,
+                                        ),
                                       ),
                                       child: Icon(
                                         Icons.edit,
@@ -936,8 +1077,12 @@ class _ActiveWorkoutScreenState extends State<ActiveWorkoutScreen> {
                                   ),
                                 SizedBox(width: sw * 0.02),
                                 Icon(
-                                  isCompleted ? Icons.check_circle : Icons.circle_outlined,
-                                  color: isCompleted ? Colors.white : subTextColor.withValues(alpha: 0.5),
+                                  isCompleted
+                                      ? Icons.check_circle
+                                      : Icons.circle_outlined,
+                                  color: isCompleted
+                                      ? Colors.white
+                                      : subTextColor.withValues(alpha: 0.5),
                                   size: sw * 0.07,
                                 ),
                               ],
@@ -960,7 +1105,9 @@ class _ActiveWorkoutScreenState extends State<ActiveWorkoutScreen> {
                                 padding: EdgeInsets.all(sw * 0.04),
                                 decoration: BoxDecoration(
                                   color: cardColor,
-                                  borderRadius: BorderRadius.circular(sw * 0.04),
+                                  borderRadius: BorderRadius.circular(
+                                    sw * 0.04,
+                                  ),
                                   border: Border.all(color: AppColors.border),
                                 ),
                                 child: Row(
@@ -991,7 +1138,9 @@ class _ActiveWorkoutScreenState extends State<ActiveWorkoutScreen> {
                                 padding: EdgeInsets.all(sw * 0.04),
                                 decoration: BoxDecoration(
                                   color: _workoutColor,
-                                  borderRadius: BorderRadius.circular(sw * 0.04),
+                                  borderRadius: BorderRadius.circular(
+                                    sw * 0.04,
+                                  ),
                                 ),
                                 child: Row(
                                   mainAxisAlignment: MainAxisAlignment.center,
@@ -1005,7 +1154,10 @@ class _ActiveWorkoutScreenState extends State<ActiveWorkoutScreen> {
                                       ),
                                     ),
                                     SizedBox(width: sw * 0.02),
-                                    Icon(Icons.arrow_forward, color: Colors.white),
+                                    Icon(
+                                      Icons.arrow_forward,
+                                      color: Colors.white,
+                                    ),
                                   ],
                                 ),
                               ),

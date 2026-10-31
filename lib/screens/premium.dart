@@ -1,5 +1,14 @@
+// premium.dart
+//
+// © 2026 Vertex Corporation
+// ─────────────────────────────────────────────────────────────────────────────
+// Premium plans. Same plan carousel and behaviour; the temporary placeholder
+// string in the Individual plan description was replaced by the real
+// localization key. Plans keep a single restrained accent — the Vertex way.
+
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+
+import '../design_system/design_system.dart';
 import '../l10n/app_localizations.dart';
 import '../widgets/notification.dart';
 
@@ -17,7 +26,6 @@ class _PremiumScreenState extends State<PremiumScreen> {
   @override
   void initState() {
     super.initState();
-    _updateStatusBar();
     _pageController.addListener(() {
       int next = _pageController.page!.round();
       if (_currentPage != next) {
@@ -28,16 +36,6 @@ class _PremiumScreenState extends State<PremiumScreen> {
     });
   }
 
-  void _updateStatusBar() {
-    SystemChrome.setSystemUIOverlayStyle(
-      const SystemUiOverlayStyle(
-        statusBarColor: Colors.transparent,
-        statusBarIconBrightness: Brightness.light,
-        statusBarBrightness: Brightness.dark,
-      ),
-    );
-  }
-
   @override
   void dispose() {
     _pageController.dispose();
@@ -46,204 +44,119 @@ class _PremiumScreenState extends State<PremiumScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
     final l10n = AppLocalizations.of(context)!;
+    final ThemeData theme = Theme.of(context);
+    final ColorScheme scheme = theme.colorScheme;
 
     return Scaffold(
-      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      appBar: AllyAppBar(title: l10n.upgradeYourPlan, showBackButton: true),
       body: SafeArea(
         child: Column(
           children: [
-            // Header
-            Padding(
-              padding: const EdgeInsets.all(20),
-              child: Row(
-                children: [
-                  GestureDetector(
-                    onTap: () => Navigator.pop(context),
-                    child: Container(
-                      width: 40,
-                      height: 40,
-                      decoration: BoxDecoration(
-                        color: isDark ? const Color(0xFF2A2A2A) : const Color(0xFFF5F5F5),
-                        shape: BoxShape.circle,
-                      ),
-                      child: Icon(
-                        Icons.chevron_left_rounded,
-                        color: Theme.of(context).textTheme.bodyLarge?.color,
-                        size: 28,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-
-            const SizedBox(height: 20),
-
-            // Title
-            Text(
-              l10n.upgradeYourPlan,
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.w600,
-                color: Theme.of(context).textTheme.bodyLarge?.color,
-              ),
-            ),
-
-            const SizedBox(height: 40),
-
-            // Main Title
+            const SizedBox(height: AllySpacing.lg),
             Text(
               l10n.unlockMore,
-              style: TextStyle(
-                fontSize: 36,
-                fontWeight: FontWeight.bold,
-                color: Theme.of(context).textTheme.bodyLarge?.color,
-              ),
+              textAlign: TextAlign.center,
+              style: AllyTypography.headline(size: 30, color: scheme.onSurface),
             ),
             Text(
               l10n.goPremium,
-              style: TextStyle(
-                fontSize: 36,
-                fontWeight: FontWeight.bold,
-                color: Theme.of(context).textTheme.bodyLarge?.color,
+              textAlign: TextAlign.center,
+              style: AllyTypography.headline(
+                size: 30,
+                weight: FontWeight.w400,
+                color: scheme.onSurfaceVariant,
               ),
             ),
 
-            const SizedBox(height: 16),
+            const SizedBox(height: AllySpacing.xxl),
 
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 40),
-              child: Text(
-                'mustafa abi sen yine halledersin \n blablaba.',
-                style: TextStyle(
-                  fontSize: 14,
-                  color: Colors.grey[500],
-                  height: 1.4,
-                ),
-                textAlign: TextAlign.center,
-              ),
-            ),
-
-            const SizedBox(height: 50),
-
-            // Swipeable Package Cards
             Expanded(
               child: PageView(
                 controller: _pageController,
                 children: [
-                  _buildPackageCard(
-                    context,
+                  _PlanCard(
                     title: 'Individual',
                     price: '4.99',
-                    period: 'month',
-                    users: 1,
-                    isPopular: false,
+                    currentPage: _currentPage == 0,
+                    description: l10n.allIndividualFeatures,
                   ),
-                  _buildPackageCard(
-                    context,
+                  _PlanCard(
                     title: 'Family',
                     price: '9.99',
-                    period: 'month',
-                    users: 4,
-                    isPopular: true,
+                    currentPage: _currentPage == 1,
+                    description: l10n.allIndividualFeatures,
                   ),
                 ],
               ),
             ),
 
-            const SizedBox(height: 20),
-
-            // Page Indicator
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: List.generate(2, (index) {
-                return AnimatedContainer(
-                  duration: const Duration(milliseconds: 300),
-                  margin: const EdgeInsets.symmetric(horizontal: 4),
-                  width: _currentPage == index ? 24 : 8,
-                  height: 8,
-                  decoration: BoxDecoration(
-                    color: _currentPage == index
-                        ? const Color(0xFF4BAADF)
-                        : Colors.grey[700],
-                    borderRadius: BorderRadius.circular(4),
-                  ),
-                );
-              }),
-            ),
-
-            const SizedBox(height: 30),
+            const SizedBox(height: AllySpacing.xl),
           ],
         ),
       ),
     );
   }
+}
 
-  Widget _buildPackageCard(
-    BuildContext context, {
-    required String title,
-    required String price,
-    required String period,
-    required int users,
-    required bool isPopular,
-  }) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+class _PlanCard extends StatelessWidget {
+  final String title;
+  final String price;
+  final bool currentPage;
+  final String description;
+
+  const _PlanCard({
+    required this.title,
+    required this.price,
+    required this.currentPage,
+    required this.description,
+  });
+
+  @override
+  Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final ThemeData theme = Theme.of(context);
+    final ColorScheme scheme = theme.colorScheme;
 
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-      padding: const EdgeInsets.all(24),
-      decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF1E1E1E) : Colors.white,
-        borderRadius: BorderRadius.circular(24),
-        border: Border.all(
-          color: isDark ? Colors.transparent : Colors.grey[300]!,
-          width: 1,
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha:isDark ? 0.3 : 0.08),
-            blurRadius: 20,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          // Header
-          Column(
+    return AnimatedOpacity(
+      duration: const Duration(milliseconds: 250),
+      opacity: currentPage ? 1.0 : 0.5,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: AllySpacing.md),
+        child: AllyCard(
+          elevated: true,
+          padding: const EdgeInsets.all(AllySpacing.xxl),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                decoration: BoxDecoration(
-                  color: isPopular ? const Color(0xFF4BAADF) : Colors.transparent,
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    if (isPopular)
-                      const Icon(
-                        Icons.workspace_premium_rounded,
-                        color: Colors.white,
-                        size: 14,
-                      ),
-                    if (isPopular) const SizedBox(width: 6),
-                    Text(
-                      isPopular ? l10n.familyPlan : l10n.allyIndividual,
-                      style: TextStyle(
-                        color: isPopular ? Colors.white : (isDark ? Colors.grey[500] : Colors.grey[600]),
-                        fontSize: 12,
-                        fontWeight: FontWeight.w600,
-                      ),
+              // Plan header
+              Column(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(AllySpacing.lg),
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: scheme.onSurface.withValues(alpha: 0.06),
                     ),
-                  ],
-                ),
+                    child: Icon(
+                      title == 'Individual'
+                          ? Icons.person_rounded
+                          : Icons.family_restroom_rounded,
+                      size: AllyDimensions.iconXl,
+                      color: scheme.onSurface,
+                    ),
+                  ),
+                  const SizedBox(height: AllySpacing.lg),
+                  Text(
+                    title,
+                    style: AllyTypography.headline(
+                      size: 20,
+                      color: scheme.onSurface,
+                    ),
+                  ),
+                ],
               ),
-              const SizedBox(height: 24),
+              const SizedBox(height: AllySpacing.xl),
 
               // Price
               Row(
@@ -254,19 +167,18 @@ class _PremiumScreenState extends State<PremiumScreen> {
                     padding: const EdgeInsets.only(top: 8),
                     child: Text(
                       '\$',
-                      style: TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                        color: isDark ? Colors.white : Colors.black,
+                      style: AllyTypography.metric(
+                        size: 24,
+                        color: scheme.onSurface,
                       ),
                     ),
                   ),
                   Text(
                     price,
-                    style: TextStyle(
-                      fontSize: 56,
-                      fontWeight: FontWeight.bold,
-                      color: isDark ? Colors.white : Colors.black,
+                    style: AllyTypography.metric(
+                      size: 56,
+                      color: scheme.onSurface,
+                      weight: FontWeight.w700,
                       height: 1.1,
                     ),
                   ),
@@ -274,64 +186,46 @@ class _PremiumScreenState extends State<PremiumScreen> {
                     padding: const EdgeInsets.only(top: 14),
                     child: Text(
                       '/${l10n.month}',
-                      style: TextStyle(
-                        fontSize: 16,
-                        color: isDark ? Colors.grey[400] : Colors.grey[600],
-                        fontWeight: FontWeight.w500,
+                      style: AllyTypography.body(
+                        size: 16,
+                        color: scheme.onSurfaceVariant,
                       ),
                     ),
                   ),
                 ],
               ),
 
-              const SizedBox(height: 16),
+              const SizedBox(height: AllySpacing.lg),
 
               // Description
               Text(
-                title == 'Individual'
-                  ? 'mustafa abi sen halledersin\n tamamm mii??' //l10n ekleemeyi untumaa
-                  : l10n.allIndividualFeatures,
-                style: TextStyle(
-                  fontSize: 13,
-                  color: isDark ? Colors.grey[400] : Colors.grey[600],
+                description,
+                style: AllyTypography.body(
+                  size: 13,
+                  color: scheme.onSurfaceVariant,
                   height: 1.5,
                 ),
                 textAlign: TextAlign.center,
               ),
+
+              const Spacer(),
+
+              // Button
+              AllyButton(
+                label: title == 'Individual'
+                    ? l10n.getAllyPlan
+                    : l10n.getFamilyPlan,
+                onPressed: () {
+                  CustomNotification.show(
+                    context,
+                    message: l10n.subscribeToPlan(title),
+                    icon: Icons.star_rounded,
+                  );
+                },
+              ),
             ],
           ),
-
-          // Button
-          SizedBox(
-            width: double.infinity,
-            child: ElevatedButton(
-              onPressed: () {
-                CustomNotification.show(
-                  context,
-                  message: AppLocalizations.of(context)!.subscribeToPlan(title),
-                  backgroundColor: const Color(0xFF4BAADF),
-                  icon: Icons.star,
-                );
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF4BAADF),
-                foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(vertical: 16),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                elevation: 0,
-              ),
-              child: Text(
-                title == 'Individual' ? l10n.getAllyPlan : l10n.getFamilyPlan,
-                style: const TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ),
-          ),
-        ],
+        ),
       ),
     );
   }

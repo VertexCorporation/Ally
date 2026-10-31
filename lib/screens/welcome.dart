@@ -1,5 +1,17 @@
+// welcome.dart
+//
+// © 2026 Vertex Corporation
+// ─────────────────────────────────────────────────────────────────────────────
+// The first screen of Ally: clean, monochrome, premium.
+//
+// - Preserves Ally's identity (logo, name, motto) — never replaced by the
+//   Vertex corporate logo.
+// - Adds a subtle "BY VERTEX" attribution.
+// - Inherits the active application theme (no forced theme overrides).
+
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+
+import '../design_system/design_system.dart';
 import '../l10n/app_localizations.dart';
 import '../login/screen.dart';
 
@@ -10,24 +22,25 @@ class WelcomeScreen extends StatefulWidget {
   State<WelcomeScreen> createState() => _WelcomeScreenState();
 }
 
-class _WelcomeScreenState extends State<WelcomeScreen> with SingleTickerProviderStateMixin {
+class _WelcomeScreenState extends State<WelcomeScreen>
+    with SingleTickerProviderStateMixin {
   late AnimationController _slideController;
   late Animation<Offset> _slideAnimation;
-  
+
   @override
   void initState() {
     super.initState();
     _slideController = AnimationController(
-      duration: const Duration(milliseconds: 600),
+      duration: const Duration(milliseconds: 500),
       vsync: this,
     );
-    _slideAnimation = Tween<Offset>(
-      begin: Offset.zero,
-      end: const Offset(0, -1),
-    ).animate(CurvedAnimation(
-      parent: _slideController,
-      curve: Curves.easeInOutCubic,
-    ));
+    _slideAnimation =
+        Tween<Offset>(begin: Offset.zero, end: const Offset(0, -1)).animate(
+          CurvedAnimation(
+            parent: _slideController,
+            curve: Curves.easeInOutCubic,
+          ),
+        );
   }
 
   @override
@@ -38,127 +51,156 @@ class _WelcomeScreenState extends State<WelcomeScreen> with SingleTickerProvider
 
   void _navigateToLogin() {
     _slideController.forward();
-    
+
     Navigator.push(
       context,
       PageRouteBuilder(
-        pageBuilder: (context, animation, secondaryAnimation) => const LoginScreen(),
+        pageBuilder: (context, animation, secondaryAnimation) =>
+            const LoginScreen(),
         transitionsBuilder: (context, animation, secondaryAnimation, child) {
-          // Slide up when going forward, slide down when going back
-          var slideAnimation = Tween<Offset>(
-            begin: const Offset(0.0, 1.0),
-            end: Offset.zero,
-          ).animate(CurvedAnimation(
-            parent: animation,
-            curve: Curves.easeInOutCubic,
-          ));
+          // Slide up when going forward, slide down when going back.
+          var slideAnimation =
+              Tween<Offset>(
+                begin: const Offset(0.0, 1.0),
+                end: Offset.zero,
+              ).animate(
+                CurvedAnimation(
+                  parent: animation,
+                  curve: Curves.easeInOutCubic,
+                ),
+              );
 
-          return SlideTransition(
-            position: slideAnimation,
-            child: child,
-          );
+          return SlideTransition(position: slideAnimation, child: child);
         },
-        transitionDuration: const Duration(milliseconds: 600),
-        reverseTransitionDuration: const Duration(milliseconds: 600),
+        transitionDuration: const Duration(milliseconds: 500),
+        reverseTransitionDuration: const Duration(milliseconds: 500),
       ),
     ).then((_) {
-      // Reset welcome animation when returning
-      _slideController.reverse();
+      // Reset welcome animation when returning.
+      if (mounted) _slideController.reverse();
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    return Theme(
-      data: ThemeData.light(),
-      child: Scaffold(
-        appBar: AppBar(
-          backgroundColor: Colors.transparent,
-          elevation: 0,
-          toolbarHeight: 0,
-          systemOverlayStyle: const SystemUiOverlayStyle(
-            statusBarColor: Colors.transparent,
-            statusBarIconBrightness: Brightness.dark,
-            statusBarBrightness: Brightness.light,
-          ),
-        ),
-        body: SlideTransition(
-          position: _slideAnimation,
-          child: Container(
-            decoration: const BoxDecoration(
-              image: DecorationImage(
-                image: AssetImage('assets/images/background_welcome.png'),
-                fit: BoxFit.cover,
-                alignment: Alignment(0, -0.6),
-              ),
+    final l10n = AppLocalizations.of(context)!;
+    final ThemeData theme = Theme.of(context);
+    final ColorScheme scheme = theme.colorScheme;
+
+    return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        toolbarHeight: 0,
+      ),
+      body: SlideTransition(
+        position: _slideAnimation,
+        child: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(
+              AllySpacing.xxl,
+              AllySpacing.xl,
+              AllySpacing.xxl,
+              AllySpacing.xxl,
             ),
-            child: SafeArea(
-              child: Padding(
-                padding: const EdgeInsets.all(32.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // ── Brand mark ────────────────────────────────────────────
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(AllyRadius.sm),
+                      child: Image.asset(
+                        'assets/images/logo.png',
+                        width: 32,
+                        height: 32,
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                    const SizedBox(width: AllySpacing.md),
                     Text(
-                      AppLocalizations.of(context)!.ally,
-                      style: TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black,
-                        letterSpacing: 2,
+                      l10n.ally,
+                      style: AllyTypography.headline(
+                        size: 18,
+                        color: scheme.onSurface,
                       ),
                     ),
-                    
-                    const Spacer(flex: 4),
-                    
-                    RichText(
-                      text: TextSpan(
-                        style: TextStyle(
-                          fontSize: 36,
-                          color: Colors.black,
-                          height: 1.3,
-                        ),
-                        children: [
-                          TextSpan(text: '${AppLocalizations.of(context)!.welcomeText1}\n'),
-                          TextSpan(text: '${AppLocalizations.of(context)!.welcomeText2} '),
-                          TextSpan(
-                            text: AppLocalizations.of(context)!.welcomeText3,
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ],
+                    const SizedBox(width: AllySpacing.md),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: AllySpacing.sm,
+                        vertical: 3,
                       ),
-                    ),
-                    
-                    const SizedBox(height: 30),
-                  
-                    GestureDetector(
-                      onTap: _navigateToLogin,
-                      child: Container(
-                        width: double.infinity,
-                        padding: const EdgeInsets.symmetric(vertical: 20),
-                        decoration: BoxDecoration(
-                          color: Colors.black87,
-                          borderRadius: BorderRadius.circular(30),
-                          border: Border.all(color: Colors.black87, width: 2),
-                        ),
-                        child: Text(
-                          AppLocalizations.of(context)!.getStarted,
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 18,
-                            fontWeight: FontWeight.w600,
-                            letterSpacing: 0.5,
-                          ),
+                      decoration: BoxDecoration(
+                        borderRadius: AllyRadius.smAll,
+                        border: Border.all(color: scheme.outlineVariant),
+                      ),
+                      child: Text(
+                        'BY VERTEX',
+                        style: AllyTypography.label(
+                          size: 10,
+                          weight: FontWeight.w600,
+                          color: scheme.onSurfaceVariant,
+                          letterSpacing: 1.4,
                         ),
                       ),
                     ),
-                    
-                    const SizedBox(height: 5),
                   ],
                 ),
-              ),
+
+                const Spacer(flex: 4),
+
+                // ── Heading ───────────────────────────────────────────────
+                Text(
+                  l10n.welcomeText1,
+                  style: AllyTypography.display(
+                    size: 44,
+                    color: scheme.onSurface,
+                    letterSpacing: 0.5,
+                  ),
+                ),
+                const SizedBox(height: AllySpacing.md),
+                RichText(
+                  text: TextSpan(
+                    style: AllyTypography.headline(
+                      size: 26,
+                      color: scheme.onSurface,
+                      weight: FontWeight.w400,
+                    ).copyWith(height: 1.3),
+                    children: [
+                      TextSpan(text: '${l10n.welcomeText2} '),
+                      TextSpan(
+                        text: l10n.welcomeText3,
+                        style: AllyTypography.headline(
+                          size: 26,
+                          color: scheme.onSurface,
+                          weight: FontWeight.w600,
+                        ).copyWith(height: 1.3),
+                      ),
+                    ],
+                  ),
+                ),
+
+                const SizedBox(height: AllySpacing.lg),
+                Text(
+                  l10n.motto,
+                  style: AllyTypography.body(
+                    size: 15,
+                    color: scheme.onSurfaceVariant,
+                  ),
+                ),
+
+                const Spacer(flex: 5),
+
+                // ── Call to action ────────────────────────────────────────
+                AllyButton(
+                  label: l10n.getStarted,
+                  onPressed: _navigateToLogin,
+                  kind: AllyButtonKind.primary,
+                ),
+              ],
             ),
           ),
         ),

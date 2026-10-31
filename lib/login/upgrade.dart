@@ -13,7 +13,8 @@ class UpgradeAccountScreen extends StatefulWidget {
   State<UpgradeAccountScreen> createState() => _UpgradeAccountScreenState();
 }
 
-class _UpgradeAccountScreenState extends State<UpgradeAccountScreen> with TickerProviderStateMixin {
+class _UpgradeAccountScreenState extends State<UpgradeAccountScreen>
+    with TickerProviderStateMixin {
   late final LoginController _controller;
 
   // Input Controller'ları
@@ -33,8 +34,8 @@ class _UpgradeAccountScreenState extends State<UpgradeAccountScreen> with Ticker
     _controller.initialize(this, context);
 
     _shakeController = AnimationController(
-        vsync: this,
-        duration: const Duration(milliseconds: 500)
+      vsync: this,
+      duration: const Duration(milliseconds: 500),
     );
   }
 
@@ -70,7 +71,9 @@ class _UpgradeAccountScreenState extends State<UpgradeAccountScreen> with Ticker
     // Tabletlerde her şeyin devasa olmaması için scale'i 1.0 civarında sabitliyoruz.
     double scale = screenSize.width / 390.0;
     if (screenSize.width > 600) {
-      scale = 1.0 + (screenSize.width - 600) * 0.0001; // Tabletlerde çok az büyüme payı
+      scale =
+          1.0 +
+          (screenSize.width - 600) * 0.0001; // Tabletlerde çok az büyüme payı
     }
     // Scale faktörünü mantıklı sınırlar içinde tut (Çok küçük veya çok büyük olmasın)
     scale = scale.clamp(0.85, 1.2);
@@ -91,8 +94,8 @@ class _UpgradeAccountScreenState extends State<UpgradeAccountScreen> with Ticker
                   child: SingleChildScrollView(
                     // Klavye açılınca scroll olabilmesi için
                     padding: EdgeInsets.symmetric(
-                        horizontal: 32.0 * scale,
-                        vertical: 24.0 * scale
+                      horizontal: 32.0 * scale,
+                      vertical: 24.0 * scale,
                     ),
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -111,10 +114,14 @@ class _UpgradeAccountScreenState extends State<UpgradeAccountScreen> with Ticker
                         ),
                         SizedBox(height: 8 * scale),
                         Text(
-                          AppLocalizations.of(context)!.upgradeAccountDescription,
+                          AppLocalizations.of(
+                            context,
+                          )!.upgradeAccountDescription,
                           style: TextStyle(
                             fontSize: 16 * scale,
-                            color: AppColors.tertiaryColor.withValues(alpha: 0.7),
+                            color: AppColors.tertiaryColor.withValues(
+                              alpha: 0.7,
+                            ),
                             height: 1.4,
                           ),
                         ),
@@ -122,7 +129,6 @@ class _UpgradeAccountScreenState extends State<UpgradeAccountScreen> with Ticker
                         SizedBox(height: 32 * scale),
 
                         // --- FORM ---
-
                         _DynamicInput(
                           controller: _usernameController,
                           hintText: AppLocalizations.of(context)!.usernameHint,
@@ -150,24 +156,37 @@ class _UpgradeAccountScreenState extends State<UpgradeAccountScreen> with Ticker
                           scale: scale,
                           suffixIcon: IconButton(
                             icon: Icon(
-                              _isPasswordVisible ? Icons.visibility_outlined : Icons.visibility_off_outlined,
-                              color: AppColors.tertiaryColor.withValues(alpha: 0.6),
+                              _isPasswordVisible
+                                  ? Icons.visibility_outlined
+                                  : Icons.visibility_off_outlined,
+                              color: AppColors.tertiaryColor.withValues(
+                                alpha: 0.6,
+                              ),
                               size: 24 * scale,
                             ),
-                            onPressed: () => setState(() => _isPasswordVisible = !_isPasswordVisible),
+                            onPressed: () => setState(
+                              () => _isPasswordVisible = !_isPasswordVisible,
+                            ),
                           ),
                         ),
 
                         SizedBox(height: 24 * scale),
 
                         // --- TERMS CHECKBOX ---
-
                         GestureDetector(
-                          onTap: () => setState(() => _agreeToTerms = !_agreeToTerms),
+                          onTap: () =>
+                              setState(() => _agreeToTerms = !_agreeToTerms),
                           child: AnimatedBuilder(
                             animation: _shakeController,
                             builder: (context, child) {
-                              final offset = (10 * scale) * (0.5 - (0.5 - Curves.elasticIn.transform(_shakeController.value)).abs());
+                              final offset =
+                                  (10 * scale) *
+                                  (0.5 -
+                                      (0.5 -
+                                              Curves.elasticIn.transform(
+                                                _shakeController.value,
+                                              ))
+                                          .abs());
                               return Transform.translate(
                                 offset: Offset(offset, 0),
                                 child: child,
@@ -180,11 +199,20 @@ class _UpgradeAccountScreenState extends State<UpgradeAccountScreen> with Ticker
                                   height: 24 * scale,
                                   child: Checkbox(
                                     value: _agreeToTerms,
-                                    onChanged: (val) => setState(() => _agreeToTerms = val ?? false),
+                                    onChanged: (val) => setState(
+                                      () => _agreeToTerms = val ?? false,
+                                    ),
                                     activeColor: AppColors.senaryColor,
                                     checkColor: Colors.white,
-                                    side: BorderSide(color: AppColors.border, width: 1.5),
-                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4 * scale)),
+                                    side: BorderSide(
+                                      color: AppColors.border,
+                                      width: 1.5,
+                                    ),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(
+                                        4 * scale,
+                                      ),
+                                    ),
                                   ),
                                 ),
                                 SizedBox(width: 12 * scale),
@@ -192,11 +220,18 @@ class _UpgradeAccountScreenState extends State<UpgradeAccountScreen> with Ticker
                                   child: GestureDetector(
                                     onTap: () => _showTermsAndPolicy(context),
                                     child: Text(
-                                      AppLocalizations.of(context)!.iHaveReadAndAgree,
+                                      AppLocalizations.of(
+                                        context,
+                                      )!.iHaveReadAndAgree,
                                       style: TextStyle(
                                         fontSize: 13 * scale,
-                                        color: _agreeToTerms ? AppColors.tertiaryColor : AppColors.tertiaryColor.withValues(alpha: 0.6),
-                                        fontWeight: _agreeToTerms ? FontWeight.w600 : FontWeight.normal,
+                                        color: _agreeToTerms
+                                            ? AppColors.tertiaryColor
+                                            : AppColors.tertiaryColor
+                                                  .withValues(alpha: 0.6),
+                                        fontWeight: _agreeToTerms
+                                            ? FontWeight.w600
+                                            : FontWeight.normal,
                                       ),
                                     ),
                                   ),
@@ -209,40 +244,57 @@ class _UpgradeAccountScreenState extends State<UpgradeAccountScreen> with Ticker
                         SizedBox(height: 24 * scale),
 
                         // --- ACTION BUTTON ---
-
                         Consumer<LoginController>(
                           builder: (context, controller, _) {
                             return GestureDetector(
-                              onTap: controller.isLoading ? null : _submitUpgrade,
+                              onTap: controller.isLoading
+                                  ? null
+                                  : _submitUpgrade,
                               child: Container(
                                 width: double.infinity,
-                                padding: EdgeInsets.symmetric(vertical: 18 * scale),
+                                padding: EdgeInsets.symmetric(
+                                  vertical: 18 * scale,
+                                ),
                                 decoration: BoxDecoration(
-                                  color: _agreeToTerms ? AppColors.senaryColor : AppColors.secondaryColor,
-                                  borderRadius: BorderRadius.circular(30 * scale),
-                                  border: _agreeToTerms ? null : Border.all(color: AppColors.border),
+                                  color: _agreeToTerms
+                                      ? AppColors.senaryColor
+                                      : AppColors.secondaryColor,
+                                  borderRadius: BorderRadius.circular(
+                                    30 * scale,
+                                  ),
+                                  border: _agreeToTerms
+                                      ? null
+                                      : Border.all(color: AppColors.border),
                                 ),
                                 child: controller.isLoading
                                     ? SizedBox(
-                                  height: 20 * scale,
-                                  child: Center(
-                                    child: CircularProgressIndicator(
-                                      strokeWidth: 2,
-                                      valueColor: AlwaysStoppedAnimation<Color>(
-                                          _agreeToTerms ? Colors.white : AppColors.tertiaryColor
-                                      ),
-                                    ),
-                                  ),
-                                )
+                                        height: 20 * scale,
+                                        child: Center(
+                                          child: CircularProgressIndicator(
+                                            strokeWidth: 2,
+                                            valueColor:
+                                                AlwaysStoppedAnimation<Color>(
+                                                  _agreeToTerms
+                                                      ? Colors.white
+                                                      : AppColors.tertiaryColor,
+                                                ),
+                                          ),
+                                        ),
+                                      )
                                     : Text(
-                                  AppLocalizations.of(context)!.createAccount,
-                                  textAlign: TextAlign.center,
-                                  style: TextStyle(
-                                    color: _agreeToTerms ? Colors.white : AppColors.tertiaryColor.withValues(alpha: 0.5),
-                                    fontSize: 16 * scale,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
+                                        AppLocalizations.of(
+                                          context,
+                                        )!.createAccount,
+                                        textAlign: TextAlign.center,
+                                        style: TextStyle(
+                                          color: _agreeToTerms
+                                              ? Colors.white
+                                              : AppColors.tertiaryColor
+                                                    .withValues(alpha: 0.5),
+                                          fontSize: 16 * scale,
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
                               ),
                             );
                           },
@@ -251,29 +303,41 @@ class _UpgradeAccountScreenState extends State<UpgradeAccountScreen> with Ticker
                         SizedBox(height: 30 * scale),
 
                         // --- DIVIDER ---
-
                         Row(
                           children: [
-                            Expanded(child: Divider(color: AppColors.border, thickness: 1)),
+                            Expanded(
+                              child: Divider(
+                                color: AppColors.border,
+                                thickness: 1,
+                              ),
+                            ),
                             Padding(
-                              padding: EdgeInsets.symmetric(horizontal: 16 * scale),
+                              padding: EdgeInsets.symmetric(
+                                horizontal: 16 * scale,
+                              ),
                               child: Text(
                                 AppLocalizations.of(context)!.or,
                                 style: TextStyle(
-                                  color: AppColors.tertiaryColor.withValues(alpha: 0.5),
+                                  color: AppColors.tertiaryColor.withValues(
+                                    alpha: 0.5,
+                                  ),
                                   fontSize: 12 * scale,
                                   fontWeight: FontWeight.w600,
                                 ),
                               ),
                             ),
-                            Expanded(child: Divider(color: AppColors.border, thickness: 1)),
+                            Expanded(
+                              child: Divider(
+                                color: AppColors.border,
+                                thickness: 1,
+                              ),
+                            ),
                           ],
                         ),
 
                         SizedBox(height: 30 * scale),
 
                         // --- SOCIAL BUTTONS ---
-
                         _DynamicSocialButton(
                           text: AppLocalizations.of(context)!.continueWithApple,
                           icon: Icons.apple,
@@ -284,7 +348,9 @@ class _UpgradeAccountScreenState extends State<UpgradeAccountScreen> with Ticker
                         SizedBox(height: 16 * scale),
 
                         _DynamicSocialButton(
-                          text: AppLocalizations.of(context)!.continueWithGoogle,
+                          text: AppLocalizations.of(
+                            context,
+                          )!.continueWithGoogle,
                           icon: Icons.g_mobiledata_rounded,
                           scale: scale,
                           onTap: () => _controller.signInWithGoogle(context),
@@ -300,7 +366,9 @@ class _UpgradeAccountScreenState extends State<UpgradeAccountScreen> with Ticker
               // --- KAPAT BUTONU ---
               Positioned(
                 top: 16 * scale,
-                left: 16 * scale, // Sol üst Ally standartlarına daha uygun olabilir
+                left:
+                    16 *
+                    scale, // Sol üst Ally standartlarına daha uygun olabilir
                 child: GestureDetector(
                   onTap: () => Navigator.of(context).pop(),
                   child: Container(
@@ -385,8 +453,8 @@ class _DynamicInput extends StatelessWidget {
           borderSide: BorderSide(color: AppColors.tertiaryColor, width: 1.5),
         ),
         contentPadding: EdgeInsets.symmetric(
-            horizontal: 20 * scale,
-            vertical: 18 * scale // Yükseklik dinamik padding ile belirleniyor
+          horizontal: 20 * scale,
+          vertical: 18 * scale, // Yükseklik dinamik padding ile belirleniyor
         ),
       ),
     );
@@ -421,11 +489,7 @@ class _DynamicSocialButton extends StatelessWidget {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(
-                icon,
-                color: AppColors.tertiaryColor,
-                size: 24 * scale
-            ),
+            Icon(icon, color: AppColors.tertiaryColor, size: 24 * scale),
             SizedBox(width: 12 * scale),
             Text(
               text,

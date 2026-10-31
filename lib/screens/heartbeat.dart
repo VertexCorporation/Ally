@@ -1,7 +1,17 @@
+// heartbeat.dart
+//
+// © 2026 Vertex Corporation
+// ─────────────────────────────────────────────────────────────────────────────
+// Heart rate. The measurement logic and data source are untouched; presentation
+// follows the design system with the restrained heart-red accent and honest
+// empty states (no invented readings, no diagnoses).
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../providers/health.dart';
+
+import '../design_system/design_system.dart';
 import '../l10n/app_localizations.dart';
+import '../providers/health.dart';
 
 class HeartbeatScreen extends StatefulWidget {
   const HeartbeatScreen({super.key});
@@ -10,8 +20,8 @@ class HeartbeatScreen extends StatefulWidget {
   State<HeartbeatScreen> createState() => _HeartbeatScreenState();
 }
 
-class _HeartbeatScreenState extends State<HeartbeatScreen> with SingleTickerProviderStateMixin {
-  
+class _HeartbeatScreenState extends State<HeartbeatScreen>
+    with SingleTickerProviderStateMixin {
   late AnimationController _pulseController;
   late Animation<double> _pulseAnimation;
 
@@ -22,8 +32,8 @@ class _HeartbeatScreenState extends State<HeartbeatScreen> with SingleTickerProv
       vsync: this,
       duration: const Duration(milliseconds: 800),
     )..repeat(reverse: true);
-    
-    _pulseAnimation = Tween<double>(begin: 1.0, end: 1.15).animate(
+
+    _pulseAnimation = Tween<double>(begin: 1.0, end: 1.12).animate(
       CurvedAnimation(parent: _pulseController, curve: Curves.easeInOut),
     );
   }
@@ -36,156 +46,118 @@ class _HeartbeatScreenState extends State<HeartbeatScreen> with SingleTickerProv
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final ThemeData theme = Theme.of(context);
+    final ColorScheme scheme = theme.colorScheme;
+    final AllySemanticPalette semantics = context.allySemantics;
+    final heartColor = semantics.heartRate;
+
     final healthProvider = Provider.of<HealthProvider>(context);
     final healthData = healthProvider.healthData;
     final currentBpm = healthData.currentBpm;
-    final goalBpm = 60;
-    final progress = (180 - currentBpm) / (180 - goalBpm);
-    
+    final hasData = currentBpm > 0;
+
     return Scaffold(
-      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        leading: IconButton(
-          icon: Icon(Icons.chevron_left_rounded, color: Theme.of(context).iconTheme.color, size: 32),
-          onPressed: () => Navigator.pop(context),
-        ),
-        title: Text(AppLocalizations.of(context)!.heartRate, style: TextStyle(color: Theme.of(context).textTheme.bodyLarge?.color, fontWeight: FontWeight.bold)),
-      ),
+      appBar: AllyAppBar(title: l10n.heartRate),
       body: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.all(20.0),
+          padding: const EdgeInsets.all(AllySpacing.xl),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              // ── Current heart rate ──────────────────────────────────────
               Hero(
                 tag: 'heartbeat_card',
                 child: Material(
                   color: Colors.transparent,
-                  child: Container(
-                    padding: const EdgeInsets.all(24),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFE57373),
-                      borderRadius: BorderRadius.circular(24),
-                      boxShadow: [BoxShadow(color: const Color(0xFFE57373).withValues(alpha:0.3), blurRadius: 20, offset: const Offset(0, 10))],
-                    ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            AppLocalizations.of(context)!.currentHeartRate,
-                            style: const TextStyle(
-                              fontSize: 16,
-                              color: Colors.white70,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                          AnimatedBuilder(
-                            animation: _pulseAnimation,
-                            builder: (context, child) {
-                              return Transform.scale(
-                                scale: _pulseAnimation.value,
-                                child: Icon(
-                                  Icons.favorite, color: Colors.white),
-                              );
-                            },
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 12),
-                      ClipRRect(
-                        borderRadius: BorderRadius.circular(12),
-                        child: LinearProgressIndicator(
-                          value: progress.clamp(0.0, 1.0),
-                          minHeight: 12,
-                          backgroundColor: Colors.white70,
-                          valueColor: const AlwaysStoppedAnimation<Color>(Colors.white),
-                        ),
-                      ),
-                      const SizedBox(height: 16),
-                      Row(
-                        crossAxisAlignment: CrossAxisAlignment.end,
-                        children: [
-                          Text(
-                            '$currentBpm',
-                            style: const TextStyle(
-                              fontSize: 64,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white,
-                              height: 1,
-                            ),
-                          ),
-                          const SizedBox(width: 12),
-                          Padding(
-                            padding: const EdgeInsets.only(bottom: 8),
-                            child: Text(
-                              AppLocalizations.of(context)!.bpmUnit,
-                              style: const TextStyle(
-                                fontSize: 24,
-                                color: Colors.white70,
-                                fontWeight: FontWeight.w500,
+                  child: AllyCard(
+                    padding: const EdgeInsets.all(AllySpacing.xxl),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Container(
+                              width: AllyDimensions.iconChip,
+                              height: AllyDimensions.iconChip,
+                              decoration: BoxDecoration(
+                                color: heartColor.withValues(alpha: 0.14),
+                                borderRadius: AllyRadius.smAll,
+                              ),
+                              child: Icon(
+                                Icons.monitor_heart_rounded,
+                                color: heartColor,
+                                size: AllyDimensions.iconSm,
                               ),
                             ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-                ),
-              ),
-              const SizedBox(height: 32),
-              Text(
-                AppLocalizations.of(context)!.todaysReadings,
-                style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 16),
-              Expanded(
-                child: Container(
-                  padding: const EdgeInsets.all(20),
-                  decoration: BoxDecoration(
-                    color: Theme.of(context).cardColor,
-                    borderRadius: BorderRadius.circular(20),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withValues(alpha:0.05),
-                        blurRadius: 10,
-                        offset: const Offset(0, 4),
-                      ),
-                    ],
-                  ),
-                  child: Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          Icons.monitor_heart_outlined,
-                          size: 80,
-                          color: Colors.grey[300],
+                            const Spacer(),
+                            if (hasData)
+                              AnimatedBuilder(
+                                animation: _pulseAnimation,
+                                builder: (context, child) {
+                                  return Transform.scale(
+                                    scale: _pulseAnimation.value,
+                                    child: Icon(
+                                      Icons.favorite_rounded,
+                                      color: heartColor,
+                                      size: AllyDimensions.iconMd,
+                                    ),
+                                  );
+                                },
+                              ),
+                          ],
                         ),
-                        const SizedBox(height: 16),
+                        const SizedBox(height: AllySpacing.xl),
                         Text(
-                          AppLocalizations.of(context)!.noReadingsYet,
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.w600,
-                            color: Colors.grey[400],
+                          l10n.currentHeartRate,
+                          style: AllyTypography.label(
+                            size: 14,
+                            color: scheme.onSurfaceVariant,
                           ),
                         ),
-                        const SizedBox(height: 8),
-                        Text(
-                          AppLocalizations.of(context)!.requiresMonitor,
-                          style: TextStyle(
-                            fontSize: 14,
-                            color: Colors.grey[400],
-                          ),
+                        const SizedBox(height: AllySpacing.sm),
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          children: [
+                            Text(
+                              hasData ? '$currentBpm' : '—',
+                              style: AllyTypography.metric(
+                                size: 64,
+                                color: scheme.onSurface,
+                                weight: FontWeight.w700,
+                              ),
+                            ),
+                            const SizedBox(width: AllySpacing.md),
+                            Padding(
+                              padding: const EdgeInsets.only(bottom: 12),
+                              child: Text(
+                                l10n.bpmUnit,
+                                style: AllyTypography.body(
+                                  size: 20,
+                                  color: scheme.onSurfaceVariant,
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
                       ],
                     ),
+                  ),
+                ),
+              ),
+
+              const SizedBox(height: AllySpacing.section),
+
+              // ── Readings ────────────────────────────────────────────────
+              AllySectionHeader(title: l10n.todaysReadings),
+              const SizedBox(height: AllySpacing.lg),
+              Expanded(
+                child: AllyCard(
+                  child: AllyEmptyState(
+                    icon: Icons.monitor_heart_outlined,
+                    title: l10n.noReadingsYet,
+                    message: l10n.requiresMonitor,
+                    compact: true,
                   ),
                 ),
               ),

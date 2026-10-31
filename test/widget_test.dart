@@ -5,11 +5,7 @@ void main() {
   testWidgets('app smoke test', (WidgetTester tester) async {
     await tester.pumpWidget(
       const MaterialApp(
-        home: Scaffold(
-          body: Center(
-            child: Text('Ally'),
-          ),
-        ),
+        home: Scaffold(body: Center(child: Text('Ally'))),
       ),
     );
 

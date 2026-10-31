@@ -1,9 +1,16 @@
+// signup_screen.dart
+//
+// © 2026 Vertex Corporation
+// ─────────────────────────────────────────────────────────────────────────────
+// Multi-step sign-up (username → email → password). Authentication behaviour
+// (LoginBackendService + verification) is untouched; this file is presentation.
+
+import 'package:ally/design_system/design_system.dart';
 import 'package:ally/l10n/app_localizations.dart';
 import 'package:ally/login/backend.dart';
 import 'package:ally/login/verify.dart';
 import 'package:ally/main.dart' show isFirebaseInitialized;
 import 'package:ally/notifications/introvert.dart';
-import 'package:ally/theme.dart';
 import 'package:email_validator/email_validator.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -133,24 +140,24 @@ class _SignUpScreenState extends State<SignUpScreen> {
     return switch (_step) {
       _SignUpStep.username => l10n.registerSubtitle,
       _SignUpStep.email => l10n.enterEmailAddress,
-      _SignUpStep.password => l10n.invalidPassword,
+      _SignUpStep.password => l10n.pleaseCheckYourEmail,
     };
   }
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    final size = MediaQuery.sizeOf(context);
+    final ThemeData theme = Theme.of(context);
+    final ColorScheme scheme = theme.colorScheme;
     final stepIndex = _step.index;
 
     return Scaffold(
-      backgroundColor: AppColors.background,
       resizeToAvoidBottomInset: true,
       body: Stack(
         fit: StackFit.expand,
         children: [
           Opacity(
-            opacity: 0.14,
+            opacity: 0.10,
             child: Image.asset(
               _step == _SignUpStep.password
                   ? 'assets/images/background_signin.png'
@@ -164,11 +171,11 @@ class _SignUpScreenState extends State<SignUpScreen> {
               child: ConstrainedBox(
                 constraints: const BoxConstraints(maxWidth: 480),
                 child: SingleChildScrollView(
-                  padding: EdgeInsets.fromLTRB(
-                    28,
-                    20,
-                    28,
-                    MediaQuery.viewInsetsOf(context).bottom + 24,
+                  padding: const EdgeInsets.fromLTRB(
+                    AllySpacing.xxl,
+                    AllySpacing.xl,
+                    AllySpacing.xxl,
+                    AllySpacing.xxl,
                   ),
                   child: Form(
                     key: _formKey,
@@ -182,104 +189,68 @@ class _SignUpScreenState extends State<SignUpScreen> {
                             tooltip: l10n.backToLogin,
                             icon: Icon(
                               Icons.arrow_back_rounded,
-                              color: AppColors.tertiaryColor,
+                              color: scheme.onSurface,
                             ),
                           ),
                         ),
-                        const SizedBox(height: 18),
+                        const SizedBox(height: AllySpacing.md),
+
+                        // ── Step progress: monochrome hairline segments ──
                         Row(
                           children: List.generate(3, (index) {
                             return Expanded(
                               child: AnimatedContainer(
                                 duration: const Duration(milliseconds: 220),
-                                height: 4,
+                                height: 3,
                                 margin: EdgeInsets.only(
-                                  right: index == 2 ? 0 : 8,
+                                  right: index == 2 ? 0 : AllySpacing.sm,
                                 ),
                                 decoration: BoxDecoration(
                                   color: index <= stepIndex
-                                      ? AppColors.senaryColor
-                                      : AppColors.border.withValues(alpha: 0.5),
-                                  borderRadius: BorderRadius.circular(8),
+                                      ? scheme.onSurface
+                                      : scheme.outlineVariant,
+                                  borderRadius: BorderRadius.circular(2),
                                 ),
                               ),
                             );
                           }),
                         ),
-                        SizedBox(height: size.height * 0.06),
+                        const SizedBox(height: AllySpacing.xl),
+
                         Text(
                           _title,
-                          style: TextStyle(
-                            color: AppColors.tertiaryColor,
-                            fontSize: 28,
-                            fontWeight: FontWeight.w700,
+                          style: AllyTypography.headline(
+                            size: 26,
+                            color: scheme.onSurface,
                           ),
                         ),
-                        const SizedBox(height: 10),
+                        const SizedBox(height: AllySpacing.sm),
                         Text(
                           _subtitle,
-                          style: TextStyle(
-                            color: AppColors.tertiaryColor.withValues(
-                              alpha: 0.72,
-                            ),
-                            fontSize: 15,
-                            height: 1.45,
+                          style: AllyTypography.body(
+                            size: 15,
+                            color: scheme.onSurfaceVariant,
                           ),
                         ),
-                        SizedBox(height: size.height * 0.07),
+                        const SizedBox(height: AllySpacing.huge),
+
                         AnimatedSwitcher(
                           duration: const Duration(milliseconds: 220),
                           child: _buildCurrentField(l10n),
                         ),
-                        const SizedBox(height: 24),
-                        SizedBox(
-                          height: 56,
-                          child: FilledButton(
-                            onPressed: _isLoading
-                                ? null
-                                : _step == _SignUpStep.password
-                                    ? _submit
-                                    : _continue,
-                            style: FilledButton.styleFrom(
-                              backgroundColor: AppColors.senaryColor,
-                              foregroundColor: Colors.white,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(28),
-                              ),
-                              elevation: 0,
-                            ),
-                            child: _isLoading
-                                ? const SizedBox.square(
-                                    dimension: 22,
-                                    child: CircularProgressIndicator(
-                                      strokeWidth: 2,
-                                      color: Colors.white,
-                                    ),
-                                  )
-                                : Text(
-                                    _step == _SignUpStep.password
-                                        ? l10n.signUp
-                                        : l10n.next,
-                                    style: const TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.w600,
-                                    ),
-                                  ),
-                          ),
+                        const SizedBox(height: AllySpacing.xxl),
+
+                        AllyButton(
+                          label: _step == _SignUpStep.password
+                              ? l10n.signUp
+                              : l10n.next,
+                          isLoading: _isLoading,
+                          onPressed: _isLoading
+                              ? null
+                              : _step == _SignUpStep.password
+                              ? _submit
+                              : _continue,
                         ),
-                        const SizedBox(height: 18),
-                        if (_step == _SignUpStep.password)
-                          Text(
-                            l10n.pleaseCheckYourEmail,
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                              color: AppColors.tertiaryColor.withValues(
-                                alpha: 0.68,
-                              ),
-                              fontSize: 13,
-                              height: 1.4,
-                            ),
-                          ),
                       ],
                     ),
                   ),
@@ -293,110 +264,77 @@ class _SignUpScreenState extends State<SignUpScreen> {
   }
 
   Widget _buildCurrentField(AppLocalizations l10n) {
-    final decoration = InputDecoration(
-      filled: true,
-      fillColor: AppColors.secondaryColor.withValues(alpha: 0.94),
-      contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
-      border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(28),
-        borderSide: BorderSide(color: AppColors.border),
-      ),
-      enabledBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(28),
-        borderSide: BorderSide(color: AppColors.border),
-      ),
-      focusedBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(28),
-        borderSide: BorderSide(color: AppColors.senaryColor, width: 1.5),
-      ),
-      errorBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(28),
-        borderSide: BorderSide(color: AppColors.septenaryColor),
-      ),
-      focusedErrorBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(28),
-        borderSide: BorderSide(color: AppColors.septenaryColor, width: 1.5),
-      ),
-    );
-
     return switch (_step) {
-      _SignUpStep.username => TextFormField(
-          key: const ValueKey(_SignUpStep.username),
-          controller: _usernameController,
-          autofocus: true,
-          textInputAction: TextInputAction.next,
-          textCapitalization: TextCapitalization.none,
-          maxLength: 16,
-          style: TextStyle(color: AppColors.tertiaryColor),
-          decoration: decoration.copyWith(
-            hintText: l10n.usernameHint,
-            prefixIcon: const Icon(Icons.person_outline_rounded),
-            counterText: '',
-          ),
-          validator: (value) {
-            final username = value?.trim() ?? '';
-            if (username.length < 3) return l10n.usernameTooShort;
-            if (username.length > 16) return l10n.usernameTooLong;
-            if (!RegExp(r'^[a-z0-9çğıöşü._-]+$', caseSensitive: false)
-                .hasMatch(username)) {
-              return l10n.invalidUsernameCharacters;
-            }
-            return null;
+      _SignUpStep.username => AllyTextField(
+        key: const ValueKey(_SignUpStep.username),
+        controller: _usernameController,
+        autofocus: true,
+        textInputAction: TextInputAction.next,
+        textCapitalization: TextCapitalization.none,
+        maxLength: 16,
+        hint: l10n.usernameHint,
+        prefixIcon: Icons.person_outline_rounded,
+        validator: (value) {
+          final username = value?.trim() ?? '';
+          if (username.length < 3) return l10n.usernameTooShort;
+          if (username.length > 16) return l10n.usernameTooLong;
+          if (!RegExp(
+            r'^[a-z0-9çğıöşü._-]+$',
+            caseSensitive: false,
+          ).hasMatch(username)) {
+            return l10n.invalidUsernameCharacters;
+          }
+          return null;
+        },
+        onFieldSubmitted: (_) => _continue(),
+      ),
+      _SignUpStep.email => AllyTextField(
+        key: const ValueKey(_SignUpStep.email),
+        controller: _emailController,
+        autofocus: true,
+        keyboardType: TextInputType.emailAddress,
+        textInputAction: TextInputAction.next,
+        autocorrect: false,
+        enableSuggestions: false,
+        hint: l10n.emailHint,
+        prefixIcon: Icons.mail_outline_rounded,
+        validator: (value) {
+          if (!EmailValidator.validate(value?.trim() ?? '')) {
+            return l10n.invalidEmail;
+          }
+          return null;
+        },
+        onFieldSubmitted: (_) => _continue(),
+      ),
+      _SignUpStep.password => AllyTextField(
+        key: const ValueKey(_SignUpStep.password),
+        controller: _passwordController,
+        autofocus: true,
+        obscureText: !_isPasswordVisible,
+        textInputAction: TextInputAction.done,
+        maxLength: 64,
+        autocorrect: false,
+        enableSuggestions: false,
+        hint: l10n.passwordHint,
+        prefixIcon: Icons.lock_outline_rounded,
+        suffix: IconButton(
+          onPressed: () {
+            setState(() => _isPasswordVisible = !_isPasswordVisible);
           },
-          onFieldSubmitted: (_) => _continue(),
-        ),
-      _SignUpStep.email => TextFormField(
-          key: const ValueKey(_SignUpStep.email),
-          controller: _emailController,
-          autofocus: true,
-          keyboardType: TextInputType.emailAddress,
-          textInputAction: TextInputAction.next,
-          autocorrect: false,
-          enableSuggestions: false,
-          style: TextStyle(color: AppColors.tertiaryColor),
-          decoration: decoration.copyWith(
-            hintText: l10n.emailHint,
-            prefixIcon: const Icon(Icons.email_outlined),
+          icon: Icon(
+            _isPasswordVisible
+                ? Icons.visibility_off_outlined
+                : Icons.visibility_outlined,
           ),
-          validator: (value) {
-            if (!EmailValidator.validate(value?.trim() ?? '')) {
-              return l10n.invalidEmail;
-            }
-            return null;
-          },
-          onFieldSubmitted: (_) => _continue(),
         ),
-      _SignUpStep.password => TextFormField(
-          key: const ValueKey(_SignUpStep.password),
-          controller: _passwordController,
-          autofocus: true,
-          obscureText: !_isPasswordVisible,
-          textInputAction: TextInputAction.done,
-          maxLength: 64,
-          style: TextStyle(color: AppColors.tertiaryColor),
-          decoration: decoration.copyWith(
-            hintText: l10n.passwordHint,
-            prefixIcon: const Icon(Icons.lock_outline_rounded),
-            counterText: '',
-            suffixIcon: IconButton(
-              onPressed: () {
-                setState(() => _isPasswordVisible = !_isPasswordVisible);
-              },
-              icon: Icon(
-                _isPasswordVisible
-                    ? Icons.visibility_off_outlined
-                    : Icons.visibility_outlined,
-              ),
-            ),
-          ),
-          validator: (value) {
-            final password = value ?? '';
-            if (password.length < 6) return l10n.invalidPassword;
-            if (password.length > 64) return l10n.passwordTooLong;
-            return null;
-          },
-          onFieldSubmitted: (_) => _submit(),
-        ),
+        validator: (value) {
+          final password = value ?? '';
+          if (password.length < 6) return l10n.invalidPassword;
+          if (password.length > 64) return l10n.passwordTooLong;
+          return null;
+        },
+        onFieldSubmitted: (_) => _submit(),
+      ),
     };
   }
 }
