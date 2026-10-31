@@ -1271,7 +1271,7 @@ class AppLocalizationsRu extends AppLocalizations {
   String get sleepDuration => 'Продолжительность сна';
 
   @override
-  String get noSleepData => 'Данные о сне не записаны';
+  String get noSleepData => 'Сон ещё не записан';
 
   @override
   String get noSleepDataYet => 'Нет данных о сне';
@@ -2017,4 +2017,126 @@ class AppLocalizationsRu extends AppLocalizations {
   @override
   String get exitAppConfirmation =>
       'Are you sure you want to leave this amazing platform?';
+
+  @override
+  String get appearance => 'Внешний вид';
+
+  @override
+  String get personalInformation => 'Личная информация';
+
+  @override
+  String get goals => 'Цели';
+
+  @override
+  String get bmiTitle => 'Показатели тела';
+
+  @override
+  String get enableAlarm => 'Включить будильник';
+
+  @override
+  String get alarmTime => 'Время будильника';
+
+  @override
+  String get alarmBefore => 'Разбудить раньше';
+
+  @override
+  String get trackingEnabled => 'Автоотслеживание включено';
+
+  @override
+  String minutesShort(String count) {
+    return '$count мин';
+  }
+
+  @override
+  String hello(String name) {
+    return 'Привет, $name!';
+  }
+
+  @override
+  String get todaysMetrics => 'Показатели за сегодня';
+
+  @override
+  String get vitals => 'Показатели организма';
+
+  @override
+  String get recentActivity => 'Недавняя активность';
+
+  @override
+  String sleepGoalHint(String hours) {
+    return 'Цель: $hours ч';
+  }
+
+  @override
+  String get allyAi => 'Ally AI';
+
+  @override
+  String get allyAiTagline => 'Спросите о чём угодно о здоровье';
+
+  @override
+  String get aiWelcome =>
+      'Привет! Я Ally AI. Спросите меня о чём угодно о вашем здоровье и привычках.';
+
+  @override
+  String get aiMessageHint => 'Сообщение для Ally AI';
+
+  @override
+  String get aiSend => 'Отправить';
+
+  @override
+  String get aiErrorUnauthenticated =>
+      'Войдите или продолжьте как гость, чтобы использовать Ally AI.';
+
+  @override
+  String get aiErrorInvalidArgument =>
+      'Проверьте сообщение и попробуйте снова.';
+
+  @override
+  String get aiErrorRateLimit =>
+      'Вы достигли дневного лимита запросов к ИИ. Попробуйте позже.';
+
+  @override
+  String get aiErrorUnavailable =>
+      'Ally AI временно недоступен. Попробуйте снова.';
+
+  @override
+  String get aiErrorGeneric =>
+      'Произошла ошибка при подключении к Ally AI. Попробуйте снова.';
+
+  @override
+  String aiGuestLimitHint(int remaining) {
+    return 'Осталось запросов сегодня: $remaining';
+  }
+
+  @override
+  String get chooseUnitsTitle => 'Выберите единицы измерения';
+
+  @override
+  String get chooseUnitsSubtitle => 'Выберите предпочитаемую систему измерения';
+
+  @override
+  String get metricUnits => 'Метрическая';
+
+  @override
+  String get imperialUnits => 'Имперская';
+
+  @override
+  String get onboardWeightTitle => 'Какой у вас вес?';
+
+  @override
+  String get onboardWeightSubtitle => 'Помогите нам персонализировать путь';
+
+  @override
+  String get onboardHeightTitle => 'Какой у вас рост?';
+
+  @override
+  String get onboardHeightSubtitle => 'Мы рассчитаем ваши идеальные показатели';
+
+  @override
+  String get onboardAgeTitle => 'Сколько вам лет?';
+
+  @override
+  String get onboardAgeSubtitle => 'Давайте создадим идеальный план здоровья';
+
+  @override
+  String get yearsUnit => 'лет';
 }

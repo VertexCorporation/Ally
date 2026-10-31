@@ -1261,7 +1261,7 @@ class AppLocalizationsKo extends AppLocalizations {
   String get sleepDuration => '수면 시간';
 
   @override
-  String get noSleepData => '수면 데이터 없음';
+  String get noSleepData => '아직 수면 기록이 없습니다';
 
   @override
   String get noSleepDataYet => '아직 수면 데이터가 없습니다';
@@ -1999,4 +1999,120 @@ class AppLocalizationsKo extends AppLocalizations {
   @override
   String get exitAppConfirmation =>
       'Are you sure you want to leave this amazing platform?';
+
+  @override
+  String get appearance => '모양';
+
+  @override
+  String get personalInformation => '개인 정보';
+
+  @override
+  String get goals => '목표';
+
+  @override
+  String get bmiTitle => '신체 지표';
+
+  @override
+  String get enableAlarm => '알람 사용';
+
+  @override
+  String get alarmTime => '알람 시간';
+
+  @override
+  String get alarmBefore => '미리 깨우기';
+
+  @override
+  String get trackingEnabled => '자동 추적이 사용 설정되었습니다';
+
+  @override
+  String minutesShort(String count) {
+    return '$count분';
+  }
+
+  @override
+  String hello(String name) {
+    return '안녕하세요, $name님!';
+  }
+
+  @override
+  String get todaysMetrics => '오늘의 지표';
+
+  @override
+  String get vitals => '활력 징후';
+
+  @override
+  String get recentActivity => '최근 활동';
+
+  @override
+  String sleepGoalHint(String hours) {
+    return '목표: $hours시간';
+  }
+
+  @override
+  String get allyAi => 'Ally AI';
+
+  @override
+  String get allyAiTagline => '건강에 대해 무엇이든 물어보세요';
+
+  @override
+  String get aiWelcome => '안녕하세요! Ally AI입니다. 건강과 습관에 대해 무엇이든 물어보세요.';
+
+  @override
+  String get aiMessageHint => 'Ally AI에게 메시지';
+
+  @override
+  String get aiSend => '보내기';
+
+  @override
+  String get aiErrorUnauthenticated => 'Ally AI를 사용하려면 로그인하거나 게스트로 계속하세요.';
+
+  @override
+  String get aiErrorInvalidArgument => '메시지를 확인하고 다시 시도하세요.';
+
+  @override
+  String get aiErrorRateLimit => '오늘의 AI 요청 한도에 도달했습니다. 나중에 다시 시도하세요.';
+
+  @override
+  String get aiErrorUnavailable => 'Ally AI를 일시적으로 사용할 수 없습니다. 다시 시도하세요.';
+
+  @override
+  String get aiErrorGeneric => 'Ally AI에 연결하는 중 문제가 발생했습니다. 다시 시도하세요.';
+
+  @override
+  String aiGuestLimitHint(int remaining) {
+    return '오늘 $remaining회 남았습니다';
+  }
+
+  @override
+  String get chooseUnitsTitle => '단위 선택';
+
+  @override
+  String get chooseUnitsSubtitle => '선호하는 측정 시스템을 선택하세요';
+
+  @override
+  String get metricUnits => '미터법';
+
+  @override
+  String get imperialUnits => '야드파운드법';
+
+  @override
+  String get onboardWeightTitle => '체중은 얼마인가요?';
+
+  @override
+  String get onboardWeightSubtitle => '여정을 맞춤화하도록 도와주세요';
+
+  @override
+  String get onboardHeightTitle => '키는 얼마인가요?';
+
+  @override
+  String get onboardHeightSubtitle => '이상적인 지표를 계산해 드립니다';
+
+  @override
+  String get onboardAgeTitle => '나이는 어떻게 되나요?';
+
+  @override
+  String get onboardAgeSubtitle => '완벽한 건강 계획을 세워 봅시다';
+
+  @override
+  String get yearsUnit => '세';
 }

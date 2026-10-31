@@ -260,7 +260,7 @@ class AppLocalizationsNl extends AppLocalizations {
   String get getStarted => 'Aan de slag';
 
   @override
-  String get startJourney => 'Start je reis';
+  String get startJourney => 'Start de reis';
 
   @override
   String get personalizeJourney => 'Help ons je reis te personaliseren';
@@ -1271,7 +1271,7 @@ class AppLocalizationsNl extends AppLocalizations {
   String get sleepDuration => 'Slaapduur';
 
   @override
-  String get noSleepData => 'Geen slaapgegevens opgenomen';
+  String get noSleepData => 'Nog geen slaap geregistreerd';
 
   @override
   String get noSleepDataYet => 'Nog geen slaapgegevens';
@@ -2016,4 +2016,126 @@ class AppLocalizationsNl extends AppLocalizations {
   @override
   String get exitAppConfirmation =>
       'Are you sure you want to leave this amazing platform?';
+
+  @override
+  String get appearance => 'Weergave';
+
+  @override
+  String get personalInformation => 'Persoonlijke gegevens';
+
+  @override
+  String get goals => 'Doelen';
+
+  @override
+  String get bmiTitle => 'Lichaamsmetrieken';
+
+  @override
+  String get enableAlarm => 'Alarm inschakelen';
+
+  @override
+  String get alarmTime => 'Alarmtijd';
+
+  @override
+  String get alarmBefore => 'Eerder wekken';
+
+  @override
+  String get trackingEnabled => 'Automatische tracking ingeschakeld';
+
+  @override
+  String minutesShort(String count) {
+    return '$count min';
+  }
+
+  @override
+  String hello(String name) {
+    return 'Hallo, $name!';
+  }
+
+  @override
+  String get todaysMetrics => 'Metrieken van vandaag';
+
+  @override
+  String get vitals => 'Vitaliteitswaarden';
+
+  @override
+  String get recentActivity => 'Recente activiteit';
+
+  @override
+  String sleepGoalHint(String hours) {
+    return 'Doel: $hours u';
+  }
+
+  @override
+  String get allyAi => 'Ally AI';
+
+  @override
+  String get allyAiTagline => 'Vraag alles over je gezondheid';
+
+  @override
+  String get aiWelcome =>
+      'Hallo! Ik ben Ally AI. Stel mij al je vragen over je gezondheid en gewoontes.';
+
+  @override
+  String get aiMessageHint => 'Bericht aan Ally AI';
+
+  @override
+  String get aiSend => 'Versturen';
+
+  @override
+  String get aiErrorUnauthenticated =>
+      'Log in of ga verder als gast om Ally AI te gebruiken.';
+
+  @override
+  String get aiErrorInvalidArgument =>
+      'Controleer je bericht en probeer het opnieuw.';
+
+  @override
+  String get aiErrorRateLimit =>
+      'Je hebt het dagelijkse AI-verzoekslimiet bereikt. Probeer het later opnieuw.';
+
+  @override
+  String get aiErrorUnavailable =>
+      'Ally AI is tijdelijk niet beschikbaar. Probeer het opnieuw.';
+
+  @override
+  String get aiErrorGeneric =>
+      'Er is een probleem bij het verbinden met Ally AI. Probeer het opnieuw.';
+
+  @override
+  String aiGuestLimitHint(int remaining) {
+    return 'Vandaag nog $remaining verzoeken over';
+  }
+
+  @override
+  String get chooseUnitsTitle => 'Kies je eenheden';
+
+  @override
+  String get chooseUnitsSubtitle => 'Selecteer je favoriete meetsysteem';
+
+  @override
+  String get metricUnits => 'Metrisch';
+
+  @override
+  String get imperialUnits => 'Imperial';
+
+  @override
+  String get onboardWeightTitle => 'Wat is je gewicht?';
+
+  @override
+  String get onboardWeightSubtitle => 'Help ons je reis te personaliseren';
+
+  @override
+  String get onboardHeightTitle => 'Wat is je lengte?';
+
+  @override
+  String get onboardHeightSubtitle => 'We berekenen je ideale metrieken';
+
+  @override
+  String get onboardAgeTitle => 'Hoe oud ben je?';
+
+  @override
+  String get onboardAgeSubtitle => 'Laten we je perfecte gezondheidsplan maken';
+
+  @override
+  String get yearsUnit => 'jaar';
 }

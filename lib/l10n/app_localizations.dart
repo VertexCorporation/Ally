@@ -599,7 +599,7 @@ abstract class AppLocalizations {
   /// No description provided for @startJourney.
   ///
   /// In en, this message translates to:
-  /// **'Start Journey'**
+  /// **'Start journey'**
   String get startJourney;
 
   /// No description provided for @personalizeJourney.
@@ -2469,7 +2469,7 @@ abstract class AppLocalizations {
   /// No description provided for @noSleepData.
   ///
   /// In en, this message translates to:
-  /// **'No sleep data recorded'**
+  /// **'No sleep recorded yet'**
   String get noSleepData;
 
   /// No description provided for @noSleepDataYet.
@@ -3849,6 +3849,222 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Are you sure you want to leave this amazing platform?'**
   String get exitAppConfirmation;
+
+  /// No description provided for @appearance.
+  ///
+  /// In en, this message translates to:
+  /// **'Appearance'**
+  String get appearance;
+
+  /// No description provided for @personalInformation.
+  ///
+  /// In en, this message translates to:
+  /// **'Personal information'**
+  String get personalInformation;
+
+  /// No description provided for @goals.
+  ///
+  /// In en, this message translates to:
+  /// **'Goals'**
+  String get goals;
+
+  /// No description provided for @bmiTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Body metrics'**
+  String get bmiTitle;
+
+  /// No description provided for @enableAlarm.
+  ///
+  /// In en, this message translates to:
+  /// **'Enable alarm'**
+  String get enableAlarm;
+
+  /// No description provided for @alarmTime.
+  ///
+  /// In en, this message translates to:
+  /// **'Alarm time'**
+  String get alarmTime;
+
+  /// No description provided for @alarmBefore.
+  ///
+  /// In en, this message translates to:
+  /// **'Wake me up before'**
+  String get alarmBefore;
+
+  /// No description provided for @trackingEnabled.
+  ///
+  /// In en, this message translates to:
+  /// **'Automatic tracking enabled'**
+  String get trackingEnabled;
+
+  /// No description provided for @minutesShort.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} min'**
+  String minutesShort(String count);
+
+  /// No description provided for @hello.
+  ///
+  /// In en, this message translates to:
+  /// **'Hello, {name}!'**
+  String hello(String name);
+
+  /// No description provided for @todaysMetrics.
+  ///
+  /// In en, this message translates to:
+  /// **'Today\'s metrics'**
+  String get todaysMetrics;
+
+  /// No description provided for @vitals.
+  ///
+  /// In en, this message translates to:
+  /// **'Vitals'**
+  String get vitals;
+
+  /// No description provided for @recentActivity.
+  ///
+  /// In en, this message translates to:
+  /// **'Recent activity'**
+  String get recentActivity;
+
+  /// No description provided for @sleepGoalHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Goal: {hours} h'**
+  String sleepGoalHint(String hours);
+
+  /// No description provided for @allyAi.
+  ///
+  /// In en, this message translates to:
+  /// **'Ally AI'**
+  String get allyAi;
+
+  /// No description provided for @allyAiTagline.
+  ///
+  /// In en, this message translates to:
+  /// **'Ask anything about your health'**
+  String get allyAiTagline;
+
+  /// No description provided for @aiWelcome.
+  ///
+  /// In en, this message translates to:
+  /// **'Hi! I\'m Ally AI. Ask me anything about your health and habits.'**
+  String get aiWelcome;
+
+  /// No description provided for @aiMessageHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Message Ally AI'**
+  String get aiMessageHint;
+
+  /// No description provided for @aiSend.
+  ///
+  /// In en, this message translates to:
+  /// **'Send'**
+  String get aiSend;
+
+  /// No description provided for @aiErrorUnauthenticated.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign in or continue as a guest to use Ally AI.'**
+  String get aiErrorUnauthenticated;
+
+  /// No description provided for @aiErrorInvalidArgument.
+  ///
+  /// In en, this message translates to:
+  /// **'Please check your message and try again.'**
+  String get aiErrorInvalidArgument;
+
+  /// No description provided for @aiErrorRateLimit.
+  ///
+  /// In en, this message translates to:
+  /// **'You have reached today\'s AI request limit. Please try again later.'**
+  String get aiErrorRateLimit;
+
+  /// No description provided for @aiErrorUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Ally AI is temporarily unavailable. Please try again.'**
+  String get aiErrorUnavailable;
+
+  /// No description provided for @aiErrorGeneric.
+  ///
+  /// In en, this message translates to:
+  /// **'Something went wrong while contacting Ally AI. Please try again.'**
+  String get aiErrorGeneric;
+
+  /// No description provided for @aiGuestLimitHint.
+  ///
+  /// In en, this message translates to:
+  /// **'{remaining} requests left today'**
+  String aiGuestLimitHint(int remaining);
+
+  /// No description provided for @chooseUnitsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose your units'**
+  String get chooseUnitsTitle;
+
+  /// No description provided for @chooseUnitsSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Select the measurement system you prefer'**
+  String get chooseUnitsSubtitle;
+
+  /// No description provided for @metricUnits.
+  ///
+  /// In en, this message translates to:
+  /// **'Metric'**
+  String get metricUnits;
+
+  /// No description provided for @imperialUnits.
+  ///
+  /// In en, this message translates to:
+  /// **'Imperial'**
+  String get imperialUnits;
+
+  /// No description provided for @onboardWeightTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'What\'s your weight?'**
+  String get onboardWeightTitle;
+
+  /// No description provided for @onboardWeightSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Help us personalize your journey'**
+  String get onboardWeightSubtitle;
+
+  /// No description provided for @onboardHeightTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'What\'s your height?'**
+  String get onboardHeightTitle;
+
+  /// No description provided for @onboardHeightSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'We\'ll calculate your ideal metrics'**
+  String get onboardHeightSubtitle;
+
+  /// No description provided for @onboardAgeTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'What\'s your age?'**
+  String get onboardAgeTitle;
+
+  /// No description provided for @onboardAgeSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Let\'s create your perfect health plan'**
+  String get onboardAgeSubtitle;
+
+  /// No description provided for @yearsUnit.
+  ///
+  /// In en, this message translates to:
+  /// **'years'**
+  String get yearsUnit;
 }
 
 class _AppLocalizationsDelegate

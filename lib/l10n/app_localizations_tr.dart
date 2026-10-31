@@ -260,7 +260,7 @@ class AppLocalizationsTr extends AppLocalizations {
   String get getStarted => 'Başla';
 
   @override
-  String get startJourney => 'Yolculuğa Başla';
+  String get startJourney => 'Yolculuğa başla';
 
   @override
   String get personalizeJourney => 'Yolculuğunu kişiselleştirmemize yardım et';
@@ -1268,7 +1268,7 @@ class AppLocalizationsTr extends AppLocalizations {
   String get sleepDuration => 'Uyku Süresi';
 
   @override
-  String get noSleepData => 'Uyku verisi kaydedilmedi';
+  String get noSleepData => 'Henüz uyku kaydı yok';
 
   @override
   String get noSleepDataYet => 'Henüz uyku verisi yok';
@@ -2017,5 +2017,129 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get exitAppConfirmation =>
-      'Bu muhteşem platformdan ayrılmak istediğinizden emin misiniz?';
+      'Bu harika platformdan ayrılmak istediğine emin misin?';
+
+  @override
+  String get appearance => 'Görünüm';
+
+  @override
+  String get personalInformation => 'Kişisel bilgiler';
+
+  @override
+  String get goals => 'Hedefler';
+
+  @override
+  String get bmiTitle => 'Vücut metrikleri';
+
+  @override
+  String get enableAlarm => 'Alarmı etkinleştir';
+
+  @override
+  String get alarmTime => 'Alarm saati';
+
+  @override
+  String get alarmBefore => 'Önce uyandır';
+
+  @override
+  String get trackingEnabled => 'Otomatik takip etkinleştirildi';
+
+  @override
+  String minutesShort(String count) {
+    return '$count dk';
+  }
+
+  @override
+  String hello(String name) {
+    return 'Merhaba, $name!';
+  }
+
+  @override
+  String get todaysMetrics => 'Bugünün metrikleri';
+
+  @override
+  String get vitals => 'Yaşamsal veriler';
+
+  @override
+  String get recentActivity => 'Son aktiviteler';
+
+  @override
+  String sleepGoalHint(String hours) {
+    return 'Hedef: $hours sa';
+  }
+
+  @override
+  String get allyAi => 'Ally AI';
+
+  @override
+  String get allyAiTagline => 'Sağlığınla ilgili her şeyi sor';
+
+  @override
+  String get aiWelcome =>
+      'Merhaba! Ben Ally AI. Sağlığın ve alışkanlıkların hakkında bana her şeyi sorabilirsin.';
+
+  @override
+  String get aiMessageHint => 'Ally AI\'a mesaj yaz';
+
+  @override
+  String get aiSend => 'Gönder';
+
+  @override
+  String get aiErrorUnauthenticated =>
+      'Ally AI\'ı kullanmak için giriş yap veya misafir olarak devam et.';
+
+  @override
+  String get aiErrorInvalidArgument =>
+      'Lütfen mesajını kontrol et ve tekrar dene.';
+
+  @override
+  String get aiErrorRateLimit =>
+      'Bugünkü AI isteği limitine ulaştın. Lütfen daha sonra tekrar dene.';
+
+  @override
+  String get aiErrorUnavailable =>
+      'Ally AI şu anda kullanılamıyor. Lütfen tekrar dene.';
+
+  @override
+  String get aiErrorGeneric =>
+      'Ally AI\'a bağlanırken bir sorun oluştu. Lütfen tekrar dene.';
+
+  @override
+  String aiGuestLimitHint(int remaining) {
+    return 'Bugün $remaining istek kaldı';
+  }
+
+  @override
+  String get chooseUnitsTitle => 'Birimlerini seç';
+
+  @override
+  String get chooseUnitsSubtitle => 'Tercih ettiğin ölçüm sistemini seç';
+
+  @override
+  String get metricUnits => 'Metrik';
+
+  @override
+  String get imperialUnits => 'İngiliz';
+
+  @override
+  String get onboardWeightTitle => 'Kilon kaç?';
+
+  @override
+  String get onboardWeightSubtitle =>
+      'Yolculuğunu kişiselleştirmemize yardım et';
+
+  @override
+  String get onboardHeightTitle => 'Boyun kaç?';
+
+  @override
+  String get onboardHeightSubtitle => 'İdeal metriklerini hesaplayacağız';
+
+  @override
+  String get onboardAgeTitle => 'Yaşın kaç?';
+
+  @override
+  String get onboardAgeSubtitle =>
+      'Mükemmel sağlık planını birlikte oluşturalım';
+
+  @override
+  String get yearsUnit => 'yaş';
 }

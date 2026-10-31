@@ -1273,7 +1273,7 @@ class AppLocalizationsHi extends AppLocalizations {
   String get sleepDuration => 'नींद की अवधि';
 
   @override
-  String get noSleepData => 'कोई नींद डेटा दर्ज नहीं किया गया';
+  String get noSleepData => 'अभी कोई नींद दर्ज नहीं है';
 
   @override
   String get noSleepDataYet => 'अभी तक कोई नींद डेटा नहीं';
@@ -2021,4 +2021,127 @@ class AppLocalizationsHi extends AppLocalizations {
   @override
   String get exitAppConfirmation =>
       'क्या आप वाकई इस शानदार प्लेटफॉर्म को छोड़ना चाहते हैं?';
+
+  @override
+  String get appearance => 'रूप-रंग';
+
+  @override
+  String get personalInformation => 'व्यक्तिगत जानकारी';
+
+  @override
+  String get goals => 'लक्ष्य';
+
+  @override
+  String get bmiTitle => 'शरीर मेट्रिक्स';
+
+  @override
+  String get enableAlarm => 'अलार्म चालू करें';
+
+  @override
+  String get alarmTime => 'अलार्म समय';
+
+  @override
+  String get alarmBefore => 'पहले जगाएँ';
+
+  @override
+  String get trackingEnabled => 'स्वतः ट्रैकिंग चालू';
+
+  @override
+  String minutesShort(String count) {
+    return '$count मि.';
+  }
+
+  @override
+  String hello(String name) {
+    return 'नमस्ते, $name!';
+  }
+
+  @override
+  String get todaysMetrics => 'आज के मेट्रिक्स';
+
+  @override
+  String get vitals => 'वाइटल्स';
+
+  @override
+  String get recentActivity => 'हाल की गतिविधि';
+
+  @override
+  String sleepGoalHint(String hours) {
+    return 'लक्ष्य: $hours घं.';
+  }
+
+  @override
+  String get allyAi => 'Ally AI';
+
+  @override
+  String get allyAiTagline => 'अपनी सेहत के बारे में कुछ भी पूछें';
+
+  @override
+  String get aiWelcome =>
+      'नमस्ते! मैं Ally AI हूँ। अपनी सेहत और आदतों के बारे में कुछ भी पूछें।';
+
+  @override
+  String get aiMessageHint => 'Ally AI को संदेश';
+
+  @override
+  String get aiSend => 'भेजें';
+
+  @override
+  String get aiErrorUnauthenticated =>
+      'Ally AI का उपयोग करने के लिए साइन इन करें या अतिथि के रूप में जारी रखें।';
+
+  @override
+  String get aiErrorInvalidArgument =>
+      'कृपया अपना संदेश जाँचें और फिर से प्रयास करें।';
+
+  @override
+  String get aiErrorRateLimit =>
+      'आज की AI अनुरोध सीमा पूरी हो गई है। कृपया बाद में प्रयास करें।';
+
+  @override
+  String get aiErrorUnavailable =>
+      'Ally AI अस्थायी रूप से उपलब्ध नहीं है। कृपया फिर से प्रयास करें।';
+
+  @override
+  String get aiErrorGeneric =>
+      'Ally AI से कनेक्ट करने में समस्या हुई। कृपया फिर से प्रयास करें।';
+
+  @override
+  String aiGuestLimitHint(int remaining) {
+    return 'आज $remaining अनुरोध शेष';
+  }
+
+  @override
+  String get chooseUnitsTitle => 'अपनी इकाइयाँ चुनें';
+
+  @override
+  String get chooseUnitsSubtitle => 'अपनी पसंदीदा माप प्रणाली चुनें';
+
+  @override
+  String get metricUnits => 'मीट्रिक';
+
+  @override
+  String get imperialUnits => 'इम्पीरियल';
+
+  @override
+  String get onboardWeightTitle => 'आपका वज़न क्या है?';
+
+  @override
+  String get onboardWeightSubtitle =>
+      'अपनी यात्रा को वैयक्तिक बनाने में हमारी मदद करें';
+
+  @override
+  String get onboardHeightTitle => 'आपकी ऊँचाई क्या है?';
+
+  @override
+  String get onboardHeightSubtitle => 'हम आपके आदर्श मेट्रिक्स की गणना करेंगे';
+
+  @override
+  String get onboardAgeTitle => 'आपकी उम्र क्या है?';
+
+  @override
+  String get onboardAgeSubtitle => 'आइए आपकी सही सेहत योजना बनाएँ';
+
+  @override
+  String get yearsUnit => 'वर्ष';
 }

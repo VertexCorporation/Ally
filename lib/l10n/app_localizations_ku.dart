@@ -260,7 +260,7 @@ class AppLocalizationsKu extends AppLocalizations {
   String get getStarted => 'Dest pê bike';
 
   @override
-  String get startJourney => 'Rêwîtiyê Dest Pê Bike';
+  String get startJourney => 'Rêwîtiyê dest pê bike';
 
   @override
   String get personalizeJourney =>
@@ -1274,7 +1274,7 @@ class AppLocalizationsKu extends AppLocalizations {
   String get sleepDuration => 'Dema Xewê';
 
   @override
-  String get noSleepData => 'Daneya xewê nehatiye tomarkirin';
+  String get noSleepData => 'Hîn agahî ya xew tune ye';
 
   @override
   String get noSleepDataYet => 'Hîn daneya xewê tune';
@@ -2020,4 +2020,129 @@ class AppLocalizationsKu extends AppLocalizations {
   @override
   String get exitAppConfirmation =>
       'Are you sure you want to leave this amazing platform?';
+
+  @override
+  String get appearance => 'Dîmen';
+
+  @override
+  String get personalInformation => 'Agahiyên kesane';
+
+  @override
+  String get goals => 'Armanc';
+
+  @override
+  String get bmiTitle => 'Pîvandinên laşî';
+
+  @override
+  String get enableAlarm => 'Alêrmê çalak bike';
+
+  @override
+  String get alarmTime => 'Dema alêrmê';
+
+  @override
+  String get alarmBefore => 'Ji ber bihiştin';
+
+  @override
+  String get trackingEnabled => 'Şopandinê otomatîk çalak bû';
+
+  @override
+  String minutesShort(String count) {
+    return '$count xulek';
+  }
+
+  @override
+  String hello(String name) {
+    return 'Silav, $name!';
+  }
+
+  @override
+  String get todaysMetrics => 'Pîvandinên îro';
+
+  @override
+  String get vitals => 'Nîşaneyên jîndar';
+
+  @override
+  String get recentActivity => 'Çalakiyên dawî';
+
+  @override
+  String sleepGoalHint(String hours) {
+    return 'Armanc: $hours st';
+  }
+
+  @override
+  String get allyAi => 'Ally AI';
+
+  @override
+  String get allyAiTagline => 'Li ser tenduristiya xwe her tiştî bipirse';
+
+  @override
+  String get aiWelcome =>
+      'Silav! Ez Ally AI im. Li ser tenduristî û adetên xwe her tiştî ji min bipirse.';
+
+  @override
+  String get aiMessageHint => 'Peyam ji bo Ally AI';
+
+  @override
+  String get aiSend => 'Bişîne';
+
+  @override
+  String get aiErrorUnauthenticated =>
+      'Ji bo bikaranîna Ally AI têkeve an wekî mêvan bidomîne.';
+
+  @override
+  String get aiErrorInvalidArgument =>
+      'Ji kerema xwe peyama xwe kontrol bike û dîsa biceribîne.';
+
+  @override
+  String get aiErrorRateLimit =>
+      'Te gihîştî sînorê daxwazên AI ya îro. Paşê dîsa biceribîne.';
+
+  @override
+  String get aiErrorUnavailable =>
+      'Ally AI niha bi demkî negihîştî ye. Dîsa biceribîne.';
+
+  @override
+  String get aiErrorGeneric =>
+      'Dema girêdana bi Ally AI re pirsgirêk çêbû. Dîsa biceribîne.';
+
+  @override
+  String aiGuestLimitHint(int remaining) {
+    return 'Îro $remaining daxwaz mane';
+  }
+
+  @override
+  String get chooseUnitsTitle => 'Yekînîyan bibijîne';
+
+  @override
+  String get chooseUnitsSubtitle =>
+      'Pergala pîvandinê ya xwe ya bijarte bibijîne';
+
+  @override
+  String get metricUnits => 'Metrik';
+
+  @override
+  String get imperialUnits => 'Împeryal';
+
+  @override
+  String get onboardWeightTitle => 'Kîlo te çend e?';
+
+  @override
+  String get onboardWeightSubtitle =>
+      'Ji bo kesanekirina rêwîtiya xwe alîkarî bike';
+
+  @override
+  String get onboardHeightTitle => 'Bilindahiya te çend e?';
+
+  @override
+  String get onboardHeightSubtitle => 'Em ê pîvandinên îdeal a te hesab bikin';
+
+  @override
+  String get onboardAgeTitle => 'Temên te çend e?';
+
+  @override
+  String get onboardAgeSubtitle =>
+      'Ka em plana tenduristiyê ya te ya bêkêmasî biafirînin';
+
+  @override
+  String get yearsUnit => 'sal';
 }

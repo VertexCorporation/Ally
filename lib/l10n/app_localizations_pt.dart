@@ -260,7 +260,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get getStarted => 'Começar';
 
   @override
-  String get startJourney => 'Iniciar Jornada';
+  String get startJourney => 'Iniciar jornada';
 
   @override
   String get personalizeJourney => 'Ajude-nos a personalizar sua jornada';
@@ -1272,7 +1272,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get sleepDuration => 'Duração do Sono';
 
   @override
-  String get noSleepData => 'Nenhum dado de sono registrado';
+  String get noSleepData => 'Ainda sem sono registado';
 
   @override
   String get noSleepDataYet => 'Nenhum dado de sono ainda';
@@ -2020,4 +2020,126 @@ class AppLocalizationsPt extends AppLocalizations {
   @override
   String get exitAppConfirmation =>
       'Tem certeza de que deseja sair desta plataforma incrível?';
+
+  @override
+  String get appearance => 'Aparência';
+
+  @override
+  String get personalInformation => 'Informações pessoais';
+
+  @override
+  String get goals => 'Objetivos';
+
+  @override
+  String get bmiTitle => 'Métricas corporais';
+
+  @override
+  String get enableAlarm => 'Ativar alarme';
+
+  @override
+  String get alarmTime => 'Hora do alarme';
+
+  @override
+  String get alarmBefore => 'Acordar antes';
+
+  @override
+  String get trackingEnabled => 'Monitorização automática ativada';
+
+  @override
+  String minutesShort(String count) {
+    return '$count min';
+  }
+
+  @override
+  String hello(String name) {
+    return 'Olá, $name!';
+  }
+
+  @override
+  String get todaysMetrics => 'Métricas de hoje';
+
+  @override
+  String get vitals => 'Sinais vitais';
+
+  @override
+  String get recentActivity => 'Atividade recente';
+
+  @override
+  String sleepGoalHint(String hours) {
+    return 'Meta: $hours h';
+  }
+
+  @override
+  String get allyAi => 'Ally AI';
+
+  @override
+  String get allyAiTagline => 'Pergunte tudo sobre a sua saúde';
+
+  @override
+  String get aiWelcome =>
+      'Olá! Sou a Ally AI. Pergunte-me tudo sobre a sua saúde e hábitos.';
+
+  @override
+  String get aiMessageHint => 'Mensagem para a Ally AI';
+
+  @override
+  String get aiSend => 'Enviar';
+
+  @override
+  String get aiErrorUnauthenticated =>
+      'Entre ou continue como convidado para usar a Ally AI.';
+
+  @override
+  String get aiErrorInvalidArgument =>
+      'Verifique a sua mensagem e tente novamente.';
+
+  @override
+  String get aiErrorRateLimit =>
+      'Atingiu o limite de pedidos de IA de hoje. Tente mais tarde.';
+
+  @override
+  String get aiErrorUnavailable =>
+      'A Ally AI está temporariamente indisponível. Tente novamente.';
+
+  @override
+  String get aiErrorGeneric =>
+      'Ocorreu um problema ao contactar a Ally AI. Tente novamente.';
+
+  @override
+  String aiGuestLimitHint(int remaining) {
+    return '$remaining pedidos restantes hoje';
+  }
+
+  @override
+  String get chooseUnitsTitle => 'Escolha as suas unidades';
+
+  @override
+  String get chooseUnitsSubtitle => 'Selecione o sistema de medição preferido';
+
+  @override
+  String get metricUnits => 'Métrico';
+
+  @override
+  String get imperialUnits => 'Imperial';
+
+  @override
+  String get onboardWeightTitle => 'Qual é o seu peso?';
+
+  @override
+  String get onboardWeightSubtitle => 'Ajude-nos a personalizar a sua jornada';
+
+  @override
+  String get onboardHeightTitle => 'Qual é a sua altura?';
+
+  @override
+  String get onboardHeightSubtitle => 'Calcularemos as suas métricas ideais';
+
+  @override
+  String get onboardAgeTitle => 'Qual é a sua idade?';
+
+  @override
+  String get onboardAgeSubtitle => 'Vamos criar o seu plano de saúde perfeito';
+
+  @override
+  String get yearsUnit => 'anos';
 }

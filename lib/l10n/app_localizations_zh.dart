@@ -259,7 +259,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get getStarted => '开始使用';
 
   @override
-  String get startJourney => '开启旅程';
+  String get startJourney => '开始旅程';
 
   @override
   String get personalizeJourney => '帮助我们个性化您的旅程';
@@ -1260,7 +1260,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get sleepDuration => '睡眠时长';
 
   @override
-  String get noSleepData => '无睡眠数据记录';
+  String get noSleepData => '暂无睡眠记录';
 
   @override
   String get noSleepDataYet => '暂无睡眠数据';
@@ -1982,4 +1982,120 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get exitAppConfirmation => '你确定要离开这个优秀的平台吗？';
+
+  @override
+  String get appearance => '外观';
+
+  @override
+  String get personalInformation => '个人信息';
+
+  @override
+  String get goals => '目标';
+
+  @override
+  String get bmiTitle => '身体指标';
+
+  @override
+  String get enableAlarm => '启用闹钟';
+
+  @override
+  String get alarmTime => '闹钟时间';
+
+  @override
+  String get alarmBefore => '提前叫醒';
+
+  @override
+  String get trackingEnabled => '已启用自动记录';
+
+  @override
+  String minutesShort(String count) {
+    return '$count 分钟';
+  }
+
+  @override
+  String hello(String name) {
+    return '你好，$name！';
+  }
+
+  @override
+  String get todaysMetrics => '今日指标';
+
+  @override
+  String get vitals => '生命体征';
+
+  @override
+  String get recentActivity => '最近活动';
+
+  @override
+  String sleepGoalHint(String hours) {
+    return '目标：$hours 小时';
+  }
+
+  @override
+  String get allyAi => 'Ally AI';
+
+  @override
+  String get allyAiTagline => '关于健康的一切都可以问';
+
+  @override
+  String get aiWelcome => '你好！我是 Ally AI。关于你的健康和习惯，尽管问我。';
+
+  @override
+  String get aiMessageHint => '给 Ally AI 发消息';
+
+  @override
+  String get aiSend => '发送';
+
+  @override
+  String get aiErrorUnauthenticated => '登录或以访客身份继续以使用 Ally AI。';
+
+  @override
+  String get aiErrorInvalidArgument => '请检查你的消息后重试。';
+
+  @override
+  String get aiErrorRateLimit => '你已达到今日 AI 请求上限，请稍后再试。';
+
+  @override
+  String get aiErrorUnavailable => 'Ally AI 暂时不可用，请重试。';
+
+  @override
+  String get aiErrorGeneric => '连接 Ally AI 时出现问题，请重试。';
+
+  @override
+  String aiGuestLimitHint(int remaining) {
+    return '今日剩余 $remaining 次请求';
+  }
+
+  @override
+  String get chooseUnitsTitle => '选择你的单位';
+
+  @override
+  String get chooseUnitsSubtitle => '选择你偏好的度量系统';
+
+  @override
+  String get metricUnits => '公制';
+
+  @override
+  String get imperialUnits => '英制';
+
+  @override
+  String get onboardWeightTitle => '你的体重是多少？';
+
+  @override
+  String get onboardWeightSubtitle => '帮助我们为你定制旅程';
+
+  @override
+  String get onboardHeightTitle => '你的身高是多少？';
+
+  @override
+  String get onboardHeightSubtitle => '我们将计算你的理想指标';
+
+  @override
+  String get onboardAgeTitle => '你多大了？';
+
+  @override
+  String get onboardAgeSubtitle => '一起制定完美的健康计划';
+
+  @override
+  String get yearsUnit => '岁';
 }

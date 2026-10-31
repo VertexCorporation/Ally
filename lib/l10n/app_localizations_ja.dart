@@ -259,7 +259,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get getStarted => '始める';
 
   @override
-  String get startJourney => '記録を始める';
+  String get startJourney => '旅を始める';
 
   @override
   String get personalizeJourney => 'あなたに合わせたプランを作成します';
@@ -1260,7 +1260,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get sleepDuration => '睡眠時間';
 
   @override
-  String get noSleepData => '睡眠データが記録されていません';
+  String get noSleepData => 'まだ睡眠データがありません';
 
   @override
   String get noSleepDataYet => '睡眠データはまだありません';
@@ -1997,4 +1997,120 @@ class AppLocalizationsJa extends AppLocalizations {
   @override
   String get exitAppConfirmation =>
       'Are you sure you want to leave this amazing platform?';
+
+  @override
+  String get appearance => '外観';
+
+  @override
+  String get personalInformation => '個人情報';
+
+  @override
+  String get goals => '目標';
+
+  @override
+  String get bmiTitle => '身体指標';
+
+  @override
+  String get enableAlarm => 'アラームを有効にする';
+
+  @override
+  String get alarmTime => 'アラーム時刻';
+
+  @override
+  String get alarmBefore => 'その前に起こす';
+
+  @override
+  String get trackingEnabled => '自動トラッキングを有効にしました';
+
+  @override
+  String minutesShort(String count) {
+    return '$count分';
+  }
+
+  @override
+  String hello(String name) {
+    return 'こんにちは、$nameさん！';
+  }
+
+  @override
+  String get todaysMetrics => '今日の指標';
+
+  @override
+  String get vitals => 'バイタル';
+
+  @override
+  String get recentActivity => '最近のアクティビティ';
+
+  @override
+  String sleepGoalHint(String hours) {
+    return '目標：$hours時間';
+  }
+
+  @override
+  String get allyAi => 'Ally AI';
+
+  @override
+  String get allyAiTagline => '健康について何でも聞いてください';
+
+  @override
+  String get aiWelcome => 'こんにちは！Ally AIです。健康や習慣について何でも聞いてください。';
+
+  @override
+  String get aiMessageHint => 'Ally AIにメッセージ';
+
+  @override
+  String get aiSend => '送信';
+
+  @override
+  String get aiErrorUnauthenticated => 'Ally AIを使うにはサインインするか、ゲストとして続行してください。';
+
+  @override
+  String get aiErrorInvalidArgument => 'メッセージを確認してもう一度お試しください。';
+
+  @override
+  String get aiErrorRateLimit => '本日のAIリクエスト上限に達しました。後でもう一度お試しください。';
+
+  @override
+  String get aiErrorUnavailable => 'Ally AIは一時的に利用できません。もう一度お試しください。';
+
+  @override
+  String get aiErrorGeneric => 'Ally AIへの接続中に問題が発生しました。もう一度お試しください。';
+
+  @override
+  String aiGuestLimitHint(int remaining) {
+    return '本日残り$remaining回';
+  }
+
+  @override
+  String get chooseUnitsTitle => '単位を選択';
+
+  @override
+  String get chooseUnitsSubtitle => '希望する計測システムを選択';
+
+  @override
+  String get metricUnits => 'メートル法';
+
+  @override
+  String get imperialUnits => 'ヤード・ポンド法';
+
+  @override
+  String get onboardWeightTitle => '体重は？';
+
+  @override
+  String get onboardWeightSubtitle => 'あなたの旅をパーソナライズしましょう';
+
+  @override
+  String get onboardHeightTitle => '身長は？';
+
+  @override
+  String get onboardHeightSubtitle => '理想の指標を計算します';
+
+  @override
+  String get onboardAgeTitle => '年齢は？';
+
+  @override
+  String get onboardAgeSubtitle => 'あなたに最適な健康プランを作りましょう';
+
+  @override
+  String get yearsUnit => '歳';
 }
